@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Buffet;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,9 +16,17 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
-    {
-        return view('auth.login');
+    public function create(Request $request)
+    {        
+        $buffet_slug = $request->slug;
+        $buffet = Buffet::where('slug', $buffet_slug)->first();
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->route('home');
+            //redirecionar para a landing page do sistema administrativo
+        } else {
+            // buffet exists
+            return view('auth.login', compact('buffet'));
+        }
     }
 
     /**
@@ -29,7 +38,14 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        $user = auth()->user();
+        if($user->buffet_id === null) {
+            return redirect()->intended(RouteServiceProvider::HOME);
+        }
+        // Caso seja um buffet
+        $buffet = Buffet::find($user->buffet_id);
+        return redirect()->route('dashboard_buffet', $buffet->slug);
+
     }
 
     /**
