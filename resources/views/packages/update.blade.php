@@ -1,7 +1,8 @@
 <x-app-layout>
     <h1>Editar Pacote</h1>
     <div>
-        <form method="POST" action="{{ route('package.store', ['buffet'=>$buffet]) }}">
+        <form method="POST" action="{{ route('package.update', ['buffet'=>$buffet]) }}">
+            @method('put')
             @csrf
 
             @if (session('success'))
@@ -13,7 +14,7 @@
             <!-- Name -->
             <div>
                 <x-input-label for="name_package" :value="__('Nome do Pacote')" />
-                <x-text-input id="name_package" class="block mt-1 w-full" type="text" name="name_package" :value="$package->name_package" required autofocus autocomplete="name_packeage" />
+                <x-text-input id="name_package" class="block mt-1 w-full" type="text" name="name_package" value="{{ old('name_package') ?? $package->name_package}}" required autofocus autocomplete="name_package" />
                 <x-input-error :messages="$errors->get('name_package')" class="mt-2" />
             </div>
 

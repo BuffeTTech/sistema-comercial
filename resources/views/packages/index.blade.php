@@ -5,6 +5,10 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <div class="overflow-auto">
+                        <div>
+                            <h1 class="inline-flex items-center border border-transparent text-lg leading-4 font-semi-bold">Listagem dos pacotes</h1>
+                            <h2><a href="{{ route('package.create', ['buffet'=> $buffet]) }}">Criar pacote</a></h2>
+                        </div>
                     <table class="w-full">
                         <thead class="bg-gray-50 border-b-2 border-gray-200">
                             <tr>
@@ -48,6 +52,7 @@
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
                                         <a href="{{ route('package.show', ['package'=>$value['slug'], 'buffet'=>$buffet]) }}" title="Visualizar '{{$value['name_package']}}'">👁️</a>
                                         <a href="{{ route('package.edit', ['package'=>$value['slug'], 'buffet'=>$buffet]) }}" title="Editar '{{$value['name_package']}}'">✏️</a>
+                                        <!-- colocar formulario de status aqui -->
                                         <!-- Se a pessoa está vendo esta página, ela por padrão ja é ADM ou comercial, logo nao preciso validar aqui! -->
 
                                     </td>

@@ -8,7 +8,6 @@ use App\Http\Requests\Packages\UpdatePackageRequest;
 use App\Models\Buffet;
 use App\Models\Package;
 use Illuminate\Http\Request;
-use Illuminate\Support\MessageBag;
 
 class PackageController extends Controller
 {
@@ -46,13 +45,13 @@ class PackageController extends Controller
             return null;
         }
 
-        $buffet = Buffet::where('slug', $request->buffet)->get()->first();
+        // $buffet = Buffet::where('slug', $request->buffet)->get()->first();
         $packages = $this->package->where('buffet', $buffet->id)->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
         return view('packages.index', ['packages'=>$packages, 'buffet'=>$buffet_slug]);
     }
 
     public function not_found() {
-        return view('packages.package-not-found');
+        return view('package.package-not-found');
     }
 
     /**
@@ -110,7 +109,7 @@ class PackageController extends Controller
         //     unset($request->images);
         // }
 
-        return redirect()->route('package.show', $package->slug);
+        return redirect()->route('packages.show', $package->slug);
 
         
     }
@@ -122,11 +121,12 @@ class PackageController extends Controller
     {
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
-
+        
         if(!$package = $this->package->where('slug', $request->package)->get()->first()){
-            return redirect()->route('package.index', $buffet_slug)->with('errors', 'Package not found');
+            return redirect()->route('packages.index', $buffet_slug)->with('errors', 'Package not found');
         }
 
+        // $package = $this->package->where('buffet', $buffet->id);
 
         return view('packages.show', ['package'=>$package, 'buffet'=>$buffet_slug]);
     }
@@ -134,13 +134,17 @@ class PackageController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Package $package, Request $request)
+    public function edit(Request $request)
     {
+        $buffet_slug = $request->buffet;
+        $buffet = Buffet::where('slug', $buffet_slug)->first();
+        // dd($request->buffet, $request->package); 
         if (!$package = $this->package->where('slug', $request->slug)->get()->first()) {
             return redirect()->back()->with('errors', 'Package not found');
+            
         }
 
-        return view('packages.update', compact('package'));
+        return view('packages.update', ['package'=> $package, 'buffet'=>$buffet_slug]);
     }
 
     /**
@@ -152,22 +156,31 @@ class PackageController extends Controller
             return redirect()->back()->with('errors', 'Package already exists');
         }
 
-        $package = $this->package->find($request->id);
-
-        return redirect()->route('packages.show', $package->slug);
+        return redirect()->route('packages.show', $package->package);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Package $package, Request $request)
-    {
-        if ($package = $this->package->where('slug', $request->slug)->get()->first()) {
-            return redirect()->route('packages.not_found');
-        }
+     public function destroy(Package $package, Request $request)
+     {
+         if ($package = $this->package->where('slug', $request->slug)->get()->first()) {
+             return redirect()->route('package.not_found');
+         }
+// 
+         $package->update(['status' => 'unactive']);
+// 
+         return redirect()->route('package.index');
+     }
 
-        $package->update(['status' => 'unactive']);
-
-        return redirect()->route('packages.index');
-    }
+    // public function change_status(Request $request)
+    // {
+    //     if (!$package = $this->package->where('slug', $request->slug)->get()->first()) {
+    //         return redirect()->back()->with('errors', 'Package not found');
+    //     }
+// 
+    //     $this->package->change_status($package->id);
+// 
+    //     return redirect()->route('packages.index');
+    // }
 }

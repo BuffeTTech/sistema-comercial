@@ -13,7 +13,7 @@
             <!-- Name -->
             <div>
                 <x-input-label for="name_package" :value="__('Nome do Pacote')" />
-                <x-text-input id="name_package" class="block mt-1 w-full" type="text" name="name_package" :value="old('name_package')" required autofocus autocomplete="name_packeage" />
+                <x-text-input id="name_package" class="block mt-1 w-full" type="text" name="name_package" :value="old('name_package')" required autofocus autocomplete="name_package" />
                 <x-input-error :messages="$errors->get('name_package')" class="mt-2" />
             </div>
 
@@ -50,7 +50,7 @@
 
             <div class="flex items-center justify-end mt-4">
                 <x-primary-button class="ms-4">
-                    {{ __('Register') }}
+                    Criar Pacote 
                 </x-primary-button>
             </div>
         </form>
