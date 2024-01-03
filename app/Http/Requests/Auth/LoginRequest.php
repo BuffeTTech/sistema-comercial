@@ -46,7 +46,7 @@ class LoginRequest extends FormRequest
 
         $credentials = $this->only('email', 'password');
 
-        $buffet = Buffet::where('slug', $this->slug)->first();
+        $buffet = Buffet::where('slug', $this->buffet)->first();
         // Buffet nao existe
         if(!$buffet) {
             throw ValidationException::withMessages([
@@ -60,6 +60,7 @@ class LoginRequest extends FormRequest
                 'email' => trans('auth.failed'),
             ]);
         }
+
 
         // Caso o usuario seja um administrador, o buffet_id é nulo, logo preciso adaptar as credenciais enviadas
         $credentials['buffet_id'] = $user->buffet_id;

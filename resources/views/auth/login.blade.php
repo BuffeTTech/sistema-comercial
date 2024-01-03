@@ -4,7 +4,7 @@
 
     <h1 class="text-white text-xl font-bold mb-4 ">Buffet {{ $buffet->trading_name }}</h1>
 
-    <form method="POST" action="{{ route('login', ['slug'=>$buffet->slug]) }}">
+    <form method="POST" action="{{ route('login', ['buffet'=>$buffet->slug]) }}">
         @csrf
 
         <!-- Email Address -->

@@ -18,7 +18,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(Request $request)
     {        
-        $buffet_slug = $request->slug;
+        $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         if(!$buffet || !$buffet_slug) {
             return redirect()->route('home');

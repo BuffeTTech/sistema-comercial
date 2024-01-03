@@ -48,10 +48,6 @@ class UserFactory extends Factory
             'status' => fake()->randomElement(array_column(UserStatus::cases(), 'name')),
             'remember_token' => Str::random(10),
             'buffet_id' => fake()->randomElement($buffets),
-            // 'buffet_id' => function () {
-            //     dd('aaa');
-            //     return Buffet::factory()->create()->id;
-            // },
         ];
     }
 

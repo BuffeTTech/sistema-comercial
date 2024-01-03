@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $user = User::create([
-            'name' => "Guilherme Andrade",
+            'name' => "Guilherme",
             'email' => "teste@teste.com",
             'email_verified_at' => now(),
             'password' => Hash::make('password'),
@@ -44,8 +44,27 @@ class DatabaseSeeder extends Seeder
             'owner_id' => $user->id,
             'status' => BuffetStatus::ACTIVE->name,
         ]);
+
+        $buffet = Buffet::create([
+            'trading_name' => 'Buffet Felicidade',
+            'email' => 'buffet@felicidade.com',
+            'slug' => 'buffet-felicidade',
+            'document' => "47.592.257/0001-50",
+            'owner_id' => $user->id,
+            'status' => BuffetStatus::ACTIVE->name,
+        ]);
+
+        // $buffet = Buffet::create([
+        //     'trading_name' => 'Buffet Família',
+        //     'email' => 'buffet@familia.com',
+        //     'slug' => 'buffet-familia',
+        //     'document' => "47.592.257/0001-70",
+        //     'owner_id' => $user->id,
+        //     'status' => BuffetStatus::UNACTIVE->name,
+        // ]);
+
         $user = User::create([
-            'name' => "Guilherme Andrade",
+            'name' => "GuilhermeX",
             'email' => "usuario@teste.com",
             'email_verified_at' => now(),
             'password' => Hash::make('password'),
@@ -54,7 +73,42 @@ class DatabaseSeeder extends Seeder
             'status' => UserStatus::ACTIVE->name,
             'buffet_id' => $buffet->id,
         ]);
+        
 
+        $user = User::create([
+            'name' => "Luiza",
+            'email' => "usuario2@teste.com",
+            'email_verified_at' => now(),
+            'password' => Hash::make('password'),
+            'document' => "269.803.080-48",
+            'document_type' => "CPF",
+            'status' => UserStatus::ACTIVE->name,
+            'buffet_id' => $buffet->id,
+        ]);
+
+        $user = User::create([
+            'name' => "Ximenes",
+            'email' => "usuario3@teste.com",
+            'email_verified_at' => now(),
+            'password' => Hash::make('password'),
+            'document' => "269.803.080-62",
+            'document_type' => "CPF",
+            'status' => UserStatus::ACTIVE->name,
+            'buffet_id' => $buffet->id,
+        ]);
+
+        $user = User::create([
+            'name' => "Rafael",
+            'email' => "usuario4@teste.com",
+            'email_verified_at' => now(),
+            'password' => Hash::make('password'),
+            'document' => "269.803.080-02",
+            'document_type' => "CPF",
+            'status' => UserStatus::ACTIVE->name,
+            'buffet_id' => $buffet->id,
+        ]);
+
+        
 
         // \App\Models\User::factory(10)->create();
 
