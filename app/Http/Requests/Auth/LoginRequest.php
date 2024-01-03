@@ -2,6 +2,9 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Enums\BuffetStatus;
+use App\Models\Buffet;
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -41,7 +44,28 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $credentials = $this->only('email', 'password');
+
+        $buffet = Buffet::where('slug', $this->buffet)->first();
+        // Buffet nao existe
+        if(!$buffet) {
+            throw ValidationException::withMessages([
+                'buffet' => trans('auth.failed'),
+            ]);
+        }
+        $credentials['buffet_id'] = $buffet->id;
+
+        if (!$user = $this->validateBuffet($credentials, $buffet)) {
+            throw ValidationException::withMessages([
+                'email' => trans('auth.failed'),
+            ]);
+        }
+
+
+        // Caso o usuario seja um administrador, o buffet_id é nulo, logo preciso adaptar as credenciais enviadas
+        $credentials['buffet_id'] = $user->buffet_id;
+
+        if (!Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -50,6 +74,30 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+    }
+
+    protected function validateBuffet(array $credentials, Buffet $buffet)
+    {
+        // if(!$buffet) return false;
+
+        // if($buffet->status !== BuffetStatus::ACTIVE->name) {
+        //     // retornar erro depois
+        // }
+
+        // Busca a existencia de um usuario em que o e-mail é válido e o buffet_id seja igual ao buffet que está tentando logar
+        $users = User::where('email', $credentials['email'])->get();
+        $isValidBuffet = $users->first(function ($user) use ($buffet) {
+            return $user->buffet_id === $buffet->id;
+        });
+
+        if($isValidBuffet) return $isValidBuffet;
+
+        // Caso não exista este usuário cadastrado, verifica se é administrador do buffet
+        $isValidOwnerBuffet = $users->first(function ($user) use ($buffet) {
+            return $user->id === $buffet->owner_id;
+        });
+
+        return $isValidOwnerBuffet ?? false;
     }
 
     /**
