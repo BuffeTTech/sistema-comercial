@@ -110,7 +110,7 @@ class PackageController extends Controller
         //     unset($request->images);
         // }
 
-        return redirect()->route('package.show', ['package'=>$package->package, 'buffet'=>$buffet_slug]);
+        return redirect()->route('package.show', ['package'=>$package, 'buffet'=>$buffet_slug]);
 
         
     }

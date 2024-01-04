@@ -12,7 +12,20 @@
                         $class_active = "p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50";
                         $class_unactive = 'p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50';
                         @endphp
-                        <p><strong>Status:</strong><span class="{{ $package->status == 1 ? $class_active : $class_unactive }}">{{ $package->status == 1 ? "Ativado" : "Desativado" }}</span></p><br>
+                        <p><strong>Status:</strong>
+                            <form action="{{ route('package.change_status', ['buffet' => $buffet, 'package' => $package['slug']]) }}" method="post" class="inline">
+                                @csrf
+                                @method('patch')
+
+                                <label for="status" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"></label>
+                                <select name="status" id="status" required onchange="this.form.submit()">
+                                    @foreach( App\Enums\PackageStatus::array() as $key=>$status )
+                                        <option value="{{$status}}" {{ $package['status'] == $status ? 'selected' : ""}}>{{$key}}</option>
+                                    @endforeach
+                                    <!-- <option value="invalid2"  disabled>Nenhum horario disponivel neste dia, tente novamente!</option> -->
+                                </select>
+                            </form>
+                        </p><br>
                         <p><strong>Descricao das comidas:</strong></p>
                         {!! $package->food_description !!}
                         <br>

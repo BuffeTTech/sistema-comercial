@@ -46,25 +46,10 @@
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{!! mb_strimwidth($value['beverages_description'], 0, $limite_char, " ...") !!}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">R$ {{ (float)$value['price'] }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['slug'] }}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                        <span class="{{ $value['status'] == 1 ? $class_active : $class_unactive }}">{{ $value['status'] == 1 ? "Ativado" : "Desativado" }}</span>
-                                    </td>
+                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.package_status :status="$value['status']" /></td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
                                         <a href="{{ route('package.show', ['package'=>$value['slug'], 'buffet'=>$buffet]) }}" title="Visualizar '{{$value['name_package']}}'">👁️</a>
                                         <a href="{{ route('package.edit', ['package'=>$value['slug'], 'buffet'=>$buffet]) }}" title="Editar '{{$value['name_package']}}'">✏️</a>
-                                        <!-- colocar formulario de status aqui -->
-                                        <form action="{{ route('package.change_status', ['buffet' => $buffet, 'package' => $value['slug']]) }}" method="post" class="inline">
-                                            @csrf
-                                            @method('patch')
-
-                                            <label for="status" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"></label>
-                                            <select name="status" id="status" required onchange="this.form.submit()">
-                                                @foreach( App\Enums\PackageStatus::array() as $key=>$status )
-                                                    <option value="{{$status}}" {{ $value['status'] == $status ? 'selected' : ""}}>{{$key}}</option>
-                                                @endforeach
-                                                <!-- <option value="invalid2"  disabled>Nenhum horario disponivel neste dia, tente novamente!</option> -->
-                                            </select>
-                                        </form>
                                         
                                         <!-- Se a pessoa está vendo esta página, ela por padrão ja é ADM ou comercial, logo nao preciso validar aqui! -->
 
