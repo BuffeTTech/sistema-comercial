@@ -1,7 +1,7 @@
 <x-app-layout>
     <h1>Criar Pacote</h1>
     <div>
-        <form method="POST" action="{{ route('package.store', ['buffet'=>$buffet]) }}">
+        <form method="POST" action="{{ route('package.store', ['buffet'=>$buffet->slug]) }}">
             @csrf
 
             @if (session('success'))

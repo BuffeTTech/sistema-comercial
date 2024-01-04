@@ -45,7 +45,7 @@ class PackageController extends Controller
             return null;
         }
 
-        // $buffet = Buffet::where('slug', $request->buffet)->get()->first();
+        $buffet = Buffet::where('slug', $request->buffet)->get()->first();
         $packages = $this->package->where('buffet', $buffet->id)->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
         return view('packages.index', ['packages'=>$packages, 'buffet'=>$buffet_slug]);
     }
@@ -68,7 +68,7 @@ class PackageController extends Controller
 
         // buffet exists
 
-        return view('packages.create', ['buffet'=>$buffet_slug]);
+        return view('packages.create', ['buffet'=>$buffet]);
     }
 
     /**
@@ -77,14 +77,15 @@ class PackageController extends Controller
     public function store(StorePackageRequest $request)
     {
         $slug = str_replace(' ', '-', $request->slug);
-        if($this->package->where('slug', $request->slug)->get()->first()){
+        $buffet_slug = $request->buffet;
+        $buffet = Buffet::where('slug', $buffet_slug)->first();
+        if($this->package->where('slug', $request->package)->where('buffet', $buffet->id)->get()->first()){
             return redirect()->back()->with('errors', 'Package already exists');
         }
 
         // if(!isset($request->images) || count($request->images) != 3) {
         //     return redirect()->back()->with('errors', 'Não existem 3 fotos na requisição');
         // }
-        $buffet = Buffet::where('slug', $request->buffet)->get()->first();
         
         $package = $this->package->create([
             "name_package"=>$request->name_package,
@@ -109,7 +110,7 @@ class PackageController extends Controller
         //     unset($request->images);
         // }
 
-        return redirect()->route('packages.show', $package->slug);
+        return redirect()->route('package.show', ['package'=>$package->package, 'buffet'=>$buffet_slug]);
 
         
     }
@@ -122,8 +123,8 @@ class PackageController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         
-        if(!$package = $this->package->where('slug', $request->package)->get()->first()){
-            return redirect()->route('packages.index', $buffet_slug)->with('errors', 'Package not found');
+        if(!$package = $this->package->where('slug', $request->package)->where('buffet', $buffet->id)->get()->first()){
+            return redirect()->route('package.index', $buffet_slug)->with('errors', 'Package not found');
         }
 
         // $package = $this->package->where('buffet', $buffet->id);
@@ -139,24 +140,45 @@ class PackageController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         // dd($request->buffet, $request->package); 
-        if (!$package = $this->package->where('slug', $request->slug)->get()->first()) {
+        if (!$package = $this->package->where('slug', $request->package)->where('buffet', $buffet->id)->get()->first() ) {
             return redirect()->back()->with('errors', 'Package not found');
             
         }
 
-        return view('packages.update', ['package'=> $package, 'buffet'=>$buffet_slug]);
+        return view('packages.update', ['package'=> $package, 'buffet'=>$buffet]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePackageRequest $request, Package $package)
+    public function update(UpdatePackageRequest $request)
     {
-        if($this->package->where('slug', $request->slug)->get()->first()){
-            return redirect()->back()->with('errors', 'Package already exists');
+        $buffet_slug = $request->buffet;
+        $buffet = Buffet::where('slug', $buffet_slug)->first();
+
+        $package = $this->package->where('slug', $request->package)->where('buffet', $buffet->id)->get()->first();
+        if(!$package){
+            return redirect()->back()->withErrors(['slug' => 'Package not found.'])->withInput();
         }
 
-        return redirect()->route('packages.show', $package->package);
+        $package_exists = $this->package->where('slug', $request->slug)->where('buffet', $buffet->id)->get()->first();
+        if($package_exists && $package_exists->id !== $package->id) {
+            return redirect()->back()->withErrors(['slug' => 'Package already exists.'])->withInput();
+        }
+
+        $package->update([
+            "name_package" => $request->name_package,
+            "food_description" => $request->food_description,
+            "beverages_description" => $request->beverages_description,
+            "status" => $request->status ?? PackageStatus::ACTIVE->name,
+            "price" => $request->price,
+            "slug" => $request->slug,
+            "buffet" => $buffet->id,
+        ]);
+
+        $pk = $this->package->find($package->id);
+
+        return redirect()->route('package.show', ['package'=>$pk->slug, 'buffet'=>$buffet_slug]);
     }
 
     /**
@@ -164,23 +186,29 @@ class PackageController extends Controller
      */
      public function destroy(Package $package, Request $request)
      {
-         if ($package = $this->package->where('slug', $request->slug)->get()->first()) {
+        $buffet_slug = $request->buffet;
+        $buffet = Buffet::where('slug', $buffet_slug)->first();
+         if ($package = $this->package->where('slug', $request->package)->where('buffet', $buffet->id)->get()->first()) {
              return redirect()->route('package.not_found');
          }
-// 
-         $package->update(['status' => 'unactive']);
-// 
-         return redirect()->route('package.index');
+
+         $package->update(['status' => PackageStatus::UNACTIVE->name]);
+
+         return redirect()->route('package.index', ['buffet'=>$buffet_slug]);
      }
 
-    // public function change_status(Request $request)
-    // {
-    //     if (!$package = $this->package->where('slug', $request->slug)->get()->first()) {
-    //         return redirect()->back()->with('errors', 'Package not found');
-    //     }
-// 
-    //     $this->package->change_status($package->id);
-// 
-    //     return redirect()->route('packages.index');
-    // }
+     public function change_status(Request $request)
+     {
+        $buffet_slug = $request->buffet;
+        $buffet = Buffet::where('slug', $buffet_slug)->first();
+
+        $package = $this->package->where('slug', $request->package)->where('buffet', $buffet->id)->get()->first();
+        if (!$package) {
+            return redirect()->back()->with('errors', 'Package not found');
+        }
+
+        $package->update(['status'=>$request->status]);
+
+        return redirect()->route('package.index', ['buffet'=>$buffet_slug]);
+     }
 }

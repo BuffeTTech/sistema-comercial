@@ -22,7 +22,7 @@ return new class extends Migration
             $table->float('price');
             $table->string('slug')->unique();
             $table->foreignId('buffet')->constrained(
-                table: 'buffets', indexName: 'buffet_id'
+                table: 'buffets', indexName: 'packages_buffet_id'
             );
             $table->timestamps();
         });

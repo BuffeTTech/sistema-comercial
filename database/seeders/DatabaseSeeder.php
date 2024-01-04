@@ -45,6 +45,17 @@ class DatabaseSeeder extends Seeder
             'status' => BuffetStatus::ACTIVE->name,
         ]);
 
+        $user1 = User::create([
+            'name' => "GuilhermeX",
+            'email' => "usuarioee@teste.com",
+            'email_verified_at' => now(),
+            'password' => Hash::make('password'),
+            'document' => "269.803.080-11",
+            'document_type' => "CPF",
+            'status' => UserStatus::ACTIVE->name,
+            'buffet_id' => $buffet->id,
+        ]);
+
         $buffet = Buffet::create([
             'trading_name' => 'Buffet Felicidade',
             'email' => 'buffet@felicidade.com',

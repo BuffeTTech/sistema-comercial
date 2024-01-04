@@ -1,7 +1,7 @@
 <x-app-layout>
     <h1>Editar Pacote</h1>
     <div>
-        <form method="POST" action="{{ route('package.update', ['buffet'=>$buffet]) }}">
+        <form method="POST" action="{{ route('package.update', ['buffet'=>$buffet->slug, 'package'=>$package->slug]) }}">
             @method('put')
             @csrf
 
@@ -20,7 +20,7 @@
 
             <div>
                 <x-input-label for="slug" :value="__('Slug')" />
-                <x-text-input id="slug" class="block mt-1 w-full" type="text" name="name" :value="$package->slug" required autofocus autocomplete="slug" />
+                <x-text-input id="slug" class="block mt-1 w-full" type="text" name="slug" :value="$package->slug" required autofocus autocomplete="slug" />
                 <x-input-error :messages="$errors->get('slug')" class="mt-2" />
             </div>
 

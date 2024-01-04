@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Buffet extends Model
 {
     use HasFactory;
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
 }
