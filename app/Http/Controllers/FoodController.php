@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\PackageStatus;
-use App\Http\Requests\Packages\StorePackageRequest;
-use App\Http\Requests\Packages\UpdatePackageRequest;
+use App\Enums\FoodStatus;
+use App\Http\Requests\Foods\StoreFoodRequest;
+use App\Http\Requests\Foods\UpdateFoodRequest;
 use App\Models\Buffet;
-use App\Models\Package;
+use App\Models\Food;
 use Illuminate\Http\Request;
 
-class PackageController extends Controller
+class FoodController extends Controller
 {
     public function __construct(
-        protected Package $package
+        protected Food $food
     ) {
     }
 
@@ -24,7 +24,7 @@ class PackageController extends Controller
             
     //         $photo = 'photo_'.$dto->image_id;
     
-    //         return $package->where('slug',$dto->slug)->update([$photo=>$dto->photo]);
+    //         return $food->where('slug',$dto->slug)->update([$photo=>$dto->photo]);
     
     //         return back();
     //     }
@@ -46,12 +46,12 @@ class PackageController extends Controller
         }
 
         $buffet = Buffet::where('slug', $request->buffet)->get()->first();
-        $packages = $this->package->where('buffet', $buffet->id)->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
-        return view('packages.index', ['packages'=>$packages, 'buffet'=>$buffet_slug]);
+        $foods = $this->food->where('buffet', $buffet->id)->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
+        return view('foods.index', ['foods'=>$foods, 'buffet'=>$buffet_slug]);
     }
 
     public function not_found() {
-        return view('package.package-not-found');
+        return view('food.food-not-found');
     }
 
     /**
@@ -68,30 +68,30 @@ class PackageController extends Controller
 
         // buffet exists
 
-        return view('packages.create', ['buffet'=>$buffet]);
+        return view('foods.create', ['buffet'=>$buffet]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePackageRequest $request)
+    public function store(StoreFoodRequest $request)
     {
         $slug = str_replace(' ', '-', $request->slug);
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
-        if($this->package->where('slug', $request->package)->where('buffet', $buffet->id)->get()->first()){
-            return redirect()->back()->with('errors', 'Package already exists');
+        if($this->food->where('slug', $request->food)->where('buffet', $buffet->id)->get()->first()){
+            return redirect()->back()->with('errors', 'food already exists');
         }
 
         // if(!isset($request->images) || count($request->images) != 3) {
         //     return redirect()->back()->with('errors', 'Não existem 3 fotos na requisição');
         // }
         
-        $package = $this->package->create([
-            "name_package"=>$request->name_package,
+        $food = $this->food->create([
+            "name_food"=>$request->name_food,
             "food_description"=>$request->food_description,
             "beverages_description"=>$request->beverages_description,
-            "status"=>$request->status ?? PackageStatus::ACTIVE->name,
+            "status"=>$request->status ?? FoodStatus::ACTIVE->name,
             "price"=>$request->price,
             "slug"=>$slug,
             "buffet"=>$buffet->id,
@@ -110,7 +110,7 @@ class PackageController extends Controller
         //     unset($request->images);
         // }
 
-        return redirect()->route('package.show', ['package'=>$package, 'buffet'=>$buffet_slug]);
+        return redirect()->route('food.show', ['food'=>$food, 'buffet'=>$buffet_slug]);
 
         
     }
@@ -123,13 +123,13 @@ class PackageController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         
-        if(!$package = $this->package->where('slug', $request->package)->where('buffet', $buffet->id)->get()->first()){
-            return redirect()->route('package.index', $buffet_slug)->with('errors', 'Package not found');
+        if(!$food = $this->food->where('slug', $request->food)->where('buffet', $buffet->id)->get()->first()){
+            return redirect()->route('food.index', $buffet_slug)->with('errors', 'food not found');
         }
 
-        // $package = $this->package->where('buffet', $buffet->id);
+        // $food = $this->food->where('buffet', $buffet->id);
 
-        return view('packages.show', ['package'=>$package, 'buffet'=>$buffet_slug]);
+        return view('foods.show', ['food'=>$food, 'buffet'=>$buffet_slug]);
     }
 
     /**
@@ -139,62 +139,62 @@ class PackageController extends Controller
     {
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
-        // dd($request->buffet, $request->package); 
-        if (!$package = $this->package->where('slug', $request->package)->where('buffet', $buffet->id)->get()->first() ) {
-            return redirect()->back()->with('errors', 'Package not found');
+        // dd($request->buffet, $request->food); 
+        if (!$food = $this->food->where('slug', $request->food)->where('buffet', $buffet->id)->get()->first() ) {
+            return redirect()->back()->with('errors', 'food not found');
             
         }
 
-        return view('packages.update', ['package'=> $package, 'buffet'=>$buffet]);
+        return view('foods.update', ['food'=> $food, 'buffet'=>$buffet]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePackageRequest $request)
+    public function update(UpdateFoodRequest $request)
     {
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
 
-        $package = $this->package->where('slug', $request->package)->where('buffet', $buffet->id)->get()->first();
-        if(!$package){
-            return redirect()->back()->withErrors(['slug' => 'Package not found.'])->withInput();
+        $food = $this->food->where('slug', $request->food)->where('buffet', $buffet->id)->get()->first();
+        if(!$food){
+            return redirect()->back()->withErrors(['slug' => 'food not found.'])->withInput();
         }
 
-        $package_exists = $this->package->where('slug', $request->slug)->where('buffet', $buffet->id)->get()->first();
-        if($package_exists && $package_exists->id !== $package->id) {
-            return redirect()->back()->withErrors(['slug' => 'Package already exists.'])->withInput();
+        $food_exists = $this->food->where('slug', $request->slug)->where('buffet', $buffet->id)->get()->first();
+        if($food_exists && $food_exists->id !== $food->id) {
+            return redirect()->back()->withErrors(['slug' => 'food already exists.'])->withInput();
         }
 
-        $package->update([
-            "name_package" => $request->name_package,
+        $food->update([
+            "name_food" => $request->name_food,
             "food_description" => $request->food_description,
             "beverages_description" => $request->beverages_description,
-            "status" => $request->status ?? PackageStatus::ACTIVE->name,
+            "status" => $request->status ?? FoodStatus::ACTIVE->name,
             "price" => $request->price,
             "slug" => $request->slug,
             "buffet" => $buffet->id,
         ]);
 
-        $pk = $this->package->find($package->id);
+        $pk = $this->food->find($food->id);
 
-        return redirect()->route('package.show', ['package'=>$pk->slug, 'buffet'=>$buffet_slug]);
+        return redirect()->route('food.show', ['food'=>$pk->slug, 'buffet'=>$buffet_slug]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-     public function destroy(Package $package, Request $request)
+     public function destroy(Food $food, Request $request)
      {
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
-         if ($package = $this->package->where('slug', $request->package)->where('buffet', $buffet->id)->get()->first()) {
-             return redirect()->route('package.not_found');
+         if ($food = $this->food->where('slug', $request->food)->where('buffet', $buffet->id)->get()->first()) {
+             return redirect()->route('food.not_found');
          }
 
-         $package->update(['status' => PackageStatus::UNACTIVE->name]);
+         $food->update(['status' => FoodStatus::UNACTIVE->name]);
 
-         return redirect()->route('package.index', ['buffet'=>$buffet_slug]);
+         return redirect()->route('food.index', ['buffet'=>$buffet_slug]);
      }
 
      public function change_status(Request $request)
@@ -202,13 +202,13 @@ class PackageController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
 
-        $package = $this->package->where('slug', $request->package)->where('buffet', $buffet->id)->get()->first();
-        if (!$package) {
-            return redirect()->back()->with('errors', 'Package not found');
+        $food = $this->food->where('slug', $request->food)->where('buffet', $buffet->id)->get()->first();
+        if (!$food) {
+            return redirect()->back()->with('errors', 'food not found');
         }
 
-        $package->update(['status'=>$request->status]);
+        $food->update(['status'=>$request->status]);
 
-        return redirect()->route('package.index', ['buffet'=>$buffet_slug]);
+        return redirect()->route('food.index', ['buffet'=>$buffet_slug]);
      }
 }

@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\BuffetController;
-use App\Http\Controllers\PackageController;
+use App\Http\Controllers\FoodController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
@@ -24,8 +24,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     Route::get('{buffet}/dashboard', [BuffetController::class, 'dashboard'])->name('dashboard_buffet');
 
-    Route::resource('{buffet}/package', PackageController::class);
-    Route::patch('/{buffet}/package/{package}/change_status', [PackageController::class,'change_status'])->name('package.change_status');
+    Route::resource('{buffet}/food', FoodController::class);
+    Route::patch('/{buffet}/food/{food}/change_status', [FoodController::class,'change_status'])->name('food.change_status');
 
 });
 

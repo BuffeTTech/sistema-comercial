@@ -19,5 +19,5 @@
         }
     @endphp
 
-    <span class="{{$class}}">{{ \App\Enums\PackageStatus::getEnumByName($status) }}</span>
+    <span class="{{$class}}">{{ \App\Enums\FoodStatus::getEnumByName($status) }}</span>
 @endif

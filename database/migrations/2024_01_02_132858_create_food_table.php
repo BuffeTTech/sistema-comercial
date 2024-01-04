@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\PackageStatus;
+use App\Enums\FoodStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,17 +12,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('packages', function (Blueprint $table) {
+        Schema::create('food', function (Blueprint $table) {
             $table->id();
-            $table->string('name_package', 255);
+            $table->string('name_food', 255);
             $table->text('food_description');
             $table->text('beverages_description');
             /** $table->text('description') */
-            $table->enum('status', array_column(PackageStatus::cases(), 'name'));
+            $table->enum('status', array_column(FoodStatus::cases(), 'name'));
             $table->float('price');
             $table->string('slug')->unique();
             $table->foreignId('buffet')->constrained(
-                table: 'buffets', indexName: 'packages_buffet_id'
+                table: 'buffets', indexName: 'foods_buffet_id'
             );
             $table->timestamps();
         });
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('packages');
+        Schema::dropIfExists('foods');
     }
 };

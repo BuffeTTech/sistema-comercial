@@ -6,8 +6,10 @@ namespace Database\Seeders;
 
 use App\Enums\BuffetStatus;
 use App\Enums\UserStatus;
+use App\Enums\FoodStatus;
 use App\Models\Buffet;
 use App\Models\User;
+use app\Models\Food;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -23,6 +25,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             BuffetSeeder::class,
             UserSeeder::class,
+            FoodSeeder::class, 
         ]);
 
         $user = User::create([
@@ -119,6 +122,17 @@ class DatabaseSeeder extends Seeder
             'buffet_id' => $buffet->id,
         ]);
 
+        // $food = Food::create([
+        //     
+        //     'name_food' => "Pacote Bolo",
+        //     'food_description' => "Bolo",
+        //     'beverages_description' => "Bolo liquido",
+        //     'status' =>FoodStatus::ACTIVE->name, ,
+        //     'price' => "10",
+        //     'slug' => "pacote-bolo",
+        //     'buffet_id' => null,
+        //     
+        // ]);
         
 
         // \App\Models\User::factory(10)->create();
