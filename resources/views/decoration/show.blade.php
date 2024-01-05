@@ -25,9 +25,11 @@
                             </div>
                         </a>
                     </div>
-
-                </div>
-
+                    <form action="{{ route('decoration.destroy', ['buffet'=>$buffet->slug, 'decoration'=>$decoration->slug]) }}" method="post" class="inline form">
+                        @csrf
+                        @method("delete")
+                        <button type="submit" title="Deletar '{{$decoration->main_theme}}'" class="bg-red-600 hover:bg-red-800 text-white font-bold py-2 px-4 rounded inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4">Excluir</button>
+                    </form>
                 {{-- <div class="p-6 text-gray-900 float-right" style="width: 50%;">
                     <!-- Imagens -->
                     <img src="{{asset('storage/decorations/'.$decoration->photo_1)}}" alt="foto1">

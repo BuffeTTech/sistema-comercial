@@ -97,8 +97,13 @@ class DecorationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Decoration $decoration)
+    public function destroy(Request $request)
     {
-        //
+        $buffet = $this->buffet->where('slug',$request->buffet)->get()->first();
+        $decoration = $this->decoration->where('slug',$request->decoration)->update([
+            'status'=> DecorationStatus::UNACTIVE->name
+        ]);
+        return redirect()->route('decoration.index',['buffet'=>$buffet->slug]);
+
     }
 }
