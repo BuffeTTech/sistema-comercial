@@ -10,6 +10,7 @@
                 </div>
             @endif
 
+
             <!-- Name -->
             <div>
                 <x-input-label for="main_theme" :value="__('Tema Principal')" />

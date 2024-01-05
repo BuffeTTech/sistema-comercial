@@ -23,6 +23,7 @@ class DecorationController extends Controller
      */
     public function index(Request $request)
     {
+
         $buffet = $this->buffet->where('slug',$request->buffet)->get()->first();
         $decorations = $this->decoration->where('buffet_id',$buffet->id)->get();
         return view('decoration.index',['decorations'=>$decorations,'buffet'=>$buffet],);
@@ -43,8 +44,7 @@ class DecorationController extends Controller
      */
     public function store(StoreDecorationRequest $request)
     {
-        $buffet = $this->buffet->where('slug',$request->buffet)->get()->first();
-
+        $buffet = $this->buffet->where('id',$request->buffet)->get()->first();
         $decoration = $this->decoration->create([
             'main_theme'=>$request->main_theme,
             'slug'=>$request->slug,
@@ -59,25 +59,39 @@ class DecorationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Decoration $decoration)
+    public function show(Request $request)
     {
-        //
+        $buffet = $this->buffet->where('slug',$request->buffet)->get()->first();
+        $decoration = $this->decoration->where('slug',$request->decoration)->get()->first();
+        return view('decoration.show',['buffet'=>$buffet, 'decoration'=>$decoration]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Decoration $decoration)
+    public function edit(Request $request)
     {
-        //
+        $buffet = $this->buffet->where('id',$request->buffet)->get()->first();
+        $decoration = $this->decoration->where('slug',$request->decoration)->get()->first();
+        return view('decoration.update',['buffet'=>$buffet->slug,'decoration'=>$decoration]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateDecorationRequest $request, Decoration $decoration)
+    public function update(Buffet $buffet ,UpdateDecorationRequest $request)
     {
-        //
+        $buffet = $this->buffet->where('slug',$request->buffet)->get()->first();
+        $decoration = $this->decoration->update([
+            'main_theme' => $request->main_theme,
+            'slug'=>$request->slug,
+            'description'=>$request->description,
+            'price'=>$request->price,
+            'status'=> $request->status,
+            'buffet_id'=> $buffet->id
+        ]);
+
+        return redirect()->route('decoration.show', ['buffet'=>$buffet,'decoration'=>$decoration]);
     }
 
     /**
