@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('file_name');
             $table->string('file_path');
+            $table->string('file_extension');
             $table->string('mime_type'); // "image/jpeg", "image/png"
             $table->unsignedBigInteger('file_size');
             $table->foreignId('food')->constrained(

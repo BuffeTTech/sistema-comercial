@@ -1,7 +1,7 @@
 <x-app-layout>
     <h1>Criar Pacote de Comida e Bebidas</h1>
     <div>
-        <form method="POST" action="{{ route('food.store', ['buffet'=>$buffet->slug]) }}">
+        <form method="POST" action="{{ route('food.store', ['buffet'=>$buffet->slug]) }}" enctype="multipart/form-data">
             @csrf
 
             @if (session('success'))
@@ -23,11 +23,7 @@
                 <x-input-error :messages="$errors->get('slug')" class="mt-2" />
             </div>
 
-            {{-- <div>
-                <x-input-label for="" :value="__('Inserir Imagem')" />
-                <x-text-input id="" class="block mt-1 w-full" type="file" name="" :value="old('')" required autofocus autocomplete="" />
-                <x-input-error :messages="$errors->get('')" class="mt-2" />
-            </div> --}}
+            
 
             <div class="mt-4">
                 <x-input-label for="food_description" :value="__('Descrição das comidas')" />
@@ -46,6 +42,18 @@
                 <x-text-input id="price" class="block mt-1 w-full" type="number" name="price" :value="old('price')" required autofocus autocomplete="price" />
                 <x-input-error :messages="$errors->get('price')" class="mt-2" />
             </div>
+
+            <div>
+                <x-input-label for="foods_photo1" :value="__('Inserir Imagem')" />
+                <x-text-input id="foods_photo1" class="block mt-1 w-full" type="file" name="foods_photo[]" :value="old('foods_photo1')" required autofocus autocomplete="foods_photo1" />
+                <x-input-error :messages="$errors->get('foods_photo[0]')" class="mt-2" />
+            </div> 
+
+            <div>
+                <x-input-label for="foods_photo2" :value="__('Inserir Imagem')" />
+                <x-text-input id="foods_photo2" class="block mt-1 w-full" type="file" name="foods_photo[]" :value="old('')" required autofocus autocomplete="" />
+                <x-input-error :messages="$errors->get('foods_photo[1]')" class="mt-2" />
+            </div> 
 
 
             <div class="flex items-center justify-end mt-4">

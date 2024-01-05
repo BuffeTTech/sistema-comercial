@@ -7,31 +7,32 @@ use App\Http\Requests\Foods\StoreFoodRequest;
 use App\Http\Requests\Foods\UpdateFoodRequest;
 use App\Models\Buffet;
 use App\Models\Food;
+use App\Models\FoodPhoto; 
 use Illuminate\Http\Request;
 
 class FoodController extends Controller
 {
     public function __construct(
-        protected Food $food
+        protected Food $food,
+        protected FoodPhoto $photo,
+        protected Buffet $buffet
     ) {
     }
 
-    // private function update_image(Request $request) {
-    //     if (isset($request->files)) {
-    //         if(!$this->package->where('slug', $request->slug)->get()->first()){
-    //             return redirect()->route('packages.not_found');
-    //         }
-            
-    //         $photo = 'photo_'.$dto->image_id;
-    
-    //         return $food->where('slug',$dto->slug)->update([$photo=>$dto->photo]);
-    
-    //         return back();
-    //     }
-    //     $retornos = new MessageBag();
-    //     $retornos->add('errors', 'Imagem não enviada');
-    //     return back()->withErrors($retornos);
-    // }
+     private function upload_image($data) {
+        dd($data);
+        //  if (isset($request->files)) {
+        //      if(!$this->food->where('slug', $request->slug)->get()->first()){
+        //          return redirect()->route('packages.not_found');
+        //      }
+      
+        //      $photo = 'photo_'.$request->image_id;
+        //      return $food->where('slug',$request->slug)->update([$photo=>$request->photo]);
+        //      return back();
+        //  }
+
+        //  return back()->with('errors', 'Imagem não enviada');
+     }
 
     /**
      * Display a listing of the resource.
@@ -97,20 +98,48 @@ class FoodController extends Controller
             "buffet"=>$buffet->id,
         ]);
 
-        // if (isset($request->images)) {
-             // if (count($request->images) !== 3) {
-             //     throw new ValueError('Has less than 3 images');
-             // }
-        //     $image_index = 1;
+        if ($request->has('foods_photo')) {
+            foreach ($request->file('foods_photo') as $foto) {
+                
+                if ($foto->isValid()) {
+                    $file_name = $foto->getClientOriginalName();
+                    $file_extension = $foto->getClientOriginalExtension();
+                    $file_size = $foto->getSize();
+                    $mime_type = $foto->getMimeType();
+
+                    $imageName = sanitize_string(explode($file_extension, $file_name)[0]).time() . rand(1, 99) . '-.' . $file_extension;
+                    // $imageName = sanitize_string(explode($file_extension, $file_name)[0]) . '-' . time() . rand(1, 99) . '.' . $file_extension;
+                    $file_path = "//food/".$imageName;
+
+                    $this->photo->create([
+                        'file_name'=>$file_name,
+                        'file_path'=>$file_path,
+                        'file_extension'=>$file_extension,
+                        'mime_type'=>$mime_type,
+                        'file_size'=>$file_size,
+                        'food'=>$food->id,
+                    ]);
+
+
+                    $foto->move(public_path('uploads'), $file_path);
+                }
+            }
+    
+            return "Pelo menos uma foto foi enviada com sucesso!";
+        } else {
+            return "Nenhuma foto foi enviada.";
+        }
+    
+
+        // dd($request->foods_photo);
+        // if (isset($request->foods_photo)) {
         //     foreach ($request->images as $image) {
-        //         $img_db = 'photo_' . $image_index;
-        //         $image_index++;
-        //         $request->$img_db = $this->uploadImage($image);
+        //         $image = $this->upload_image($image);
         //     }
         //     unset($request->images);
         // }
 
-        return redirect()->route('food.show', ['food'=>$food, 'buffet'=>$buffet_slug]);
+        // return redirect()->route('food.show', ['food'=>$food, 'buffet'=>$buffet_slug]);
 
         
     }
