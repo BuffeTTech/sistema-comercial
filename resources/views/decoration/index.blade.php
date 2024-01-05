@@ -40,7 +40,7 @@
                                 <tr class="bg-white">
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['id'] }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                    <a href="{{ route('decoration.show', ['decoration'=>$value['slug'], 'buffet'=>$buffet]) }}" class="font-bold text-blue-500 hover:underline">{{ $value['main_theme'] }}</a>
+                                    <a href="{{ route('decoration.show', ['buffet'=>$buffet->slug ,'decoration'=>$value->slug]) }}" class="font-bold text-blue-500 hover:underline">{{ $value['main_theme'] }}</a>
                                     </td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap">{!! mb_strimwidth($value['description'], 0, $limite_char, " ...") !!}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['slug'] }}</td>
@@ -49,8 +49,8 @@
                                         <span class="{{ $value['status'] == 1 ? $class_active : $class_unactive }}">{{ $value['status'] == 1 ? "Ativado" : "Desativado" }}</span>
                                     </td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                        <a href="{{ route('decoration.show', ['decoration'=>$value['slug'], 'buffet'=>$buffet]) }}" title="Visualizar '{{$value['main_theme']}}'">👁️</a>
-                                        <a href="{{ route('decoration.edit', ['decoration'=>$value['slug'], 'buffet'=>$buffet]) }}" title="Editar '{{$value['main_theme']}}'">✏️</a>
+                                        <a href="{{ route('decoration.show', ['buffet'=>$buffet->slug ,'decoration'=>$value->slug]) }}" title="Visualizar '{{$value['main_theme']}}'">👁️</a>
+                                        <a href="{{ route('decoration.edit', ['buffet'=>$buffet->slug, 'decoration'=>$value->slug]) }}" title="Editar '{{$value['main_theme']}}'">✏️</a>
                                         <!-- Se a pessoa está vendo esta página, ela por padrão ja é ADM ou comercial, logo nao preciso validar aqui! -->
 
                                     </td>

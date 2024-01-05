@@ -71,18 +71,18 @@ class DecorationController extends Controller
      */
     public function edit(Request $request)
     {
-        $buffet = $this->buffet->where('id',$request->buffet)->get()->first();
+        $buffet = $this->buffet->where('slug',$request->buffet)->get()->first();
         $decoration = $this->decoration->where('slug',$request->decoration)->get()->first();
-        return view('decoration.update',['buffet'=>$buffet->slug,'decoration'=>$decoration]);
+        return view('decoration.update',['buffet'=>$buffet,'decoration'=>$decoration]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Buffet $buffet ,UpdateDecorationRequest $request)
+    public function update(UpdateDecorationRequest $request)
     {
         $buffet = $this->buffet->where('slug',$request->buffet)->get()->first();
-        $decoration = $this->decoration->update([
+        $decoration = $this->decoration->where('id',$request->decoration)->update([
             'main_theme' => $request->main_theme,
             'slug'=>$request->slug,
             'description'=>$request->description,
@@ -90,8 +90,8 @@ class DecorationController extends Controller
             'status'=> $request->status,
             'buffet_id'=> $buffet->id
         ]);
+        return redirect()->route('decoration.index',['buffet'=>$buffet->slug]);
 
-        return redirect()->route('decoration.show', ['buffet'=>$buffet,'decoration'=>$decoration]);
     }
 
     /**

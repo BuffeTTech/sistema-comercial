@@ -1,7 +1,7 @@
 <x-app-layout>
     <h1>Editar Pacote</h1>
     <div>
-        <form method="POST" action="{{ route('decoration.update', ['buffet'=>$buffet,'decoration'=>$decoration]) }}">
+        <form method="POST" action="{{ route('decoration.update', ['buffet'=>$buffet->slug,'decoration'=>$decoration]) }}">
             @csrf
             @method('put')
             @if (session('success'))
@@ -19,7 +19,7 @@
 
             <div>
                 <x-input-label for="slug" :value="__('Slug')" />
-                <x-text-input id="slug" class="block mt-1 w-full" type="text" name="name" :value="$decoration->slug" required autofocus autocomplete="slug" />
+                <x-text-input id="slug" class="block mt-1 w-full" type="text" name="slug" :value="$decoration->slug" required autofocus autocomplete="slug" />
                 <x-input-error :messages="$errors->get('slug')" class="mt-2" />
             </div>
 
@@ -41,6 +41,14 @@
                 <x-input-error :messages="$errors->get('price')" class="mt-2" />
             </div>
 
+            <div>
+                <label for="status" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"></label>
+                <select name="status" id="status">
+                    @foreach( App\Enums\DecorationStatus::array() as $key => $value )
+                        <option value="{{$value}}" {{ $decoration->status == $value ? 'selected' : ""}}>{{$key}}</option>
+                    @endforeach
+                </select>
+            </div>
 
             <div class="flex items-center justify-end mt-4">
                 <x-primary-button class="ms-4">
