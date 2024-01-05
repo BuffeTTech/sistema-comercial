@@ -42,7 +42,12 @@
                             </div>
                         </a>
                     </div>
+                </div>
 
+                <div class="p-6 text-gray-900 float-right" style="width: 50%;">
+                    <!-- Imagens -->
+                    <img src="{{ asset('storage/foods'. $foods_photo[0]->file_path) }}" alt="{{ $foods_photo[0]->file_name }}"> 
+                    <img src="{{ asset('storage/foods'. $foods_photo[1]->file_path) }}" alt="{{ $foods_photo[1]->file_name }}">     
                 </div>
 
                 {{-- <div class="p-6 text-gray-900 float-right" style="width: 50%;">

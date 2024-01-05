@@ -1,4 +1,7 @@
 <x-app-layout>
+
+    <script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
+
     <h1>Criar Pacote de Comida e Bebidas</h1>
     <div>
         <form method="POST" action="{{ route('food.store', ['buffet'=>$buffet->slug]) }}" enctype="multipart/form-data">
@@ -27,13 +30,13 @@
 
             <div class="mt-4">
                 <x-input-label for="food_description" :value="__('Descrição das comidas')" />
-                <x-text-input id="food_description" class="block mt-1 w-full" type="text" name="food_description" :value="old('food_description')" required autocomplete="food_description" />
+                <textarea name="food_description" id="food_description" cols="40" rows="10" class="height-500 width-500" placeholder="Descrição das comidas">{{ old('food_description')}}</textarea>
                 <x-input-error :messages="$errors->get('food_description')" class="mt-2" />
             </div>
 
             <div>
                 <x-input-label for="beverages_description" :value="__('Descrição das bebidas')" />
-                <x-text-input id="beverages_description" class="block mt-1 w-full" type="text" name="beverages_description" :value="old('beverages_description')" required autofocus autocomplete="beverages_description" />
+                <textarea name="beverages_description" id="beverages_description" cols="40" rows="10" class="height-500 width-500" placeholder="Descrição das comidas"> {{old('beverages_description') }}</textarea>
                 <x-input-error :messages="$errors->get('beverages_description')" class="mt-2" />
             </div>
 
@@ -63,4 +66,20 @@
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+        ClassicEditor
+            .create(document.querySelector('#food_description'))
+            .catch(error => {
+                console.error(error);
+            });
+            ClassicEditor
+            .create(document.querySelector('#beverages_description'))
+            .catch(error => {
+                console.error(error);
+            });
+        });
+    </script>
+    
 </x-app-layout>
