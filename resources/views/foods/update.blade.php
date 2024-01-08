@@ -78,7 +78,7 @@
                 <input type="hidden" name="photo_id" value="1">
                 <input type="file" name="photo" id="photo_1" class="input_file" required onchange="this.form.submit()">
                 <label for="photo_1">
-                    <img src="{{asset('storage'.$foods_photo[0]->file_path)}}" alt="{{ $foods_photo[0]->file_name }}">
+                    <img src="{{asset('storage/foods'.$foods_photo[0]->file_path)}}" alt="{{ $foods_photo[0]->file_name }}">
                 </label>
             </form>
             <form action="{{ route('food.update_photo', ['buffet' => $buffet->slug, 'food' => $food['slug'], 'foods_photo' => $foods_photo[1]->id]) }}" method="post" enctype="multipart/form-data" >
@@ -87,7 +87,7 @@
                 <input type="hidden" name="photo_id" value="2">
                 <input type="file" name="photo" id="photo_2" class="input_file" required onchange="this.form.submit()">
                 <label for="photo_2">
-                    <img src="{{asset('storage'.$foods_photo[1]->file_path)}}" alt="{{ $foods_photo[1]->file_name }}">
+                    <img src="{{asset('storage/foods'.$foods_photo[1]->file_path)}}" alt="{{ $foods_photo[1]->file_name }}">
                 </label>
             </form>
         </div>
