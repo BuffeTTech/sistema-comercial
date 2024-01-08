@@ -91,31 +91,23 @@ class FoodController extends Controller
             "buffet"=>$buffet->id,
         ]);
 
-        if ($request->has('foods_photo')) {
-            foreach ($request->file('foods_photo') as $foto) {
-                if ($foto->isValid()) {
-                    Storage::delete($foto);
-                    $file_name = $foto->getClientOriginalName();
-                    $file_extension = $foto->getClientOriginalExtension();
-                    $file_size = $foto->getSize();
-                    $mime_type = $foto->getMimeType();
-
-                    $imageName = sanitize_string(explode($file_extension, $file_name)[0]).time() . rand(1, 99) . '-.' . $file_extension;
-                    // $imageName = sanitize_string(explode($file_extension, $file_name)[0]) . '-' . time() . rand(1, 99) . '.' . $file_extension;
-                    $file_path = "/".$imageName;
-
-                    $this->photo->create([
-                        'file_name'=>$file_name,
-                        'file_path'=>$file_path,
-                        'file_extension'=>$file_extension,
-                        'mime_type'=>$mime_type,
-                        'file_size'=>$file_size,
-                        'food'=>$food->id,
-                    ]);
-
-
-                    // $foto->move(public_path('uploads'), $file_path);
-                    $foto->move(storage_path(self::$image_repository), $imageName);
+         if ($request->has('foods_photo')) {
+            $foods_photo = $request->foods_photo; 
+            foreach($foods_photo as $photo){
+                if ($photo->isValid()) {
+                    if($upload = $this->upload_image(photo: $photo))  {
+                        $this->photo->create([
+                            'file_name'=>$upload['file_name'],
+                            'file_path'=>$upload['file_path'],
+                            'file_extension'=>$upload['file_extension'],
+                            'mime_type'=>$upload['mime_type'],
+                            'file_size'=>$upload['file_size'],
+                            'food'=>$food->id,
+                        ]);
+    
+                    } else {
+                        return redirect()->route('food.show', ['buffet' => $request->buffet, 'food' => $request->food])->withErrors(['photo'=>"error photo not valid"])->withInput();
+                    }
                 }
             }
         }
@@ -174,14 +166,19 @@ class FoodController extends Controller
         if(!$foods_photo){
             return redirect()->route('food.index', ['buffet'=>$request->buffet])->withErrors(['photo'=>"Photo not found."])->withInput();
         }
-        
-         $photo_id = $this->photo->find($foods_photo->id);
+    
+        $previousFilePath = $foods_photo->file_path;
+        $photo_id = $this->photo->find($foods_photo->id);
 
          $photo = $request->photo;
          if ($request->has('photo')) {
             if ($photo->isValid()) {
+                
                 if($upload = $this->upload_image(photo: $photo))  {
                     // excluir foto anterior aqui
+                    if (file_exists($previousFilePath)) {
+                        unlink($previousFilePath);
+                    }
                     $foods_photo->update([
                         'file_name'=>$upload['file_name'],
                         'file_path'=>$upload['file_path'],
@@ -192,11 +189,11 @@ class FoodController extends Controller
                     ]);
 
                 } else {
-                    return redirect()->route('food.show', ['buffet' => $request->buffet, 'food' => $request->food])->withErrors(['photo'=>"error photo not valid"])->withInput();
+                    return redirect()->back()->withErrors(['photo'=>"error photo not valid"])->withInput();
                 }
             }
         }
-        return redirect()->route('food.show', ['buffet' => $request->buffet, 'food' => $request->food]);
+        return redirect()->back()->withInput();
     }
 
     private function upload_image($photo) {
@@ -253,7 +250,7 @@ class FoodController extends Controller
 
         $pk = $this->food->find($food->id);
 
-        return redirect()->route('food.show', ['food'=>$pk->slug, 'buffet'=>$buffet_slug, 'foods_photo'=> $foods_photo]);
+        return redirect()->back();
     }
 
     /**

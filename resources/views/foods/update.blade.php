@@ -93,6 +93,14 @@
         </div>
     </div>
 
+    <div class="flex items-center justify-end mt-4">
+       <a href="{{ route('food.show', ['food'=>$food->slug, 'buffet'=>$buffet->slug]) }}" class="font-bold text-blue-500 hover:underline""> 
+            <div class="ms-4">
+                Back
+            <div>
+        </a>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
         ClassicEditor
