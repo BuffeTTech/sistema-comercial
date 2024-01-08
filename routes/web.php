@@ -26,7 +26,7 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
 
     Route::resource('{buffet}/food', FoodController::class);
     Route::patch('/{buffet}/food/{food}/change_status', [FoodController::class,'change_status'])->name('food.change_status');
-    Route::patch('/{buffet}/food/{food}/photo ',[FoodController::class,'update_photo'])->name('food.update_photo');
+    Route::patch('/{buffet}/food/{food}/{foods_photo} ',[FoodController::class,'update_photo'])->name('food.update_photo');
 
 });
 

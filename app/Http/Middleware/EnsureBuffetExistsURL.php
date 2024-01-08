@@ -22,8 +22,10 @@ class EnsureBuffetExistsURL
         
         if(!$buffet || !$buffet_slug) {
             if(auth()->user()) {
+                dd('aaa');
                 return redirect()->intended(RouteServiceProvider::HOME);
             }
+            dd('bbb');  
             return route('home');
         }
 

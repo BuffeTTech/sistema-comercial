@@ -9,6 +9,7 @@ use App\Models\Buffet;
 use App\Models\Food;
 use App\Models\FoodPhoto; 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class FoodController extends Controller
 {
@@ -73,7 +74,7 @@ class FoodController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         if($this->food->where('slug', $request->food)->where('buffet', $buffet->id)->get()->first()){
-            return redirect()->back()->with('errors', 'food already exists');
+            return redirect()->back()->withErrors(['slug' => 'food already exists.'])->withInput();
         }
 
         // if(!isset($request->images) || count($request->images) != 3) {
@@ -92,8 +93,8 @@ class FoodController extends Controller
 
         if ($request->has('foods_photo')) {
             foreach ($request->file('foods_photo') as $foto) {
-                
                 if ($foto->isValid()) {
+                    Storage::delete($foto);
                     $file_name = $foto->getClientOriginalName();
                     $file_extension = $foto->getClientOriginalExtension();
                     $file_size = $foto->getSize();
@@ -131,10 +132,11 @@ class FoodController extends Controller
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         
         if(!$food = $this->food->where('slug', $request->food)->where('buffet', $buffet->id)->get()->first()){
-            return redirect()->route('food.index', $buffet_slug)->with('errors', 'food not found');
+            return redirect()->route('food.index', $buffet_slug)->withErrors(['slug' => 'food not found.'])->withInput();
         }
 
         $foods_photo = $this->getFoodPhotos($food->id); 
+
 
         // $food = $this->food->where('buffet', $buffet->id);
 
@@ -150,11 +152,14 @@ class FoodController extends Controller
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         // dd($request->buffet, $request->food); 
         if (!$food = $this->food->where('slug', $request->food)->where('buffet', $buffet->id)->get()->first()) {
-            return redirect()->back()->with('errors', 'food not found');
+            return redirect()->back()->withErrors(['slug' => 'food not found.'])->withInput();
             
         }
 
-        return view('foods.update', ['food'=> $food, 'buffet'=>$buffet]);
+        $foods_photo = $this->getFoodPhotos($food->id); 
+
+        // dd($foods_photo);
+        return view('foods.update', ['food'=> $food, 'buffet'=>$buffet, 'foods_photo'=> $foods_photo]);
     }
 
     /**
@@ -165,36 +170,60 @@ class FoodController extends Controller
     {
         $food_slug = $request->food;
         $food = Food::where('slug', $food_slug)->first();
-        if(!$foods_photo =  $this->photo->where('slug', $request->foods_photo)->where('food', $food->id)->get()->first()){
-            return redirect()->route('food.index', $food_slug)->with('errors', 'photo not found');
+        $foods_photo =  $this->photo->where('id', $request->foods_photo)->where('food', $food->id)->get()->first();
+        if(!$foods_photo){
+            return redirect()->route('food.index', ['buffet'=>$request->buffet])->withErrors(['photo'=>"Photo not found."])->withInput();
         }
+        
+         $photo_id = $this->photo->find($foods_photo->id);
 
-        if ($request->hasFile('updated_photo') && $request->file('updated_photo')->isValid()) {
-            $updatedPhoto = $request->file('updated_photo');
+         $photo = $request->photo;
+         if ($request->has('photo')) {
+            if ($photo->isValid()) {
+                if($upload = $this->upload_image(photo: $photo))  {
+                    // excluir foto anterior aqui
+                    $foods_photo->update([
+                        'file_name'=>$upload['file_name'],
+                        'file_path'=>$upload['file_path'],
+                        'file_extension'=>$upload['file_extension'],
+                        'mime_type'=>$upload['mime_type'],
+                        'file_size'=>$upload['file_size'],
+                        'food'=>$food->id,
+                    ]);
 
-            $file_name = $updatedPhoto->getClientOriginalName();
-            $file_extension = $updatedPhoto->getClientOriginalExtension();
-            $file_size = $updatedPhoto->getSize();
-            $mime_type = $updatedPhoto->getMimeType();
-
-            $imageName = sanitize_string(explode($file_extension, $file_name)[0]) . time() . rand(1, 99) . '-.' . $file_extension;
-            $file_path = "/".$imageName;
-
-            // Atualizar informações da foto
-            $updatedPhoto->update([
-                'file_name' => $file_name,
-                'file_path' => $file_path,
-                'file_extension' => $file_extension,
-                'mime_type' => $mime_type,
-                'file_size' => $file_size,
-            ]);
-
-            // Mover o novo arquivo
-            $updatedPhoto->move(storage_path(self::$image_repository), $imageName);
+                } else {
+                    return redirect()->route('food.show', ['buffet' => $request->buffet, 'food' => $request->food])->withErrors(['photo'=>"error photo not valid"])->withInput();
+                }
+            }
         }
-
         return redirect()->route('food.show', ['buffet' => $request->buffet, 'food' => $request->food]);
     }
+
+    private function upload_image($photo) {
+        if ($photo->isValid()) {
+            $file_name = $photo->getClientOriginalName();
+            $file_extension = $photo->getClientOriginalExtension();
+            $file_size = $photo->getSize();
+            $mime_type = $photo->getMimeType();
+            
+            $imageName = sanitize_string(explode($file_extension, $file_name)[0]).time() . rand(1, 99) . '-.' . $file_extension;
+            // $imageName = sanitize_string(explode($file_extension, $file_name)[0]) . '-' . time() . rand(1, 99) . '.' . $file_extension;
+            $file_path = "/".$imageName;
+
+            // $foto->move(public_path('uploads'), $file_path);
+            $photo->move(storage_path(self::$image_repository), $imageName);
+
+            return [
+                "file_name"=>$file_name,
+                "file_extension"=>$file_extension,
+                "file_size"=>$file_size,
+                "mime_type"=>$mime_type,
+                "file_path"=>$file_path,
+            ];
+        }
+        return null;
+    }
+   
     public function update(UpdateFoodRequest $request)
     {
         $buffet_slug = $request->buffet;
@@ -220,38 +249,11 @@ class FoodController extends Controller
             "buffet" => $buffet->id,
         ]);
 
-        // if ($request->has('foods_photo')) {
-        //     foreach ($request->file('foods_photo') as $foto) {
-        //         
-        //         if ($foto->isValid()) {
-        //             $file_name = $foto->getClientOriginalName();
-        //             $file_extension = $foto->getClientOriginalExtension();
-        //             $file_size = $foto->getSize();
-        //             $mime_type = $foto->getMimeType();
-// 
-        //             $imageName = sanitize_string(explode($file_extension, $file_name)[0]).time() . rand(1, 99) . '-.' . $file_extension;
-        //             // $imageName = sanitize_string(explode($file_extension, $file_name)[0]) . '-' . time() . rand(1, 99) . '.' . $file_extension;
-        //             $file_path = "/".$imageName;
-// 
-        //             $this->photo->update([
-        //                 'file_name'=>$file_name,
-        //                 'file_path'=>$file_path,
-        //                 'file_extension'=>$file_extension,
-        //                 'mime_type'=>$mime_type,
-        //                 'file_size'=>$file_size,
-        //                 'food'=>$food->id,
-        //             ]);
-// 
-// 
-        //             // $foto->move(public_path('uploads'), $file_path);
-        //             $foto->move(storage_path(self::$image_repository), $imageName);
-        //         }
-        //     }
-        // }
+        $foods_photo =  $this->photo->where('id', $request->slug)->where('food', $food->id)->get()->first(); 
 
         $pk = $this->food->find($food->id);
 
-        return redirect()->route('food.show', ['food'=>$pk->slug, 'buffet'=>$buffet_slug]);
+        return redirect()->route('food.show', ['food'=>$pk->slug, 'buffet'=>$buffet_slug, 'foods_photo'=> $foods_photo]);
     }
 
     /**
@@ -277,7 +279,7 @@ class FoodController extends Controller
 
         $food = $this->food->where('slug', $request->food)->where('buffet', $buffet->id)->get()->first();
         if (!$food) {
-            return redirect()->back()->with('errors', 'food not found');
+            return redirect()->back()->withErrors(['slug' => 'food not found.'])->withInput();
         }
 
         $food->update(['status'=>$request->status]);
