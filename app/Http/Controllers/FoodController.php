@@ -20,7 +20,7 @@ class FoodController extends Controller
     ) {
     }
 
-    public static string $image_repository = 'app/public/foods';
+    public static string $image_repository = '/app/public';
 
      private function getFoodPhotos($foodId)
     {
@@ -167,17 +167,18 @@ class FoodController extends Controller
             return redirect()->route('food.index', ['buffet'=>$request->buffet])->withErrors(['photo'=>"Photo not found."])->withInput();
         }
     
-        $previousFilePath = $foods_photo->file_path;
+        $previousFilePath = self::$image_repository.$foods_photo->file_path;
         $photo_id = $this->photo->find($foods_photo->id);
 
          $photo = $request->photo;
          if ($request->has('photo')) {
-            if ($photo->isValid()) {
+            if ($photo->isValid()) { 
                 
                 if($upload = $this->upload_image(photo: $photo))  {
+                    dd($previousFilePath);
                     // excluir foto anterior aqui
-                    if (file_exists($previousFilePath)) {
-                        unlink($previousFilePath);
+                    if (Storage::exists($previousFilePath)) {
+                        Storage::delete($previousFilePath);
                     }
                     $foods_photo->update([
                         'file_name'=>$upload['file_name'],
@@ -204,11 +205,12 @@ class FoodController extends Controller
             $mime_type = $photo->getMimeType();
             
             $imageName = sanitize_string(explode($file_extension, $file_name)[0]).time() . rand(1, 99) . '-.' . $file_extension;
-            // $imageName = sanitize_string(explode($file_extension, $file_name)[0]) . '-' . time() . rand(1, 99) . '.' . $file_extension;
             $file_path = "/".$imageName;
 
             // $foto->move(public_path('uploads'), $file_path);
             $photo->move(storage_path(self::$image_repository), $imageName);
+
+            $file_path = "/foods/".$imageName;
 
             return [
                 "file_name"=>$file_name,
