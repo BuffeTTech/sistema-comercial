@@ -166,8 +166,12 @@ class FoodController extends Controller
         if(!$foods_photo){
             return redirect()->route('food.index', ['buffet'=>$request->buffet])->withErrors(['photo'=>"Photo not found."])->withInput();
         }
+
+        // dd(storage_path(self::$image_repository).$foods_photo->file_path,
+        //     Storage::exists(self::$image_repository).$foods_photo->file_path,
+        //     Storage::allFiles(self::$image_repository));
     
-        $previousFilePath = "/storage/foods".$foods_photo->file_path;
+        $previousFilePath = storage_path(self::$image_repository).$foods_photo->file_path;
         $photo_id = $this->photo->find($foods_photo->id);
 
          $photo = $request->photo;
@@ -176,10 +180,9 @@ class FoodController extends Controller
                
                 if($upload = $this->upload_image(photo: $photo))  {
                     // excluir foto anterior aqui
-                    dd($previousFilePath);
-                    if (Storage::exists($previousFilePath)) {
-
-                        Storage::delete($previousFilePath);
+                    if (file_exists($previousFilePath)) {
+                        // dd(Storage::delete($previousFilePath));
+                        unlink($previousFilePath);
                     }
                     $foods_photo->update([
                         'file_name'=>$upload['file_name'],
