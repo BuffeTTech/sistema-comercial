@@ -8,6 +8,9 @@ use App\Models\Buffet;
 
 class BuffetController extends Controller
 {
+    public function dashboard() {
+        dd('Dashboard do buffet');
+    }
 
     /**
      * Display the specified resource.

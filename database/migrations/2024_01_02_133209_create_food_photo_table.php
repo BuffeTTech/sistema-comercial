@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('package_photos', function (Blueprint $table) {
+        Schema::create('food_photos', function (Blueprint $table) {
             $table->id();
             $table->string('file_name');
             $table->string('file_path');
+            $table->string('file_extension');
             $table->string('mime_type'); // "image/jpeg", "image/png"
             $table->unsignedBigInteger('file_size');
-            $table->foreignId('package')->constrained(
-                table: 'packages', indexName: 'package_id'
+            $table->foreignId('food')->constrained(
+                table: 'food', indexName: 'food_id'
             );
             $table->timestamps();
         });
