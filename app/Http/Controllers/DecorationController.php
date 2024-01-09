@@ -116,8 +116,6 @@ class DecorationController extends Controller
                             'file_size'=>$upload['file_size'],
                             'decorations'=>$decoration->id,
                         ]);
-                    } else{
-                        return redirect()->route('decoration.show', ['buffet'=>$request->buffet, 'decoration'=>$request->decoration])->withErrors(['photo'=>"error photo not valid"])->withInput();
                     }
                 }
             }
@@ -139,7 +137,8 @@ class DecorationController extends Controller
 
         //$decoration = $this->decoration->where('slug',$request->decoration)->get()->first();
         $decoration_slug = $request->decoration; 
-        $decoration_photos = DecorationPhotos::where('decorations', $decoration_slug)->get(); 
+        $decoration_photos = DecorationPhotos::where('decorations', $decoration->id)->get(); 
+        
 
         return view('decoration.show',['buffet'=>$buffet_slug, 'decoration'=>$decoration, 'decoration_photos'=>$decoration_photos]);
     }
@@ -157,7 +156,7 @@ class DecorationController extends Controller
         }
 
         $decoration_slug = $request->decoration; 
-        $decoration_photos = DecorationPhotos::where('decorations', $decoration_slug)->get(); 
+        $decoration_photos = DecorationPhotos::where('decorations', $decoration->id)->get(); 
 
         return view('decoration.update',['buffet'=>$buffet,'decoration'=>$decoration, 'decoration_photos'=>$decoration_photos]);
     }
@@ -191,7 +190,7 @@ class DecorationController extends Controller
 
         $dec = $this->decoration->find($decoration->id);
         
-        $decoration_photos = $this->photos->where('slug', $request->slug)->where('decorations', $decoration->id)->get(); 
+        $decoration_photos = $this->photos->where('id', $request->slug)->where('decorations', $decoration->id)->get(); 
 
         return redirect()->back(); // para ser possivel update foto e conteudos ao mesmo tempo 
 
@@ -201,8 +200,7 @@ class DecorationController extends Controller
         $decoration_slug = $request->decoration; 
         $decoration = Decoration::where('slug', $decoration_slug)->first();
 
-        $decoration_photos_slug = $request->decoration_photos; 
-        $decoration_photos = $this->photos->where('id', $decoration_photos_slug)->where('decorations', $decoration->id)->get()->first();
+        $decoration_photos = $this->photos->where('id', $request->decoration_photos)->where('decorations', $decoration->id)->get()->first();
 
         if(!$decoration_photos){
             return redirect()->route('decoration.index', ['buffet'=>$request->buffet])->withErrors(['photo'=>"photo not found"])->withInput();
@@ -211,7 +209,7 @@ class DecorationController extends Controller
         $previous_file_path = storage_path(self::$image_repository).$decoration_photos->file_path; 
         $photo_id = $this->photos->find($decoration_photos->id);
 
-        $photo = $request->photos; 
+        $photo = $request->photo; 
         if($request->has('photo')){
             if ($photo->isValid()){
                 if($upload = $this->upload_image(photo: $photo)){

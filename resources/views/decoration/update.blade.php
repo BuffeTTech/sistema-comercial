@@ -84,7 +84,7 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-        <a href="{{ route('decoration.show', ['decoration'=>$decoration->slug, 'buffet'=>$buffet->slug]) }}" class="font-bold text-blue-500 hover:underline""> 
+        <a href="{{ route('decoration.show', ['decoration'=>$decoration->slug, 'buffet'=>$buffet->slug]) }}" class="font-bold text-blue-500 hover:underline"> 
                 <div class="ms-4">
                     Back
                 <div>

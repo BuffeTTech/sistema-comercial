@@ -37,12 +37,13 @@
                         </a>
                     </div>
 
-                    <div class="p-6 text-gray-900 float-right" style="width: 50%;">
-                        <!-- Imagens -->
-                        <img src="{{ asset('storage/decorations'. $decoration_photos[0]->file_path) }}" alt="{{ $decoration_photos[0]->file_name }}"> 
-                        <img src="{{ asset('storage/decorations'. $decoratiom_photos[1]->file_path) }}" alt="{{ $decoration_photos[1]->file_name }}">     
-                    </div>
+                   
             </div>
+        </div>
+        <div class="p-6 text-gray-900 float-right" style="width: 50%;">
+            <!-- Imagens -->
+            <img src="{{ asset('storage/decorations'. $decoration_photos[0]->file_path) }}" alt="{{ $decoration_photos[0]->file_name }}"> 
+            <img src="{{ asset('storage/decorations'. $decoration_photos[1]->file_path) }}" alt="{{ $decoration_photos[1]->file_name }}">     
         </div>
     </div>
 </x-app-layout>
