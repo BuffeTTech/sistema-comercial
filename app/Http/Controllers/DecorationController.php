@@ -7,13 +7,15 @@ use App\Http\Requests\Decorations\StoreDecorationRequest;
 use App\Http\Requests\Decorations\UpdateDecorationRequest;
 use App\Models\Buffet;
 use App\Models\Decoration;
+use App\Models\DecorationPhotos;
 use Illuminate\Http\Request;
 
 class DecorationController extends Controller
 {
     public function __construct(
         protected Decoration $decoration,
-        protected Buffet $buffet
+        protected Buffet $buffet,
+        protected DecorationPhotos $photos,
     )
     {
         
