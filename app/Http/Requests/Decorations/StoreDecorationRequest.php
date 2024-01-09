@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Decorations;
 
 use App\Models\Decoration;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateDecorationRequest extends FormRequest
+class StoreDecorationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,10 @@ class UpdateDecorationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'main_theme'=>['required','max:255','unique:' .Decoration::class,'string'],
-            'slug'=>['required','max:20','unique:'.Decoration::class, 'string',],
-            'description'=>['required','max:255','string'],
-            'price'=>['required','numeric'],
+            'main_theme'=>'required|max:255',
+            'slug'=> 'required|max:255',
+            'description'=>'required',
+            'price'=>'required|numeric'
         ];
     }
 }

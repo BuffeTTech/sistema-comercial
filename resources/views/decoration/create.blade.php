@@ -1,4 +1,5 @@
 <x-app-layout>
+    <script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
     <h1>Criar Decoração</h1>
     <div>
         <form method="POST" action="{{ route('decoration.store', ['buffet'=>$buffet]) }}">
@@ -26,7 +27,7 @@
 
             <div>
                 <x-input-label for="description" :value="__('Descrição da Decoração: ')" />
-                <x-text-input id="description" class="block mt-1 w-full" type="text" name="description" :value="old('description')" required autofocus autocomplete="description" />
+                <textarea name="description" id="description" cols="40" rows="10" class="height-500 width-500" placeholder="Descrição">{{ old('description')}}</textarea>
                 <x-input-error :messages="$errors->get('description')" class="mt-2" />
             </div> 
 
@@ -50,4 +51,15 @@
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+        ClassicEditor
+            .create(document.querySelector('#description'))
+            .catch(error => {
+                console.error(error);
+            });
+        });
+    </script>
+
 </x-app-layout>

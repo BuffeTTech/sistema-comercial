@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('description');
             $table->float('price');
             $table->enum('status', array_column(DecorationStatus::cases(),'name'));
-            $table->foreignId('buffet_id')->constrained(
+            $table->foreignId('buffet')->constrained(
                 table: 'buffets', indexName:'decoration_buffet_id'
             );
             //$table->string('photo');

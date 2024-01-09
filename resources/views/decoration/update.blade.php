@@ -1,7 +1,10 @@
 <x-app-layout>
+
+    <script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
+
     <h1>Editar Pacote</h1>
     <div>
-        <form method="POST" action="{{ route('decoration.update', ['buffet'=>$buffet->slug,'decoration'=>$decoration]) }}">
+        <form method="POST" action="{{ route('decoration.update', ['buffet'=>$buffet->slug,'decoration'=>$decoration->slug]) }}">
             @csrf
             @method('put')
             @if (session('success'))
@@ -29,25 +32,16 @@
                 <x-input-error :messages="$errors->get('')" class="mt-2" />
             </div> --}}
 
-            <div class="mt-4">
-                <x-input-label for="description" :value="__('Descrição das Decorações')" />
-                <x-text-input id="description" class="block mt-1 w-full" type="description" name="description" :value="$decoration->description" required autocomplete="description" />
+            <div>
+                <x-input-label for="description" :value="__('Descrição da Decoração: ')" />
+                <textarea name="description" id="description" cols="40" rows="10" class="height-500 width-500" placeholder="Descrição">{{ html_entity_decode(old('description') ?? $decoration->description) }}</textarea>
                 <x-input-error :messages="$errors->get('description')" class="mt-2" />
-            </div>
+            </div> 
 
             <div>
                 <x-input-label for="price" :value="__('Preço')" />
                 <x-text-input id="price" class="block mt-1 w-full" type="number" name="price" :value="$decoration->price" required autofocus autocomplete="price" />
                 <x-input-error :messages="$errors->get('price')" class="mt-2" />
-            </div>
-
-            <div>
-                <label for="status" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"></label>
-                <select name="status" id="status">
-                    @foreach( App\Enums\DecorationStatus::array() as $key => $value )
-                        <option value="{{$value}}" {{ $decoration->status == $value ? 'selected' : ""}}>{{$key}}</option>
-                    @endforeach
-                </select>
             </div>
 
             <div class="flex items-center justify-end mt-4">
@@ -57,4 +51,15 @@
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+        ClassicEditor
+            .create(document.querySelector('#description'))
+            .catch(error => {
+                console.error(error);
+            });
+        });
+    </script>
+
 </x-app-layout>

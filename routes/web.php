@@ -36,7 +36,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
     Route::resource('{buffet}/package', PackageController::class);
-    Route::resource('{buffet}/decoration',DecorationController::class);
+    
+    Route::resource('{buffet}/decoration', DecorationController::class);
+    Route::patch('/{buffet}/decoration/{decoration}/change_status', [decorationController::class,'change_status'])->name('decoration.change_status');
 });
 
 require __DIR__.'/auth.php';
