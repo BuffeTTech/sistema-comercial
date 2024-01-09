@@ -52,6 +52,47 @@
         </form>
     </div>
 
+            <style>
+                .input_file {
+                    display: none;
+                }
+            </style>
+
+            <h2><strong>Imagens:</strong></h2>
+            <h3>Clique na imagem para alterar</h3>
+
+            <div class="images bg-yellow-100">
+                <form action="{{ route('decoration.update_photo', ['buffet' => $buffet->slug, 'decoration' => $decoration['slug'], 'decoration_photos' => $decoration_photos[0]->id]) }}" method="post" enctype="multipart/form-data" >
+                    @csrf
+                    @method('PATCH')
+                    <input type="hidden" name="photo_id" value="1">
+                    <input type="file" name="photo" id="photo_1" class="input_file" required onchange="this.form.submit()">
+                    <label for="photo_1">
+                        <img src="{{asset('storage/decorations'.$decoration_photos[0]->file_path)}}" alt="{{ $decoration_photos[0]->file_name }}">
+                    </label>
+                </form>
+                <form action="{{ route('decoration.update_photo', ['buffet' => $buffet->slug, 'decoration' => $decoration['slug'], 'decoration_photos' => $decoration_photos[1]->id]) }}" method="post" enctype="multipart/form-data" >
+                    @csrf
+                    @method('PATCH')
+                    <input type="hidden" name="photo_id" value="2">
+                    <input type="file" name="photo" id="photo_2" class="input_file" required onchange="this.form.submit()">
+                    <label for="photo_2">
+                        <img src="{{asset('storage/decorations'.$decoration_photos[1]->file_path)}}" alt="{{ $decoration_photos[1]->file_name }}">
+                    </label>
+                </form>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end mt-4">
+        <a href="{{ route('decoration.show', ['decoration'=>$decoration->slug, 'buffet'=>$buffet->slug]) }}" class="font-bold text-blue-500 hover:underline""> 
+                <div class="ms-4">
+                    Back
+                <div>
+            </a>
+        </div>
+        
+    
+
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
         ClassicEditor

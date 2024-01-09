@@ -2,7 +2,7 @@
     <script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
     <h1>Criar Decoração</h1>
     <div>
-        <form method="POST" action="{{ route('decoration.store', ['buffet'=>$buffet]) }}">
+        <form method="POST" action="{{ route('decoration.store', ['buffet'=>$buffet->slug]) }}" enctype="multipart/form-data">
             @csrf
 
             @if (session('success'))
@@ -42,6 +42,18 @@
                 <x-text-input id="price" class="block mt-1 w-full" type="number" name="price" :value="old('price')" required autofocus autocomplete="price" />
                 <x-input-error :messages="$errors->get('price')" class="mt-2" />
             </div>
+
+            <div>
+                <x-input-label for="decoration_photos1" :value="__('Inserir Imagem')" />
+                <x-text-input id="decoration_photos1" class="block mt-1 w-full" type="file" name="decoration_photos[]" :value="old('decoration_photos1')" required autofocus autocomplete="decoration_photos1" />
+                <x-input-error :messages="$errors->get('decoration_photos[0]')" class="mt-2" />
+            </div> 
+
+            <div>
+                <x-input-label for="decoration_photos2" :value="__('Inserir Imagem')" />
+                <x-text-input id="decoration_photos2" class="block mt-1 w-full" type="file" name="decoration_photos[]" :value="old('')" required autofocus autocomplete="" />
+                <x-input-error :messages="$errors->get('decoration_photos[1]')" class="mt-2" />
+            </div> 
 
 
             <div class="flex items-center justify-end mt-4">

@@ -38,7 +38,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('{buffet}/package', PackageController::class);
     
     Route::resource('{buffet}/decoration', DecorationController::class);
-    Route::patch('/{buffet}/decoration/{decoration}/change_status', [decorationController::class,'change_status'])->name('decoration.change_status');
+    Route::patch('/{buffet}/decoration/{decoration}/change_status', [DecorationController::class,'change_status'])->name('decoration.change_status');
+    Route::patch('/{buffet}/decoration{decoration/{decoration_photos} ',[DecorationController::class,'update_photo'])->name('decoration.update_photo');
 });
 
 require __DIR__.'/auth.php';
