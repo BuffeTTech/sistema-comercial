@@ -16,7 +16,7 @@ class Authenticate extends Middleware
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         if(!$buffet || !$buffet_slug) {
-            return null;
+            return route('home');
         }
             // buffet exists
         return $request->expectsJson() ? null : route('login', ['buffet'=>$buffet_slug]);

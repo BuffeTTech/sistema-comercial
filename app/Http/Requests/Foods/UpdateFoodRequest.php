@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Packages;
+namespace App\Http\Requests\Foods;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdatePackageRequest extends FormRequest
+class UpdateFoodRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,7 @@ class UpdatePackageRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'name_package' => 'required|max:255',
+            'name_food' => 'required|max:255',
             'slug' => 'required|max:255',
             'food_description' => 'required',
             'beverages_description' => 'required',

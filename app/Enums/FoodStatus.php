@@ -3,7 +3,7 @@
 namespace App\Enums;
 
 
-enum PackageStatus: string {
+enum FoodStatus: string {
 
 use EnumToArray;
 

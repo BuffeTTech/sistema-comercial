@@ -44,4 +44,21 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function ownedBuffets()
+    {
+        return $this->hasMany(Buffet::class, 'owner_id');
+    }
+
+
+
+    public function isBuffet(): bool {
+        return !!$this->buffet_id;
+    }
+    public function isOwner(): bool
+    {
+        return $this->ownedBuffets()->exists();
+    }
+
+
 }

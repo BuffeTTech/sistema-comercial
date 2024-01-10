@@ -6,8 +6,10 @@ namespace Database\Seeders;
 
 use App\Enums\BuffetStatus;
 use App\Enums\UserStatus;
+use App\Enums\FoodStatus;
 use App\Models\Buffet;
 use App\Models\User;
+use app\Models\Food;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -23,6 +25,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             BuffetSeeder::class,
             UserSeeder::class,
+            FoodSeeder::class, 
         ]);
 
         $user = User::create([
@@ -43,6 +46,17 @@ class DatabaseSeeder extends Seeder
             'document' => "47.592.257/0001-43",
             'owner_id' => $user->id,
             'status' => BuffetStatus::ACTIVE->name,
+        ]);
+
+        $user1 = User::create([
+            'name' => "GuilhermeX",
+            'email' => "usuarioee@teste.com",
+            'email_verified_at' => now(),
+            'password' => Hash::make('password'),
+            'document' => "269.803.080-11",
+            'document_type' => "CPF",
+            'status' => UserStatus::ACTIVE->name,
+            'buffet_id' => $buffet->id,
         ]);
 
         $buffet = Buffet::create([
@@ -108,6 +122,17 @@ class DatabaseSeeder extends Seeder
             'buffet_id' => $buffet->id,
         ]);
 
+        // $food = Food::create([
+        //     
+        //     'name_food' => "Pacote Bolo",
+        //     'food_description' => "Bolo",
+        //     'beverages_description' => "Bolo liquido",
+        //     'status' =>FoodStatus::ACTIVE->name, ,
+        //     'price' => "10",
+        //     'slug' => "pacote-bolo",
+        //     'buffet_id' => null,
+        //     
+        // ]);
         
 
         // \App\Models\User::factory(10)->create();
