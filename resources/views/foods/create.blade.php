@@ -48,13 +48,13 @@
 
             <div>
                 <x-input-label for="foods_photo1" :value="__('Inserir Imagem')" />
-                <x-text-input id="foods_photo1" class="block mt-1 w-full" type="file" name="foods_photo[]" :value="old('foods_photo1')" required autofocus autocomplete="foods_photo1" />
+                <x-text-input id="foods_photo1" class="block mt-1 w-full" accept="image/png, image/gif, image/jpeg" type="file" name="foods_photo[]" :value="old('foods_photo1')" required autofocus autocomplete="foods_photo1" />
                 <x-input-error :messages="$errors->get('foods_photo[0]')" class="mt-2" />
             </div> 
 
             <div>
                 <x-input-label for="foods_photo2" :value="__('Inserir Imagem')" />
-                <x-text-input id="foods_photo2" class="block mt-1 w-full" type="file" name="foods_photo[]" :value="old('')" required autofocus autocomplete="" />
+                <x-text-input id="foods_photo2" class="block mt-1 w-full" accept="image/png, image/gif, image/jpeg" type="file" name="foods_photo[]" :value="old('')" required autofocus autocomplete="" />
                 <x-input-error :messages="$errors->get('foods_photo[1]')" class="mt-2" />
             </div> 
 

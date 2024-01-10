@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Decorations;
 
+use App\Models\Decoration;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateBuffetRequest extends FormRequest
+class UpdateDecorationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return TRUE;
     }
 
     /**
@@ -22,7 +23,10 @@ class UpdateBuffetRequest extends FormRequest
     public function rules(): array
     {
         return [
-
+            'main_theme'=>'required|max:255',
+            'slug'=> 'required|max:255',
+            'description'=>'required',
+            'price'=>'required|numeric'
         ];
     }
 }
