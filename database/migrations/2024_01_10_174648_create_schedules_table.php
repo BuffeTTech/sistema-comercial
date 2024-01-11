@@ -22,7 +22,7 @@ return new class extends Migration
             $table->date('end_block')->nullable();
             $table->enum('status', array_column(ScheduleStatus::cases(), 'name')); 
             $table->foreignId('buffet')->constrained(
-                table: 'buffets', indexName: 'foods_buffet_id'
+                table: 'buffets', indexName: 'schedules_buffet_id'
             );
             $table->timestamps();
         });

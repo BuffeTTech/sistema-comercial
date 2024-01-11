@@ -24,13 +24,14 @@ class ScheduleController extends Controller
     public function index(Request $request)
     {
         $buffet_slug = $request->buffet; 
-        $buffet = Buffet::where('slug', $buffet_slug);
+        $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
 
-        if (!$buffet || $buffet_slug){
+        if (!$buffet || !$buffet_slug){
             return null; 
         }
         $schedules = $this->schedule->where('buffet', $buffet->id)->paginate($request->get('per page', 5), ['*'], 'page', $request->get('page', 1)); 
-        return view('schedules.index', ['buffet'=>$buffet_slug, 'schedules'=>$schedules]); 
+        
+        return view('schedule .index', ['buffet'=>$buffet_slug, 'schedules'=>$schedules]); 
     }
 
     /**
@@ -38,14 +39,15 @@ class ScheduleController extends Controller
      */
     public function create(Request $request)
     {
+        
         $buffet_slug = $request->buffet; 
-        $buffet = Buffet::where('slug', $buffet_slug); 
+        $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
 
-        if(!$buffet || $buffet_slug){
+        if(!$buffet || !$buffet_slug){
             return null; 
         }
-
-        return view('schedules.create', ['buffet'=>$buffet_slug]);
+        
+        return view('schedule .create', ['buffet'=>$buffet_slug]);
     }
 
     /**
@@ -53,10 +55,9 @@ class ScheduleController extends Controller
      */
     public function store(StoreScheduleRequest $request)
     {
-        $slug = str_replace(' ', '-', $request->slug);
 
         $buffet_slug = $request->buffet; 
-        $buffet = Buffet::where('slug', $buffet_slug); 
+        $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
 
         if($this->schedule->where('id', $request->schedule)->where('buffet', $buffet->id)->get()->first()){
             return redirect()->back()->withErrors(['schedule' => 'schedule already exists'])->withInput();
@@ -65,7 +66,7 @@ class ScheduleController extends Controller
         $schedule = $this->schedule->create([
             'day_week' => $request->day_week,
             'start_time' => $request->start_time, 
-            'duration' => $request->time, 
+            'duration' => $request->duration, 
             'start_block'=> $request->start_block,
             'end_block' => $request->end_block, 
             'status' => $request->status ?? ScheduleStatus::ACTIVE->name, 
@@ -81,36 +82,90 @@ class ScheduleController extends Controller
     public function show(Request $request)
     {
         $buffet_slug = $request->buffet; 
-        $buffet = Buffet::where('slug', $buffet_slug); 
+        $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
 
-        if(!$schedule = $this->schedule->where('id', $request->schedule)->where('buffet', $buffet->id)){
+        if(!$schedule = $this->schedule->where('id', $request->schedule)->where('buffet', $buffet->id)->first()){
             return redirect()->route('schedule.index', ['buffet'=>$buffet_slug])->withErrors(['schedule'=>'schedule not found'])->withInput();
         }
-
-        return view('schedule.show',['buffet'=>$buffet_slug, 'schedule'=>$schedule]); 
+        
+        return view('schedule .show',['buffet'=>$buffet_slug, 'schedule'=>$schedule]); 
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Schedule $schedule)
+    public function edit(Request $request)
     {
-        //
+        $buffet_slug = $request->buffet;
+        $buffet = Buffet::where('slug', $buffet_slug)->first();
+        $schedule = Schedule::where('id', $request->schedule)->where('buffet', $buffet->id)->first(); 
+        if(!$schedule){
+            return redirect()->back()->withErrors(['schedule'=>'schedule not found'])->withInput();
+        }
+
+        return view('schedule .update', ['buffet'=>$buffet_slug, 'schedule'=>$schedule]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateScheduleRequest $request, Schedule $schedule)
+    public function update(UpdateScheduleRequest $request)
     {
-        //
+        $buffet_slug = $request->buffet;
+        $buffet = Buffet::where('slug', $buffet_slug)->first();
+
+        $schedule = Schedule::where('id', $request->schedule)->where('buffet', $buffet->id)->first(); 
+        if(!$schedule){
+            return redirect()->back()->withErrors(['schedule'=>'schedule not found'])->withInput();
+        }
+
+        $schedule_exists = $this->schedule->where('id', $request->schedule)->where('buffet', $buffet->id)->get()->first();
+        if($schedule_exists && $schedule_exists->id !== $schedule->id) {
+            return redirect()->back()->withErrors(['slug' => 'schedule already exists.'])->withInput();
+        }
+
+        $schedule = $this->schedule->update([
+            'day_week' => $request->day_week,
+            'start_time' => $request->start_time, 
+            'duration' => $request->duration, 
+            'start_block'=> $request->start_block,
+            'end_block' => $request->end_block, 
+            'status' => $request->status ?? ScheduleStatus::ACTIVE->name, 
+            'buffet'=> $buffet->id, 
+        ]); 
+
+        return route('schedule.show', ['buffet'=>$buffet_slug, 'schedule'=>$schedule]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Schedule $schedule)
+    public function destroy(Request $request)
     {
-        //
+        $buffet_slug = $request->buffet;
+        $buffet = Buffet::where('slug', $buffet_slug)->get()->first(); 
+
+        $schedule = Schedule::where('id', $request->schedule)->where('buffet', $buffet->id)->first(); 
+        if(!$schedule){
+            return redirect()->back()->withErrors(['schedule'=>'schedule not found'])->withInput();
+        }
+
+        $schedule->update(['status'=> ScheduleStatus::UNACTIVE->name]);
+
+        return redirect()->route('schedule.index', ['buffet'=>$buffet_slug]);
+    }
+
+    public function change_status(Request $request){
+        $buffet_slug = $request->buffet; 
+        $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
+        
+        $schedule = $this->schedule->where('id', $request->schedule)->where('buffet', $buffet->id)->first();
+        if(!$schedule){
+            return redirect()->back()->withErrors(['schedule' => 'schedule not found'])->withInput();
+        }
+
+        $schedule->update(['status'=>$request->status]); 
+
+        return redirect()->route('schedule.index', ['buffet'=>$buffet_slug]); 
     }
 }

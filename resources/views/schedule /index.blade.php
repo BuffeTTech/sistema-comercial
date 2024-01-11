@@ -6,8 +6,8 @@
                 <div class="p-6 text-gray-900">
                     <div class="overflow-auto">
                         <div>
-                            <h1 class="inline-flex items-center border border-transparent text-lg leading-4 font-semi-bold">Listagem dos pacotes de comidas e bebidas</h1>
-                            <h2><a href="{{ route('food.create', ['buffet'=> $buffet]) }}">Criar pacote de Comidas e Bebidas</a></h2>
+                            <h1 class="inline-flex items-center border border-transparent text-lg leading-4 font-semi-bold">Listagem dos horários de festas</h1>
+                            <h2><a href="{{ route('schedule.create', ['buffet'=> $buffet]) }}">Criar horário</a></h2>
                         </div>
                     <table class="w-full">
                         <thead class="bg-gray-50 border-b-2 border-gray-200">
@@ -15,20 +15,20 @@
                                 <!-- w-24 p-3 text-sm font-semibold tracking-wide text-left -->
                                 
                                 <th class="w-20 p-3 text-sm font-semibold tracking-wide text-center">ID</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-left">Nome do Pacote</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Descrição das comidas</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Descrição das bebidas</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Preço do pacote</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Slug</th>
+                                <th class="p-3 text-sm font-semibold tracking-wide text-left">Dia da semana</th>
+                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Hora de início</th>
+                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Duração</th>
+                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Início de bloqueio</th>
+                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Final de bloqueio</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">Status</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">Ações</th>
 
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            @if(count($foods) === 0)
+                            @if(count($schedules) === 0)
                             <tr>
-                                <td colspan="8" class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">Nenhum pacote encontrado</td>
+                                <td colspan="8" class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">Nenhum horário encontrado</td>
                             </tr>
                             @else
                                 @php
@@ -36,23 +36,29 @@
                                     $class_active = "p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50";
                                     $class_unactive = 'p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50';
                                 @endphp
-                                @foreach($foods as $value)
+                                @foreach($schedules as $value)
                                 <tr class="bg-white">
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['id'] }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                    <a href="{{ route('food.show', ['food'=>$value['slug'], 'buffet'=>$buffet]) }}" class="font-bold text-blue-500 hover:underline">{{ $value['name_food'] }}</a>
+                                    <a href="{{ route('schedule.show', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" class="font-bold text-blue-500 hover:underline">{{ $value['day_week'] }}</a>
                                     </td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap">{!! mb_strimwidth($value['food_description'], 0, $limite_char, " ...") !!}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{!! mb_strimwidth($value['beverages_description'], 0, $limite_char, " ...") !!}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">R$ {{ (float)$value['price'] }}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['slug'] }}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.food_status :status="$value['status']" /></td>
+                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap">{{$value['start_time']}}</td>
+                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{$value['duration']}} minutos</td>
+                                    @if($value['start_block']=== null)
+                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">Não existe início do bloqueio</td>
+                                    @else
+                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{$value['start_block'] }}</td>
+                                    @endif
+                                    @if($value['start_block']=== null)
+                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">Não existe final do bloqueio</td>
+                                    @else
+                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{$value['end_block'] }}</td>
+                                    @endif
+                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.schedule_status :status="$value['status']" /></td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                        <a href="{{ route('food.show', ['food'=>$value['slug'], 'buffet'=>$buffet]) }}" title="Visualizar '{{$value['name_food']}}'">👁️</a>
-                                        <a href="{{ route('food.edit', ['food'=>$value['slug'], 'buffet'=>$buffet]) }}" title="Editar '{{$value['name_food']}}'">✏️</a>
-                                        
-                                        <!-- Se a pessoa está vendo esta página, ela por padrão ja é ADM ou comercial, logo nao preciso validar aqui! -->
-
+                                        <a href="{{ route('schedule.show', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" title="Visualizar '{{$value['day_week']}}'">👁️</a>
+                                        <a href="{{ route('schedule.edit', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" title="Editar '{{$value['day_week']}}'">✏️</a>
+                                        <a href="{{ route('schedule.destroy', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" title="Deletar '{{$value['day_week']}}'">❌</a>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -60,7 +66,7 @@
 
                         </tbody>
                     </table>
-                    {{ $foods->links('components.pagination') }}
+                    {{ $schedules->links('components.pagination') }}
                     </div>
 
                 </div>
