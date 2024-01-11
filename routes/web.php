@@ -34,4 +34,5 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     Route::patch('/{buffet}/decoration/{decoration}/{decoration_photos} ',[DecorationController::class,'update_photo'])->name('decoration.update_photo');
 });
 
+
 require __DIR__.'/auth.php';
