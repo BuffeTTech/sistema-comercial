@@ -32,6 +32,11 @@ class SubscriptionController extends Controller
             'status'=>[],
         ]);*/
 
+        $subscription_exists = $this->subscription->where('slug', $request->subscription['slug'])->get()->first();
+        if($subscription_exists) {
+            return response(403)->json();
+        }
+
         $subscription = $this->subscription->create([
             'name'=>$request->subscription['name'],
             'slug'=>$request->subscription['slug'],
@@ -76,6 +81,10 @@ class SubscriptionController extends Controller
     }
 
     public function create_role(Request $request) {
+        $role_exists = $this->role->where('name', $request->role['name'])->get()->first();
+        if($role_exists) {
+            return response(403)->json();
+        }
         $role = $this->role->create([
             'name'=>$request->role['name'],
         ]);
@@ -83,6 +92,10 @@ class SubscriptionController extends Controller
         return response(status: 201)->json($role);
     }
     public function create_permission(Request $request) {
+        $permission_exists = $this->permission->where('name', $request->permission['name'])->get()->first();
+        if($permission_exists) {
+            return response(403)->json();
+        }
         $permission = $this->permission->create([
             'name'=>$request->permission['name'],
         ]);
