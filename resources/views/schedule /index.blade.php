@@ -58,7 +58,11 @@
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
                                         <a href="{{ route('schedule.show', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" title="Visualizar '{{$value['day_week']}}'">👁️</a>
                                         <a href="{{ route('schedule.edit', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" title="Editar '{{$value['day_week']}}'">✏️</a>
-                                        <a href="{{ route('schedule.destroy', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" title="Deletar '{{$value['day_week']}}'">❌</a>
+                                        <form action="{{ route('schedule.destroy', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" method="post" class="inline">
+                                            @csrf
+                                            @method('delete')
+                                            <button type="submit" title="Deletar '{{ $value['start_time'] }}'">❌</button>
+                                        </form>
                                     </td>
                                 </tr>
                                 @endforeach
