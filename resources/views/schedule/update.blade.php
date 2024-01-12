@@ -25,9 +25,17 @@
                     </select>
             </div>
 
+            @php
+                $date = DateTime::createFromFormat('H:i:s', $schedule->start_time);
+                $date = $date->format('H:i');
+
+                $oldTime = old('time', date('H:i', strtotime($schedule->start_time)));
+                // $oldTime = old('time') ? date('H:i', old('time')) : false;
+            @endphp
+
             <div>
                 <x-input-label for="start_time" :value="__('Início da festa')" />
-                <x-text-input id="start_time" class="block mt-1 w-full" type="time" name="start_time" :value="old('start_time')" required autofocus autocomplete="start_time" />
+                <x-text-input id="start_time" class="block mt-1 w-full" type="time" name="start_time" :value="$oldTime ?? $schedule->time" required autofocus autocomplete="start_time" />
                 <x-input-error :messages="$errors->get('start_time')" class="mt-2" />
             </div>
 
@@ -35,7 +43,7 @@
 
             <div>
                 <x-input-label for="duration" :value="__('Duração da festa')" />
-                <x-text-input id="duration" class="block mt-1 w-full" type="number" name="duration" :value="old('duration')" placeholder="duração em minutos" required autofocus autocomplete="duration" />
+                <x-text-input id="duration" class="block mt-1 w-full" type="number" name="duration" :value="old('duration') ?? $schedule->duration" placeholder="duração em minutos" required autofocus autocomplete="duration" />
                 <x-input-error :messages="$errors->get('duration')" class="mt-2" />
             </div>
 
@@ -43,13 +51,13 @@
 
             <div>
                 <x-input-label for="start_block" :value="__('Data início bloqueio')" />
-                <x-text-input id="start_block" class="block mt-1 w-full" type="date" name="start_block" :value="old('start_block')" autofocus autocomplete="start_block" />
+                <x-text-input id="start_block" class="block mt-1 w-full" type="date" name="start_block" :value="old('start_block') ?? $schedule->start_block" autofocus autocomplete="start_block" />
                 <x-input-error :messages="$errors->get('start_block')" class="mt-2" />
             </div>
 
             <div>
                 <x-input-label for="end_block" :value="__('Data final bloqueio')" />
-                <x-text-input id="end_block" class="block mt-1 w-full" type="date" name="end_block" :value="old('end_block')" autofocus autocomplete="end_block" />
+                <x-text-input id="end_block" class="block mt-1 w-full" type="date" name="end_block" :value="old('end_block') ?? $schedule->end_block" autofocus autocomplete="end_block" />
                 <x-input-error :messages="$errors->get('end_block')" class="mt-2" />
             </div>
            

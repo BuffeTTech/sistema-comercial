@@ -88,7 +88,7 @@ class ScheduleController extends Controller
             return redirect()->route('schedule.index', ['buffet'=>$buffet_slug])->withErrors(['schedule'=>'schedule not found'])->withInput();
         }
         
-        return view('schedule .show',['buffet'=>$buffet_slug, 'schedule'=>$schedule]); 
+        return view('schedule.show',['buffet'=>$buffet_slug, 'schedule'=>$schedule]); 
     }
 
     /**
@@ -124,7 +124,7 @@ class ScheduleController extends Controller
             return redirect()->back()->withErrors(['slug' => 'schedule already exists.'])->withInput();
         }
 
-        $schedule = $this->schedule->update([
+        $schedule->update([
             'day_week' => $request->day_week,
             'start_time' => $request->start_time, 
             'duration' => $request->duration, 
@@ -134,7 +134,7 @@ class ScheduleController extends Controller
             'buffet'=> $buffet->id, 
         ]); 
 
-        return route('schedule.show', ['buffet'=>$buffet_slug, 'schedule'=>$schedule]);
+        return redirect()->route('schedule.show', ['buffet'=>$buffet_slug, 'schedule'=>$schedule->id]);
     }
 
     /**
