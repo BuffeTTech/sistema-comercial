@@ -61,7 +61,6 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-
         // Caso o usuario seja um administrador, o buffet_id é nulo, logo preciso adaptar as credenciais enviadas
         $credentials['buffet_id'] = $user->buffet_id;
 

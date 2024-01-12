@@ -12,6 +12,6 @@ class BuffetSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\Buffet::factory(5)->create();
+        // \App\Models\Buffet::factory(5)->create();
     }
 }

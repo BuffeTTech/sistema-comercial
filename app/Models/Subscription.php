@@ -10,4 +10,9 @@ class Subscription extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public function buffet_subscriptions()
+    {
+        return $this->hasMany(BuffetSubscription::class, 'subscription_id');
+    }
 }

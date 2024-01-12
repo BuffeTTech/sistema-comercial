@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BuffetController;
 use App\Http\Controllers\SubscriptionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +19,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::post('/buffet', [BuffetController::class, 'store_buffet_api'])->name('api.buffet.store');
 
 Route::post('/subscription', [SubscriptionController::class, 'create_subscription'])->name('buffet.subscription.store');
 Route::post('/subscription/permission', [SubscriptionController::class, 'create_permission'])->name('buffet.permission.store');
