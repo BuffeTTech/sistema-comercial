@@ -50,19 +50,21 @@ class SubscriptionController extends Controller
     }
     public function insert_role_in_permission(Request $request){
         $permission = $request->permission;
-        $role = $request->role;
-        $role_eloquent = $this->role->where('name', $role['name'])->get()->first();
+        $roles = $request->roles;
+
         $permission_eloquent = $this->permission->where('name', $permission['name'])->get()->first();
-        if(!$role_eloquent) {
-            return response(422)->json();
-        }
         if(!$permission_eloquent) {
             $this->permission->create([
                 'name'=>$permission['name']
             ]);
         }
 
-        $role_eloquent->givePermissionTo($permission['name']);
+        foreach($roles as $role) {
+            $role_eloquent = $this->role->where('name', $role['name'])->get()->first();
+            if($role_eloquent) {
+                $role_eloquent->givePermissionTo($permission['name']);
+            }
+        }
 
         return response()->json();
     }
