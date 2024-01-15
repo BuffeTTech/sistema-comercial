@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('subscription_id')->constrained(
                 table: 'subscriptions', indexName: 'buffet_subscriptions_subscriptions_id'
             );
+            $table->dateTime('expires_in');
 
             // Informações de pagamento
             $table->timestamps();

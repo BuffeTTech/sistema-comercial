@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\BuffetStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\Buffet;
@@ -20,8 +21,8 @@ class AuthenticatedSessionController extends Controller
     {        
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
-        if(!$buffet || !$buffet_slug) {
-            return redirect()->route('home');
+        if(!$buffet || !$buffet_slug || $buffet->status == BuffetStatus::UNACTIVE->name) {
+            return redirect(RouteServiceProvider::NOT_FOUND);
             //redirecionar para a landing page do sistema administrativo
         } else {
             // buffet exists
@@ -34,6 +35,12 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        // $buffet_slug = $request->buffet;
+        // $buffet = Buffet::where('slug', $buffet_slug)->first();
+        // if(!$buffet || !$buffet_slug || $buffet->status == BuffetStatus::UNACTIVE->name) {
+        //     return redirect()->back();
+        // }
+
         $request->authenticate();
 
         $request->session()->regenerate();

@@ -21,6 +21,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/buffet', [BuffetController::class, 'store_buffet_api'])->name('api.buffet.store');
+Route::put('/buffet/{slug}', [BuffetController::class, 'update_buffet_api'])->name('api.buffet.update');
+Route::delete('/buffet/{slug}', [BuffetController::class, 'delete_buffet_api'])->name('api.buffet.delete');
 
 Route::post('/subscription', [SubscriptionController::class, 'create_subscription'])->name('buffet.subscription.store');
 Route::post('/subscription/permission', [SubscriptionController::class, 'create_permission'])->name('buffet.permission.store');
