@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\BuffetStatus;
 use App\Models\Buffet;
 use App\Providers\RouteServiceProvider;
 use Closure;
@@ -20,7 +21,7 @@ class EnsureBuffetExistsURL
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         
-        if(!$buffet || !$buffet_slug) {
+        if(!$buffet || !$buffet_slug || $buffet->status == BuffetStatus::UNACTIVE->name) {
             if(auth()->user()) {
                 dd('aaa');
                 return redirect()->intended(RouteServiceProvider::HOME);

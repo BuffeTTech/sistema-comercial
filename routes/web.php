@@ -38,4 +38,5 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     Route::patch('/{buffet}/schedule/{schedule}/change_status', [ScheduleController::class,'change_status'])->name('schedule.change_status');
 });
 
+
 require __DIR__.'/auth.php';
