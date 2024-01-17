@@ -116,7 +116,8 @@ class BookingController extends Controller
                 ->select('schedules.*')
             ->where('schedules.buffet_id', $buffet->id)
             ->where('schedules.status', ScheduleStatus::ACTIVE->name)
-            ->where('day_week', $dayOfWeek)
+            ->where('schedules.day_week', $dayOfWeek)
+            ->select('schedules.*')
             ->get();
 
 
