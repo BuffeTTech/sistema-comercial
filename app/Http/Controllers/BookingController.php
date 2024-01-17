@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Enums\BookingStatus;
+use App\Enums\BuffetStatus;
 use App\Enums\DayWeek;
 use App\Enums\DecorationStatus;
 use App\Enums\FoodStatus;
 use App\Enums\ScheduleStatus;
+use App\Events\BookingCreatedEvent;
 use App\Http\Requests\Bookings\StoreBookingRequest;
 use App\Http\Requests\Bookings\UpdateBookingRequest;
 use App\Models\Booking;
@@ -14,6 +16,7 @@ use App\Models\Buffet;
 use App\Models\Decoration;
 use App\Models\Food;
 use App\Models\Schedule;
+use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
 
@@ -29,6 +32,8 @@ class BookingController extends Controller
     {
         
     }
+
+    private static int $min_days = 5;
     /**
      * Display a listing of the resource.
      */
@@ -70,15 +75,109 @@ class BookingController extends Controller
      */
     public function store(StoreBookingRequest $request)
     {
-        //
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
+        }
+
+        // valida a hora
+        $schedule = $this->schedule->where('id', $request->schedule_id)->where('buffet_id', $buffet->id)->get()->first();
+
+        if(!$schedule) {
+            return redirect()->back()->withErrors(['schedule_id'=>'Schedule not found'])->withInput();
+        }
+        
+        if($schedule->status !== ScheduleStatus::ACTIVE->name) {
+            return redirect()->back()->withErrors(['schedule_id'=>'Schedule is not active'])->withInput();
+        }
+
+        // valida o dia
+        $party_day = $request->party_day;
+
+        $today_date = date('Y-m-d');
+        $party_start = date("Y-m-d H:i",strtotime(Carbon::parse($party_day)->setHours($schedule['start_time'])));
+        $party_end = date("Y-m-d H:i",strtotime(Carbon::parse($party_day)->setHours($schedule['start_time'])->addMinutes($schedule['duration'])));
+        $max_date = Carbon::parse($today_date)->addDays(self::$min_days);
+
+        if($max_date > $party_start) {
+            return redirect()->back()->withErrors(['party_day'=>"Party should be scheduled with a minimum of ".self::$min_days." days"])->withInput();
+        }
+        if($party_end < $party_start) {
+            return redirect()->back()->withErrors(['party_day'=>"Party can not end before start"])->withInput();
+        }
+
+        // Valida se existe alguma reserva neste horário
+        $booking_exists_in_time = $this->booking
+            ->where('buffet_id', $buffet->id)
+            ->where('party_day', $party_day)
+            ->where('schedule_id', $schedule->id)
+            ->where('status', BookingStatus::APPROVED->name)
+            ->get()->first();
+        if($booking_exists_in_time) {
+            return redirect()->back()->withErrors(['party_day'=>"Booking already exists in this time"])->withInput();
+        }
+
+        // Valida o pacote de comida
+        $food = $this->food
+            ->where('slug', $request->food_id)
+            ->where('buffet', $buffet->id)
+            ->where('status', FoodStatus::ACTIVE->name)
+            ->get()
+            ->first();
+
+        if(!$food) {
+            return redirect()->back()->withErrors(['food_id'=>"Food not found"])->withInput();
+        }
+
+        // Valida o pacote de decorações
+        $decoration = $this->decoration
+            ->where('slug', $request->decoration_id)
+            ->where('buffet', $buffet->id)
+            ->where('status', DecorationStatus::ACTIVE->name)
+            ->get()
+            ->first();
+
+        if(!$decoration) {
+            return redirect()->back()->withErrors(['decoration_id'=>"Decoration not found"])->withInput();
+        }
+
+        // Cria a reserva
+        $booking = $this->booking->create([
+            'name_birthdayperson'=>$request->name_birthdayperson,
+            'years_birthdayperson'=>$request->years_birthdayperson,
+            'num_guests'=>$request->num_guests,
+            'party_day'=>$party_day,
+            'buffet_id'=>$buffet->id,
+            'user_id'=>auth()->user()->id,
+            'food_id'=>$food->id,
+            'price_food'=>$food->price,
+            'decoration_id'=>$decoration->id,
+            'price_decoration'=>$decoration->price,
+            'schedule_id'=>$schedule->id,
+            'price_schedule'=>0,
+            'discount'=>0,
+            'status'=>BookingStatus::PENDENT->name
+        ]);
+
+        event(new BookingCreatedEvent($booking));
+
+        return redirect()->route('booking.show', ['buffet'=>$buffet->slug, 'booking'=>$booking->id]);
+
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Booking $booking)
+    public function show(Request $request)
     {
-        //
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+        $booking = $this->booking->where('id',$request->booking)->with(['food', 'decoration', 'schedule'])->get()->first();
+        
+        
+        return view('bookings.show', ['buffet'=>$buffet,'booking'=>$booking]);
     }
 
     /**
@@ -103,6 +202,17 @@ class BookingController extends Controller
     public function destroy(Booking $booking)
     {
         //
+    }
+    public function change_status(Request $request)
+    {
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+        $booking = $this->booking->where('id',$request->booking)->with(['food', 'decoration', 'schedule'])->get()->first();
+
+        $booking->update(['status'=>$request->status]);
+
+
+        return redirect()->route('booking.show', ['buffet'=>$buffet->slug, 'booking'=>$booking->id]);
     }
 
     // API

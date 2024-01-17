@@ -7,7 +7,7 @@
                     <div class="overflow-auto">
                         <div>
                             <h1 class="inline-flex items-center border border-transparent text-lg leading-4 font-semi-bold">Listagem das reservas</h1>
-                            <h2><a href="{{ route('booking.create', ['buffet'=> $buffet]) }}">Criar Reserva</a></h2>
+                            <h2><a href="{{ route('booking.create', ['buffet'=> $buffet->slug]) }}">Criar Reserva</a></h2>
                         </div>
                         {{-- @php
                             $user = auth()->user();
@@ -50,7 +50,7 @@
                                 <tr class="bg-white">
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $booking['id'] }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                    <a href="{{ route('booking.show', ['booking'=>$booking['id'], 'buffet'=>$buffet]) }}" class="font-bold text-blue-500 hover:underline">{{ $booking->name_birthdayperson }}</a>
+                                    <a href="{{ route('booking.show', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" class="font-bold text-blue-500 hover:underline">{{ $booking->name_birthdayperson }}</a>
                                     </td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $booking->num_guests }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $booking->food['slug'] }}</td>
@@ -60,9 +60,9 @@
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ date("H:i", strtotime(\Carbon\Carbon::parse($booking->schedule['start_time'])->addMinutes($booking->schedule['duration']))) }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.booking_status :status="$booking['status']" /></td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                        <a href="{{ route('booking.show', ['booking'=>$booking['id'], 'buffet'=>$buffet]) }}" title="Visualizar '{{$booking->name_birthdayperson}}'">👁️</a>
-                                        <a href="{{ route('booking.edit', ['booking'=>$booking['id'], 'buffet'=>$buffet]) }}" title="Editar '{{$booking->name_birthdayperson}}'">✏️</a>
-                                        <form action="{{ route('booking.destroy', ['booking'=>$booking['id'], 'buffet'=>$buffet]) }}" method="post" class="inline">
+                                        <a href="{{ route('booking.show', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" title="Visualizar '{{$booking->name_birthdayperson}}'">👁️</a>
+                                        <a href="{{ route('booking.edit', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" title="Editar '{{$booking->name_birthdayperson}}'">✏️</a>
+                                        <form action="{{ route('booking.destroy', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" method="post" class="inline">
                                             @csrf
                                             @method('delete')
                                             <button type="submit" title="Deletar '{{ $booking['start_time'] }}'">❌</button>

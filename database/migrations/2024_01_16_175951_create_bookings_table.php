@@ -40,7 +40,7 @@ return new class extends Migration
             );
             $table->float('price_schedule'); 
 
-            $table->float('discount');
+            $table->float('discount')->nullable();
             $table->enum('status', array_column(BookingStatus::cases(), 'name'));
             $table->timestamps();
         });

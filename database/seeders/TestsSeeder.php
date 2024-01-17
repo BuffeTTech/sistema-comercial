@@ -167,6 +167,7 @@ class TestsSeeder extends Seeder
             'price_schedule'=>0,
             'discount'=>0,
             'status'=>BookingStatus::APPROVED->name,
+            'user_id'=>$user1->id
         ]);
     }
 }

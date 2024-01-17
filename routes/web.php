@@ -39,6 +39,8 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     Route::patch('/{buffet}/schedule/{schedule}/change_status', [ScheduleController::class,'change_status'])->name('schedule.change_status');
     
     Route::resource('{buffet}/booking', BookingController::class);
+    Route::patch('/{buffet}/booking/{booking}/change_status', [BookingController::class,'change_status'])->name('booking.change_status');
+
 });
 
 

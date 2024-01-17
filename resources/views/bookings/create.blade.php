@@ -125,7 +125,7 @@
                                     <div class="swiper-button-next"></div>
 
                             </div>
-                            <x-input-error :messages="$errors->get('food_id')" class="mt-2" />
+                            <x-input-error :messages="$errors->get('decoration_id')" class="mt-2" />
                         </div>
                         <div>
                             <x-input-label for="party_day" :value="__('Dia da festa')" class="dark:text-slate-800"/>
