@@ -40,7 +40,7 @@
                                 <tr class="bg-white">
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['id'] }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                    <a href="{{ route('schedule.show', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" class="font-bold text-blue-500 hover:underline">{{ $value['day_week'] }}</a>
+                                    <a href="{{ route('schedule.show', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" class="font-bold text-blue-500 hover:underline">{{ App\Enums\DayWeek::getNameInPortuguese($value['day_week']) }}</a>
                                     </td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap">{{$value['start_time']}}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{$value['duration']}} minutos</td>

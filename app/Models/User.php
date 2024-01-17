@@ -46,6 +46,16 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function phone1() {
+        return $this->belongsTo(Phone::class, 'phone1');
+    }
+    public function phone2() {
+        return $this->belongsTo(Phone::class, 'phone2');
+    }
+    public function address() {
+        return $this->belongsTo(Address::class, 'address');
+    }
+
     public function ownedBuffets()
     {
         return $this->hasMany(Buffet::class, 'owner_id');

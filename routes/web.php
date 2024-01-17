@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BuffetController;
 use App\Http\Controllers\FoodController;
 use App\Http\Controllers\ProfileController;
@@ -36,6 +37,8 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
 
     Route::resource('{buffet}/schedule', ScheduleController::class);
     Route::patch('/{buffet}/schedule/{schedule}/change_status', [ScheduleController::class,'change_status'])->name('schedule.change_status');
+    
+    Route::resource('{buffet}/booking', BookingController::class);
 });
 
 

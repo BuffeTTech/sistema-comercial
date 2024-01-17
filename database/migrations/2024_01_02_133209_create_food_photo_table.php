@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('mime_type'); // "image/jpeg", "image/png"
             $table->unsignedBigInteger('file_size');
             $table->foreignId('food')->constrained(
-                table: 'food', indexName: 'food_id'
+                table: 'foods', indexName: 'food_id'
             );
             $table->timestamps();
         });

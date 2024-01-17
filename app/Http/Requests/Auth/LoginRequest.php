@@ -54,24 +54,24 @@ class LoginRequest extends FormRequest
             ]);
         }
         $credentials['buffet_id'] = $buffet->id;
-
+        
         if (!$user = $this->validateBuffet($credentials, $buffet)) {
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);
         }
-
+        
         // Caso o usuario seja um administrador, o buffet_id é nulo, logo preciso adaptar as credenciais enviadas
         $credentials['buffet_id'] = $user->buffet_id;
-
+        
         if (!Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
-
+            
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);
         }
-
+        
         RateLimiter::clear($this->throttleKey());
     }
 

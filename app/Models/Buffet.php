@@ -21,4 +21,19 @@ class Buffet extends Model
         return $this->hasMany(BuffetSubscription::class, 'buffet_id');
     }
 
+    public function phone1() {
+        return $this->belongsTo(Phone::class, 'phone1');
+    }
+    public function phone2() {
+        return $this->belongsTo(Phone::class, 'phone2');
+    }
+    public function address() {
+        return $this->belongsTo(Address::class, 'address');
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'buffet_id');
+    }
+
 }

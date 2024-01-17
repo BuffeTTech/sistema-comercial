@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BuffetController;
 use App\Http\Controllers\SubscriptionController;
 use Illuminate\Http\Request;
@@ -19,6 +20,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/{buffet}/booking/schedule/{day}', [BookingController::class, 'api_get_open_schedules_by_day_and_buffet'])->name('api.bookings.get_schedules_by_day_buffet');
+Route::get('/{buffet}/booking/schedule/{day}/edit', [BookingController::class, 'api_get_open_schedules_by_day_and_buffet_update'])->name('api.bookings.get_schedules_by_day_buffet_update');
 
 Route::post('/buffet', [BuffetController::class, 'store_buffet_api'])->name('api.buffet.store');
 Route::put('/buffet/{slug}', [BuffetController::class, 'update_buffet_api'])->name('api.buffet.update');
