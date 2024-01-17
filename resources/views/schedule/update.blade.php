@@ -19,7 +19,7 @@
                 <label for="day_week" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Dia da semana</label>
                     <select name="day_week" id="day_week" :value="old('start_time')" required>
                         @foreach( App\Enums\DayWeek::array() as $key=>$day_week )
-                            <option value="{{$key}}">{{$key}}</option>
+                            <option value="{{$day_week}}">{{$key}}</option>
                         @endforeach
                         <!-- <option value="invalid2"  disabled>Nenhum horario disponivel neste dia, tente novamente!</option> -->
                     </select>

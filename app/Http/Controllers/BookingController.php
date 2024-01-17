@@ -4,11 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Enums\BookingStatus;
 use App\Enums\DayWeek;
+use App\Enums\DecorationStatus;
+use App\Enums\FoodStatus;
 use App\Enums\ScheduleStatus;
 use App\Http\Requests\Bookings\StoreBookingRequest;
 use App\Http\Requests\Bookings\UpdateBookingRequest;
 use App\Models\Booking;
 use App\Models\Buffet;
+use App\Models\Decoration;
+use App\Models\Food;
 use App\Models\Schedule;
 use DateTime;
 use Illuminate\Http\Request;
@@ -19,6 +23,8 @@ class BookingController extends Controller
         protected Buffet $buffet,
         protected Schedule $schedule,
         protected Booking $booking,
+        protected Food $food,
+        protected Decoration $decoration
     )
     {
         
@@ -26,9 +32,19 @@ class BookingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+        
+        if(!$buffet || !$buffet_slug) {
+            return null;
+        }
+        
+        // Lista de somente as próximas reservas 
+        $bookings =  $this->booking->where('buffet_id', $buffet->id)->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
+
+        return view('bookings.index', ['bookings'=>$bookings,'buffet' => $buffet]);
     }
 
     /**
@@ -43,7 +59,10 @@ class BookingController extends Controller
             return null;
         }
 
-        return view('booking.create', ['buffet'=>$buffet]);
+        $foods = $this->food->where('buffet', $buffet->id)->where('status', FoodStatus::ACTIVE->name)->get();
+        $decorations = $this->decoration->where('buffet', $buffet->id)->where('status', DecorationStatus::ACTIVE->name)->get();
+
+        return view('bookings.create', ['buffet'=>$buffet, 'foods'=>$foods, 'decorations'=>$decorations]);
     }
 
     /**
@@ -102,6 +121,41 @@ class BookingController extends Controller
             return response()->json(['message' => 'Day not found'], 422);
         }
 
+        if($request->booking) {
+            $booking = $this->booking->where('id', $request->booking)->get()->first();
+            if(!$booking) {
+                return response()->json(['message' => 'Booking not found'], 422);
+            }
+
+            $booking_id = $booking->id;
+
+            $schedules = $this->schedule
+                ->leftJoin('bookings', function ($join) use ($date) {
+                    $join->on('schedules.id', '=', 'bookings.schedule_id')
+                        ->where('bookings.party_day', '=', $date);
+                })
+                ->where(function ($query) use ($booking_id) {
+                    $query->whereNull('bookings.schedule_id')
+                        ->orWhere('bookings.id', '=', $booking_id);
+                })
+                ->orderBy('schedules.start_time', 'asc')
+                ->where('schedules.buffet_id', $buffet->id)
+                ->where('schedules.day_week', $dayOfWeek)
+                ->where('schedules.status', ScheduleStatus::ACTIVE->name)
+                ->select('schedules.*')
+                ->get()
+                ->map(function ($item) use ($booking_id) {
+                    if ($item->id === $booking_id) {
+                        $item->special_id = $item->id;
+                    } else {
+                        $item->special_id = null;
+                    }
+                    return $item;
+                })
+                ->toArray();
+            return response()->json(['day'=>$date, 'day_week'=>$dayOfWeek, 'schedules'=>$schedules], 200);
+
+        }
 
         $schedules = $this->schedule
             ->leftJoin('bookings', function ($join) use ($date) {
@@ -113,18 +167,13 @@ class BookingController extends Controller
                     ->orWhere('bookings.status', '=', BookingStatus::REJECTED->name);
             })
             ->orderBy('schedules.start_time', 'asc')
-                ->select('schedules.*')
-            ->where('schedules.buffet_id', $buffet->id)
             ->where('schedules.status', ScheduleStatus::ACTIVE->name)
+            ->where('schedules.buffet_id', $buffet->id)
             ->where('schedules.day_week', $dayOfWeek)
             ->select('schedules.*')
             ->get();
 
 
         return response()->json(['day'=>$date, 'day_week'=>$dayOfWeek, 'schedules'=>$schedules], 200);
-    }
-    public function api_get_open_schedules_by_day_and_buffet_update(Request $request) {
-        return response()->json(['dataa'=>$request]);
-
     }
 }

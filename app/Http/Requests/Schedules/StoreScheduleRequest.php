@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Schedules;
 
+use App\Enums\DayWeek;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreScheduleRequest extends FormRequest
@@ -22,7 +23,7 @@ class StoreScheduleRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'day_week' => 'required|in:Segunda,Terca,Quarta,Quinta,Sexta,Sabado,Domingo',
+            'day_week' => ['required', 'in:' . implode(',', DayWeek::array())],
             'start_time'=>'required|date_format:H:i', // esse formato é Hora:minuto
             'duration'=>'required|numeric|min:60', //minimo de uma hora em minutos 
             'start_block' => 'nullable|date_format:Y-m-d',

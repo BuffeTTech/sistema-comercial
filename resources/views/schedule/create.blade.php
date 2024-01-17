@@ -15,13 +15,15 @@
 
             <!-- Dia da semana -->
             <div>
+                <x-input-label for="day_week" :value="__('Dia da semana')" />
                 <label for="day_week" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Dia da semana</label>
                     <select name="day_week" id="day_week" required>
                         @foreach( App\Enums\DayWeek::array() as $key=>$day_week )
-                            <option value="{{$key}}">{{$key}}</option>
+                            <option value="{{$day_week}}">{{$key}}</option>
                         @endforeach
                         <!-- <option value="invalid2"  disabled>Nenhum horario disponivel neste dia, tente novamente!</option> -->
                     </select>
+                <x-input-error :messages="$errors->get('day_week')" class="mt-2" />
             </div>
 
             <div>

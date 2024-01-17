@@ -17,4 +17,10 @@ class Booking extends Model
     public function schedule() {
         return $this->belongsTo(Schedule::class, 'schedule_id');
     } 
+    public function food() {
+        return $this->belongsTo(Food::class);
+    } 
+    public function decoration() {
+        return $this->belongsTo(Decoration::class);
+    } 
 }

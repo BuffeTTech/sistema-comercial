@@ -8,13 +8,13 @@ enum DayWeek: string
 
     use EnumToArray;
 
-    case SUNDAY = 'sunday';
-    case MONDAY = 'monday';
-    case TUESDAY = 'tuesday';
-    case WEDNESDAY = 'wednesday';
-    case THURSDAY = 'thursday';
-    case FRIDAY = 'friday';
-    case SATURDAY = 'saturday';
+    case SUNDAY = 'Domingo';
+    case MONDAY = 'Segunda-feira';
+    case TUESDAY = 'Terça-feira';
+    case WEDNESDAY = 'Quarta-feira';
+    case THURSDAY = 'Quinta-feira';
+    case FRIDAY = 'Sexta-feira';
+    case SATURDAY = 'Sábado';
 
     public static function getNameInPortuguese($dayOfWeek)
     {

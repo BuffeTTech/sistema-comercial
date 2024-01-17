@@ -21,6 +21,9 @@ return new class extends Migration
             $table->foreignId('buffet_id')->constrained(
                 table: 'buffets', indexName: 'booking_buffet_id'
             );
+            $table->foreignId('user_id')->constrained(
+                table: 'users', indexName: 'bookings_user_id'
+            );
 
             $table->foreignId('food_id')->constrained(
                 table: 'foods', indexName: 'booking_food_id'

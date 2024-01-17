@@ -58,12 +58,34 @@ class ScheduleController extends Controller
      */
     public function store(StoreScheduleRequest $request)
     {
-
         $buffet_slug = $request->buffet; 
         $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
 
-        if($this->schedule->where('id', $request->schedule)->where('buffet_id', $buffet->id)->get()->first()){
-            return redirect()->back()->withErrors(['schedule' => 'schedule already exists'])->withInput();
+        if(!$buffet || !$buffet_slug){
+            return null; 
+        }
+
+        $startDateTime = \Carbon\Carbon::parse($request->start_time);
+        $endDateTime = $startDateTime->copy()->addMinutes($request->duration);
+
+        // Verifica conflitos de horário e dia da semana
+        $conflictingSchedules = $this->schedule
+            ->where('buffet_id', $buffet->id)
+            ->where('day_week', $request->day_week)
+            ->where(function ($query) use ($startDateTime, $endDateTime) {
+                $query->where(function ($q) use ($startDateTime, $endDateTime) {
+                    $q->where('start_time', '>=', $startDateTime)
+                        ->where('start_time', '<', $endDateTime);
+                })
+                ->orWhere(function ($q) use ($startDateTime, $endDateTime) {
+                    $q->where('start_time', '<', $startDateTime)
+                        ->where('start_time', '>', $endDateTime);
+                });
+            })
+            ->get();
+
+        if (count($conflictingSchedules) !== 0) {
+            return redirect()->back()->withErrors(['start_time' => 'Schedule conflicts with existing schedules for the selected day of the week'])->withInput();
         }
 
         $schedule = $this->schedule->create([
@@ -123,8 +145,31 @@ class ScheduleController extends Controller
         }
 
         $schedule_exists = $this->schedule->where('id', $request->schedule)->where('buffet_id', $buffet->id)->get()->first();
-        if($schedule_exists && $schedule_exists->id !== $schedule->id) {
-            return redirect()->back()->withErrors(['slug' => 'schedule already exists.'])->withInput();
+        // if($schedule_exists && $schedule_exists->id !== $schedule->id) {
+        //     return redirect()->back()->withErrors(['slug' => 'schedule already exists.'])->withInput();
+        // }
+
+        $startDateTime = \Carbon\Carbon::parse($request->start_time);
+        $endDateTime = $startDateTime->copy()->addMinutes($request->duration);
+
+        // Verifica conflitos de horário e dia da semana
+        $conflictingSchedules = $this->schedule
+            ->where('buffet_id', $buffet->id)
+            ->where('day_week', $request->day_week)
+            ->where(function ($query) use ($startDateTime, $endDateTime) {
+                $query->where(function ($q) use ($startDateTime, $endDateTime) {
+                    $q->where('start_time', '>=', $startDateTime)
+                        ->where('start_time', '<', $endDateTime);
+                })
+                ->orWhere(function ($q) use ($startDateTime, $endDateTime) {
+                    $q->where('start_time', '<', $startDateTime)
+                        ->where('start_time', '>', $endDateTime);
+                });
+            })
+            ->get();
+
+        if (count($conflictingSchedules) > 1 || ($schedule_exists->id !== $schedule->id && count($conflictingSchedules) === 1)) {
+            return redirect()->back()->withErrors(['start_time' => 'Schedule conflicts with existing schedules for the selected day of the week'])->withInput();
         }
 
         $schedule->update([
