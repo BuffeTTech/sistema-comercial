@@ -35,6 +35,7 @@ class BookingFinishedNotification extends Notification implements ShouldQueue
     {
         $url = url($this->booking->buffet->slug.'/dashboard');
         return (new MailMessage)
+                    ->subject('Festa Finalizada em '.$this->booking->buffet->trading_name)
                     ->greeting('Boa tarde, '.$notifiable->name.'!')
                     ->line('Agradecemos e o parabenizamos pela sua festa no buffet '.$this->booking->buffet->trading_name.'!')
                     ->line('Para finalizar nosso atendimento, pedimos que responda a nossa pesquisa de satisfação através do link apresentado no botão abaixo')

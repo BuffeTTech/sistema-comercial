@@ -37,6 +37,7 @@ class BookingRejectedNotification extends Notification implements ShouldQueue
         $url = url($this->booking->buffet->slug.'/booking/'.$this->booking->id.'/reschedule');
 
         return (new MailMessage)
+                    ->subject('Festa Negada em '.$this->booking->buffet->trading_name)
                     ->greeting('Boa tarde, '.$notifiable->name.'!')
                     ->line('Infelizmente, sua festa no buffet '.$this->booking->buffet->trading_name.' no dia '.date("Y-m-d",strtotime(Carbon::parse($this->booking->party_day))).' foi negada')
                     ->line('Caso tenha interesse em re-agendar sua festa em outro momento')

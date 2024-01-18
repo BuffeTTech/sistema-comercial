@@ -39,6 +39,7 @@ class BookingApprovedNotification extends Notification implements ShouldQueue
     {
         $url = url($this->booking->buffet->slug.'/booking/'.$this->booking->id);
         return (new MailMessage)
+                    ->subject('Festa Agendada em '.$this->booking->buffet->trading_name)
                     ->greeting('Boa tarde, '.$notifiable->name.'!')
                     ->line('Temos o prazer em confirmar a sua festa no buffet '.$this->booking->buffet->trading_name.'!')
                     ->line('A festa está agendada para '.date("Y-m-d H:i",strtotime(Carbon::parse($this->booking->party_day)->setHours($this->booking->schedule['start_time']))))

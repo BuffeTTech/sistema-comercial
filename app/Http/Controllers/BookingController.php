@@ -78,7 +78,26 @@ class BookingController extends Controller
             $query->orderBy('start_time', 'asc');
         }, 'food','decoration', 'user'])->where('status', BookingStatus::APPROVED->name)->where('party_day', '>=', date('Y-m-d'))->orderBy('party_day', 'asc')->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
 
-        return view('bookings.index', ['bookings'=>$bookings,'buffet' => $buffet]);
+
+        $dataAgora = Carbon::now()->locale('pt-BR');
+
+        $current_party = null;
+        $isPartyHappening = false;
+
+        foreach($bookings->items() as $key => $booking)
+        {
+            $schedule = $this->schedule->where('id',$booking->schedule_id)->get()->first();
+            $booking_start = Carbon::parse($booking->party_day . ' ' . $schedule->start_time);
+            $booking_end = Carbon::parse($booking->party_day . ' ' . $schedule->start_time);
+            $booking_end->addMinutes($schedule->duration);
+
+            if($dataAgora < $booking_end && $dataAgora > $booking_start){
+                $current_party = $booking;
+                $isPartyHappening = true;
+                break;
+            }
+        }
+        return view('bookings.index', ['bookings'=>$bookings,'buffet' => $buffet, 'current_party'=>$current_party, 'isPartyHappening'=> $isPartyHappening]);
     }
 
     /**
@@ -410,6 +429,7 @@ class BookingController extends Controller
                         ->get();
         return response()->json($bookings);
     }
+
 
     public function api_get_open_schedules_by_day_and_buffet(Request $request) {
         $buffet_slug = $request->buffet;
