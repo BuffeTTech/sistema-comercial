@@ -10,6 +10,7 @@ use App\Enums\FoodStatus;
 use App\Enums\ScheduleStatus;
 use App\Events\BookingCreatedEvent;
 use App\Events\BookingUpdatedEvent;
+use App\Events\ChangeBookingStatusEvent;
 use App\Http\Requests\Bookings\StoreBookingRequest;
 use App\Http\Requests\Bookings\UpdateBookingRequest;
 use App\Models\Booking;
@@ -355,8 +356,25 @@ class BookingController extends Controller
 
         $booking->update(['status'=>$request->status]);
 
+        if($request->status === BookingStatus::APPROVED->name) {
+            $booking_exists_in_time = $this->booking
+                ->where('buffet_id', $buffet->id)
+                ->where('party_day', $booking->party_day)
+                ->where('schedule_id', $booking->schedule_id)
+                ->where('status', '!=', BookingStatus::APPROVED->name)
+                ->get();
 
-        return redirect()->route('booking.show', ['buffet'=>$buffet->slug, 'booking'=>$booking->id]);
+            foreach ($booking_exists_in_time as $bk) {
+                $bk->status = BookingStatus::REJECTED->name;
+                $bk->save();
+                event(new ChangeBookingStatusEvent($bk));
+            }
+                
+        }
+
+        event(new ChangeBookingStatusEvent($booking));
+
+        return redirect()->back()->with(['success'=>'Reserva atualizada com sucesso!']);
     }
 
     public function calendar(Request $request) {
@@ -368,6 +386,10 @@ class BookingController extends Controller
         }
 
         return view('bookings.calendar', ['buffet'=>$buffet]);
+    }
+
+    public function reschedule_party() {
+        
     }
     
     // API
@@ -382,9 +404,9 @@ class BookingController extends Controller
         $bookings = $this->booking
                         ->with(['schedule'])
                         ->where('buffet_id', $buffet->id)
-                        ->where('status', '!=', BookingStatus::CANCELED)
-                        ->where('status', '!=', BookingStatus::REJECTED)
-                        ->where('status', '!=', BookingStatus::PENDENT)
+                        ->where('status', '!=', BookingStatus::CANCELED->name)
+                        ->where('status', '!=', BookingStatus::REJECTED->name)
+                        ->where('status', '!=', BookingStatus::PENDENT->name)
                         ->get();
         return response()->json($bookings);
     }
@@ -441,20 +463,24 @@ class BookingController extends Controller
         }
 
         $schedules = $this->schedule
-            ->leftJoin('bookings', function ($join) use ($date) {
-                $join->on('schedules.id', '=', 'bookings.schedule_id')
-                    ->where('bookings.party_day', '=', $date);
-            })
-            ->where(function ($query) {
-                $query->whereNull('bookings.schedule_id')
-                    ->orWhere('bookings.status', '=', BookingStatus::REJECTED->name);
-            })
-            ->orderBy('schedules.start_time', 'asc')
-            ->where('schedules.status', ScheduleStatus::ACTIVE->name)
-            ->where('schedules.buffet_id', $buffet->id)
-            ->where('schedules.day_week', $dayOfWeek)
-            ->select('schedules.*')
-            ->get();
+                ->leftJoin('bookings', function ($join) use ($date) {
+                    $join->on('schedules.id', '=', 'bookings.schedule_id')
+                        ->where('bookings.party_day', '=', $date);
+                })
+                ->where(function ($query) {
+                    $query->whereNull('bookings.schedule_id')
+                        ->orWhereIn('bookings.status', [
+                            BookingStatus::PENDENT->name,
+                            BookingStatus::REJECTED->name,
+                            BookingStatus::CANCELED->name,
+                        ]);
+                })
+                ->orderBy('schedules.start_time', 'asc')
+                ->where('schedules.status', ScheduleStatus::ACTIVE->name)
+                ->where('schedules.buffet_id', $buffet->id)
+                ->where('schedules.day_week', $dayOfWeek)
+                ->select('schedules.*')
+                ->get();
 
 
         return response()->json(['day'=>$date, 'day_week'=>$dayOfWeek, 'schedules'=>$schedules], 200);

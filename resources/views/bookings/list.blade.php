@@ -27,12 +27,6 @@
                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">Fim</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">Status</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">Ações</th>
-                                {{--@if($format == 'all')
-                                     @role('administrative')
-                                        <th class="p-3 text-sm font-semibold tracking-wide text-center">Alterar Status</th>
-                                    @endrole
-                                @endif
-                                --}}
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -55,48 +49,27 @@
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ date("H:i", strtotime(\Carbon\Carbon::parse($booking->schedule['start_time'])->addMinutes($booking->schedule['duration']))) }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.booking_status :status="$booking['status']" /></td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
+                                            @php
+                                                // $date = \Illuminate\Support\Carbon::parse($booking->party_day.' '.$booking->open_schedule['time']);
+                                                // $date = $date->subDays($min_days);
+                                            @endphp
+                                            @if($booking->status === App\Enums\BookingStatus::PENDENT->name && $format == 'pendent')
+                                                <form action="{{ route('booking.change_status', ['buffet'=>$buffet->slug, 'booking'=>$booking->id]) }}" method="post" class="inline">
+                                                    @csrf
+                                                    @method('patch')
+                                                    <input type="hidden" name="status" value="{{App\Enums\BookingStatus::APPROVED->name}}">
+                                                    <button type="submit" title="Aprovar festa '{{$booking->name_birthdayperson}}'">✅</button>
+                                                </form>
+                                                <form action="{{ route('booking.change_status', ['buffet'=>$buffet->slug, 'booking'=>$booking->id]) }}"  method="post" class="inline">
+                                                    @csrf
+                                                    @method('patch')
+                                                    <button type="submit" title="Negar festa '{{$booking->name_birthdayperson}}'">❌</button>
+                                                </form>
+                                            @endif
                                         <a href="{{ route('booking.show', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" title="Visualizar '{{$booking->name_birthdayperson}}'">👁️</a>
                                         <a href="{{ route('booking.edit', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" title="Editar '{{$booking->name_birthdayperson}}'">✏️</a>
                                     </td>
                                 </tr>
-                                    {{-- @if($format === 'all')
-                                        @role('administrative')
-                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                                <form method="POST">
-                                                    @csrf
-                                                    @method('PATCH')
-
-                                                    <label for="status" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"></label>
-                                                    <select name="status" id="status" required onchange="this.form.submit()">
-                                                        @foreach( App\Enums\BookingStatus::array() as $key => $value )
-                                                            <option value="{{$value}}" {{ $booking->status == $value ? 'selected' : ""}}>{{$key}}</option>
-                                                        @endforeach
-                                                        <!-- <option value="invalid2"  disabled>Nenhum horario disponivel neste dia, tente novamente!</option> -->
-                                                    </select>
-                                                </form>
-                                        </td>
-                                        @endrole
-                                    @endif --}}
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                        @php
-                                            // $date = \Illuminate\Support\Carbon::parse($booking->party_day.' '.$booking->open_schedule['time']);
-                                            // $date = $date->subDays($min_days);
-                                        @endphp
-                                        {{-- @if($booking->status === 'Pendente' && $format == 'pendent')
-                                            <form action="{{ route('booking.changeStatus', $booking->id) }}" method="post" class="inline">
-                                                @csrf
-                                                @method('patch')
-                                                <input type="hidden" name="status" value="{{App\Enums\BookingStatus::APPROVED->name}}">
-                                                <button type="submit" title="Aprovar festa '{{$booking->name_birthdayperson}}'">✅</button>
-                                            </form>
-                                            <form action="{{ route('booking.negar', $booking->id) }}" method="post" class="inline">
-                                                @csrf
-                                                @method('delete')
-                                                <button type="submit" title="Negar festa '{{$booking->name_birthdayperson}}'">❌</button>
-                                            </form>
-                                        @endif --}}
-
-                                    </td>
                                 </tr>
 
 
