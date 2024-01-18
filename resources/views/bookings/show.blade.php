@@ -10,12 +10,6 @@
                         <p><strong>Dia da Festa:</strong> {{ $booking->party_day }}</p><br>
                         <p><strong>Horário da festa:</strong> {{ $booking->schedule['start_time'] }}</p><br>
                    {{-- <p><strong>Valor do Horário:</strong> {{ $booking->price_scheduçe }}</p><br> --}}
-                        
-                        @php
-                        $class_active = "p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50";
-                        $class_unactive = 'p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50';
-                        @endphp
-
                         <p><strong>Status:</strong><x-status.booking_status :status="$booking->status" /></p>
                             <form action="{{ route('booking.change_status', ['buffet' => $buffet->slug, 'booking' => $booking]) }}" method="post" class="inline">
                                 @csrf

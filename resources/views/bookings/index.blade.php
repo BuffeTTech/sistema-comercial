@@ -8,6 +8,7 @@
                         <div>
                             <h1 class="inline-flex items-center border border-transparent text-lg leading-4 font-semi-bold">Listagem das reservas</h1>
                             <h2><a href="{{ route('booking.create', ['buffet'=> $buffet->slug]) }}">Criar Reserva</a></h2>
+                            <h2><a href="{{ route('booking.list', ['buffet'=>$buffet->slug])}}">Listar todas reservas</a></h2>
                         </div>
                         {{-- @php
                             $user = auth()->user();
@@ -46,9 +47,9 @@
                                     $class_active = "p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50";
                                     $class_unactive = 'p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50';
                                 @endphp
-                                @foreach($bookings as $booking)
+                                @foreach($bookings as $key=>$booking)
                                 <tr class="bg-white">
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $booking['id'] }}</td>
+                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $key+1 }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
                                     <a href="{{ route('booking.show', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" class="font-bold text-blue-500 hover:underline">{{ $booking->name_birthdayperson }}</a>
                                     </td>

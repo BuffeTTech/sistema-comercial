@@ -28,8 +28,9 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <h1 class="text-3xl font-bold mb-4">Agendar reserva</h1>
-                    <form method="POST" action="{{ route('booking.store', ['buffet'=>$buffet->slug]) }}">
+                    <form method="POST" action="{{ route('booking.update', ['buffet'=>$buffet->slug, 'booking'=>$booking->id]) }}">
                         @csrf
+                        @method('put')
 
                         @if (session('success'))
                             <div class="alert alert-success">
@@ -64,7 +65,14 @@
                                     @foreach($foods as $key => $food)
 
                                     <div class="swiper-slide input-radio p-4 max-w-xl rounded overflow-hidden shadow-lg">
-                                        <input {{ $key === 0 ? "required" : "" }} type="radio" name="food_id" id="food-{{$food['slug']}}" value="{{$food['slug']}}" class="px-8 py-8" >
+                                        <input 
+                                            {{ $key === 0 ? "required" : "" }} 
+                                            {{ $booking->food_id == $food['id'] ? "checked" : ""}}
+                                            type="radio" 
+                                            name="food_id" 
+                                            id="food-{{$food['slug']}}" 
+                                            value="{{$food['slug']}}" 
+                                            class="px-8 py-8" >
                                         <label for="food-{{$food['slug']}}" class="px-6 py-4 bg-amber-100 block">
                                             <span class="font-bold block text-lg">
                                                 {{$food['name_food']}}
@@ -102,7 +110,14 @@
                                     @foreach($decorations as $key => $decoration)
 
                                     <div class="swiper-slide input-radio p-4 max-w-xl rounded overflow-hidden shadow-lg">
-                                        <input {{ $key === 0 ? "required" : "" }} type="radio" name="decoration_id" id="decoration-{{$decoration['slug']}}" value="{{$decoration['slug']}}" class="px-8 py-8" >
+                                        <input 
+                                            {{ $key === 0 ? "required" : "" }}
+                                            {{ $booking->decoration_id == $decoration['id'] ? "checked" : ""}}
+                                            type="radio"
+                                            name="decoration_id"
+                                            id="decoration-{{$decoration['slug']}}" 
+                                            value="{{$decoration['slug']}}" 
+                                            class="px-8 py-8" >
                                         <label for="decoration-{{$decoration['slug']}}" class="px-6 py-4 bg-amber-100 block">
                                             <span class="font-bold block text-lg">
                                                 {{$decoration['main_theme']}}
@@ -366,7 +381,7 @@
 
         async function getDates(day) {
             const csrf = document.querySelector('meta[name="csrf-token"]').content
-            const data = await axios.get(SITEURL + '/api/{{$buffet->slug}}/booking/schedule/' + day, {
+            const data = await axios.get(SITEURL + '/api/{{$buffet->slug}}/booking/schedule/' + day + '?booking={{ $booking->id }}', {
                 headers: {
                     'X-CSRF-TOKEN': csrf
                 }

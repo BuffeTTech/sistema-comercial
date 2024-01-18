@@ -7,6 +7,9 @@ use App\Http\Controllers\FoodController;
 use App\Http\Controllers\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/{buffet}/booking/calendar', [BookingController::class,'api_calendar'])->name('api.booking.calendar');
+
+
 Route::get('/{buffet}/booking/schedule/{day}', [BookingController::class, 'api_get_open_schedules_by_day_and_buffet'])->name('api.bookings.get_schedules_by_day_buffet');
 Route::get('/{buffet}/booking/schedule/{day}/edit', [BookingController::class, 'api_get_open_schedules_by_day_and_buffet_update'])->name('api.bookings.get_schedules_by_day_buffet_update');
 

@@ -15,6 +15,9 @@ Route::get('/', function () {
 
 // Todas as rotas de landing page caso existam devem ser feitas aqui, antes dos middlewares
 
+Route::get('/{buffet}/booking/calendar', [BookingController::class,'calendar'])->name('booking.calendar');
+
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -38,8 +41,9 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     Route::resource('{buffet}/schedule', ScheduleController::class);
     Route::patch('/{buffet}/schedule/{schedule}/change_status', [ScheduleController::class,'change_status'])->name('schedule.change_status');
     
-    Route::resource('{buffet}/booking', BookingController::class);
+    Route::get('/{buffet}/booking/list', [BookingController::class, 'list'])->name('booking.list');
     Route::patch('/{buffet}/booking/{booking}/change_status', [BookingController::class,'change_status'])->name('booking.change_status');
+    Route::resource('{buffet}/booking', BookingController::class);
 
 });
 

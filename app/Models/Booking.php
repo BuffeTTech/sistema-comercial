@@ -23,4 +23,7 @@ class Booking extends Model
     public function decoration() {
         return $this->belongsTo(Decoration::class);
     } 
+    public function user() {
+        return $this->belongsTo(User::class);
+    } 
 }
