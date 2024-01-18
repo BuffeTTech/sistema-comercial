@@ -11,7 +11,9 @@ use App\Models\Booking;
 use App\Models\Buffet;
 use App\Models\BuffetSubscription;
 use App\Models\Decoration;
+use App\Models\DecorationPhotos;
 use App\Models\Food;
+use App\Models\FoodPhoto;
 use App\Models\Schedule;
 use App\Models\Subscription;
 use App\Models\User;
@@ -135,22 +137,55 @@ class TestsSeeder extends Seeder
         ]);
 
         $food = Food::create([
-            'name_food'=>'Fodinha',
-            'food_description'=>'Fodinha',
-            'beverages_description'=>'Fodinha',
+            'name_food'=>'Pacote Alegria',
+            'food_description'=>'bauru, batata frita, pastel, espetinho, churros, fundoe, petit gateu, bolo da sua escolha',
+            'beverages_description'=>'coca/zero, guarana, fanta, água, suco de laranja, morango, uva, maracúja',
             'status'=>'ACTIVE',
             'price'=>55,
-            'slug'=>'fodinha',
+            'slug'=>'pacote-alegria',
             'buffet'=>$buffet->id,
         ]);
 
+        FoodPhoto::create([
+            'file_name'=>'169998221766.jpg',
+            'file_path'=>'/169998221766.170554800078-.jpg',
+            'file_extension'=>'jpg',
+            'mime_type'=>'image/jpeg',
+            'file_size'=>'40847',
+            'food'=>$food->id
+        ]);
+        FoodPhoto::create([
+            'file_name'=>'169998221749.jpg',
+            'file_path'=>'/169998221749.170554800088-.jpg',
+            'file_extension'=>'jpg',
+            'mime_type'=>'image/jpeg',
+            'file_size'=>'31904',
+            'food'=>$food->id
+        ]);
+
         $decoration = Decoration::create([
-            'main_theme'=>'fodinha',
-            'slug'=>'fodinha',
-            'description'=>'fodinha',
+            'main_theme'=>'Marvel',
+            'slug'=>'marvel',
+            'description'=>'Decoração com bonecos e personagens da Marvel',
             'price'=>66,
             'status'=>'ACTIVE',
             'buffet'=>$buffet->id
+        ]);
+        DecorationPhotos::create([
+            'file_name'=>'0_qdHImq1G588SB9Ii.jpg',
+            'file_path'=>'/0_qdhimq1g588sb9ii.170554830898-.jpg',
+            'file_extension'=>'jpg',
+            'mime_type'=>'image/jpeg',
+            'file_size'=>'191250',
+            'decorations'=>$decoration->id
+        ]);
+        DecorationPhotos::create([
+            'file_name'=>'ordem-marvel-e1606754420868.jpg',
+            'file_path'=>'/ordem-marvel-e1606754420868.17055483086-.jpg',
+            'file_extension'=>'jpg',
+            'mime_type'=>'image/jpeg',
+            'file_size'=>'113155',
+            'decorations'=>$decoration->id
         ]);
 
         $booking = Booking::create([

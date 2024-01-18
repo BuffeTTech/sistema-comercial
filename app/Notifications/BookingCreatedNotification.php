@@ -43,8 +43,7 @@ class BookingCreatedNotification extends Notification implements ShouldQueue
                     ->line('Dia da festa: '.date("Y-m-d H:i",strtotime(Carbon::parse($this->booking->party_day)->setHours($this->booking->schedule['start_time']))))
                     ->line('Pacote de comida escolhido: '.$this->booking->food->name_food)
                     ->line('Pacote de decorações escolhido: '.$this->booking->food->name_food)
-                    ->line('Preço final: R$'.$this->booking->price_food + $this->booking->price_decoration + $this->booking->price_schedule)
-                    ->line('Thank you for using our application!');
+                    ->line('Preço final: R$'.$this->booking->price_food + $this->booking->price_decoration + $this->booking->price_schedule);
     }
 
     /**

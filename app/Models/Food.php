@@ -12,4 +12,9 @@ class Food extends Model
     protected $table = "foods";
 
     protected $guarded = [];
+
+    public function photos()
+    {
+        return $this->hasMany(FoodPhoto::class, 'food');
+    }
 }

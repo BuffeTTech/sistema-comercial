@@ -37,7 +37,7 @@ class BookingPolicy
      */
     public function update(User $user, Booking $booking): bool
     {
-        //
+        return true;
     }
 
     /**

@@ -174,8 +174,12 @@ class BookingController extends Controller
     {
         $buffet_slug = $request->buffet;
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
+        }
+
         $booking = $this->booking->where('id',$request->booking)->with(['food', 'decoration', 'schedule'])->get()->first();
-        
         
         return view('bookings.show', ['buffet'=>$buffet,'booking'=>$booking]);
     }
@@ -183,9 +187,27 @@ class BookingController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Booking $booking)
+    public function edit(Request $request)
     {
-        //
+        // $this->authorize('update', Booking::class);
+
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['errors'=>'Buffet not found'])->withInput();
+        }
+        
+        $booking = $this->booking->where('id', $request->booking)->where('buffet_id', $buffet->id)->get()->first();
+        
+        if(!$booking) {
+            return redirect()->back()->withErrors(['errors'=>'Booking not found'])->withInput();
+        }
+
+        $foods = $this->food->where('buffet', $buffet->id)->where('status', FoodStatus::ACTIVE->name)->get();
+        $decorations = $this->decoration->where('buffet', $buffet->id)->where('status', DecorationStatus::ACTIVE->name)->get();
+
+        return view('bookings.update', ['buffet'=>$buffet, 'foods'=>$foods, 'decorations'=>$decorations, 'booking'=>$booking]);
     }
 
     /**
