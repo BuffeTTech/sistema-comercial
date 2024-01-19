@@ -83,6 +83,18 @@ class DatabaseSeeder extends Seeder
             'status' => UserStatus::ACTIVE->name,
             'buffet_id' => $buffet->id,
         ]);
+        $user1->assignRole($user_role->name);
+        $user2 = User::create([
+            'name' => "Andrade",
+            'email' => "foguinho@teste.com",
+            'email_verified_at' => now(),
+            'password' => Hash::make('password'),
+            'document' => "791.655.700-22",
+            'document_type' => "CPF",
+            'status' => UserStatus::ACTIVE->name,
+            'buffet_id' => $buffet->id,
+        ]);
+        $user2->assignRole($commercial_role->name);
 
         // $user = User::create([
         //     'name' => "Guilherme",

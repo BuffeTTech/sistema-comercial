@@ -27,7 +27,6 @@
                                     <th class="p-3 text-sm font-semibold tracking-wide text-center">Email</th>
                                     <th class="p-3 text-sm font-semibold tracking-wide text-center">Cargo</th>
                                     <th class="p-3 text-sm font-semibold tracking-wide text-center">Status</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100">
@@ -45,11 +44,11 @@
                                             </a>
                                         </td>
                                         <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $employee->email }}</td>
-                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"></td>
+                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $employee->roles[0]->name ?? ""}}</td>
                                         <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.user_status :status="$employee->status" /></td>
 
                                         <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                            @can('show employee')
+                                             @can('show employee')
                                             <a href="{{ route('employee.show', ['buffet'=>$buffet->slug, 'employee'=>$employee->id]) }}" title="Visualizar '{{$employee->name}}'">👁️</a>
                                             @endcan
                                             @if($employee->status !== \App\Enums\UserStatus::UNACTIVE->name)

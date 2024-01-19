@@ -41,11 +41,16 @@ class EmployeeController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
         }
 
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
+        }
+
         $employees = $this->user
             ->with(['user_phone2', 'user_phone1', 'user_address'])
             ->where('buffet_id', $buffet->id)
-            ->paginate($request->get('per page', 5), ['*'], 'page', $request->get('page', 1)); 
-
+            ->withoutRole($buffet_subscription->subscription->slug.'.user')
+            ->paginate($request->get('per page', 5), ['*'], 'page', $request->get('page', 1));
 
         return view('employee.index', ['buffet'=>$buffet, 'employees'=>$employees]); 
     }
@@ -129,7 +134,7 @@ class EmployeeController extends Controller
         }
 
         $employee = $this->user
-            ->with(['user.user_phone2', 'user.user_phone1', 'user.user_address'])
+            ->with(['user_phone2', 'user_phone1', 'user_address'])
             ->where('buffet_id', $buffet->id)
             ->find($request->employee); 
 
@@ -137,7 +142,7 @@ class EmployeeController extends Controller
             return redirect()->back()->withErrors(['user'=>'user not found'])->withInput();
         }
 
-        return view('employee .update', ['buffet'=>$buffet_slug, 'employee'=>$employee]);
+        return view('employee.update', ['buffet'=>$buffet, 'employee'=>$employee]);
         // $this->authorize('update', Employee::class);
         
         // $commercial = $this->commercial->with(['user.user_phone1','user.user_phone2', 'user.user_address'])->find($request->commercial);
@@ -152,8 +157,24 @@ class EmployeeController extends Controller
 
     }
     
-    public function show(){
+    public function show(Request $request){
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
 
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
+        }
+
+        $employee = $this->user
+            ->with(['user_phone2', 'user_phone1', 'user_address'])
+            ->where('buffet_id', $buffet->id)
+            ->find($request->employee); 
+
+        if(!$employee){
+            return redirect()->back()->withErrors(['user'=>'user not found'])->withInput();
+        }
+
+        return view('employee.show', ['buffet'=>$buffet, 'employee'=>$employee]);
     }
 
     public function destroy(){
