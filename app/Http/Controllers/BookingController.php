@@ -20,6 +20,7 @@ use App\Models\Food;
 use App\Models\Schedule;
 use Carbon\Carbon;
 use DateTime;
+use Hashids\Hashids;
 use Illuminate\Http\Request;
 
 class BookingController extends Controller
@@ -230,7 +231,7 @@ class BookingController extends Controller
         }
 
         $booking = $this->booking->where('id',$request->booking)->with(['food', 'decoration', 'schedule'])->get()->first();
-        
+
         return view('bookings.show', ['buffet'=>$buffet,'booking'=>$booking]);
     }
 
