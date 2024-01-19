@@ -51,7 +51,15 @@ class User extends Authenticatable
         return $this->hasMany(Buffet::class, 'owner_id');
     }
 
-
+    public function user_phone1() {
+        return $this->belongsTo(Phone::class, 'phone1');
+    }
+    public function user_phone2() {
+        return $this->belongsTo(Phone::class, 'phone2');
+    }
+    public function user_address() {
+        return $this->belongsTo(Address::class, 'address');
+    }
 
     public function isBuffet(): bool {
         return !!$this->buffet_id;
