@@ -29,7 +29,21 @@
                             </div>
                         </a>
                     </div>
-
+                    @if(isset($employee->roles[0]->name))
+                        @php
+                            $role = explode($buffet_subscription->subscription->slug.'.', $employee->roles[0]->name)[1];
+                        @endphp
+                        @if( $role !== "user")
+                            <br>
+                            <form action="{{ route('employee.destroy', ['buffet' => $buffet->slug, 'employee' => $employee->hashed_id]) }}" method="post" class="inline">
+                                @csrf
+                                @method('delete')
+            
+                                <button type="submit" class="bg-red-300 hover:bg-red-500 text-black font-bold py-2 px-4 rounded">Demitir funcionario</button>
+                                <p>Esta ação transforma o funcionário em um cliente</p>
+                            </form>
+                        @endif
+                    @endif
                    
             </div>
         </div>
