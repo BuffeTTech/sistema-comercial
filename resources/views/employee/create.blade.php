@@ -57,8 +57,11 @@
                                     $slug = $buffet_subscription->subscription->slug;
                                 @endphp
                                 @foreach($roles as $role)
-                                    <option value="{{ $role->name }}">{{ ucwords(explode($slug.'.', $role->name)[1]) }}</option>
-                                    (string $separator, string $string, int $limit = PHP_INT_MAX)
+                                    <option 
+                                        {{ old('role') == $role['name'] ? "selected" : "" }}
+                                        value="{{ $role->name }}">
+                                            {{ ucwords(explode($slug.'.', $role->name)[1]) }}
+                                    </option>
                                 @endforeach
                             </select>
                             <x-input-error :messages="$errors->get('role')" class="mt-2" />

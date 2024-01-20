@@ -22,7 +22,6 @@
                         <table class="w-full">
                             <thead class="bg-gray-50 border-b-2 border-gray-200">
                                 <tr>
-                                    <th class="w-20 p-3 text-sm font-semibold tracking-wide text-center">ID</th>
                                     <th class="p-3 text-sm font-semibold tracking-wide text-center">Nome</th>
                                     <th class="p-3 text-sm font-semibold tracking-wide text-center">Email</th>
                                     <th class="p-3 text-sm font-semibold tracking-wide text-center">Cargo</th>
@@ -37,9 +36,8 @@
                                 @else   
                                     @foreach($employees->items() as $employee)
                                     <tr>
-                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $employee->id }}</td>
                                         <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                            <a href="{{ route('employee.show', ['buffet'=>$buffet->slug, 'employee'=>$employee->id]) }}" class="font-bold text-blue-500 hover:underline">
+                                            <a href="{{ route('employee.show', ['buffet'=>$buffet->slug, 'employee'=>$employee->hashed_id]) }}" class="font-bold text-blue-500 hover:underline">
                                                 {{ $employee->name }}
                                             </a>
                                         </td>
@@ -49,14 +47,14 @@
 
                                         <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
                                              @can('show employee')
-                                            <a href="{{ route('employee.show', ['buffet'=>$buffet->slug, 'employee'=>$employee->id]) }}" title="Visualizar '{{$employee->name}}'">👁️</a>
+                                            <a href="{{ route('employee.show', ['buffet'=>$buffet->slug, 'employee'=>$employee->hashed_id]) }}" title="Visualizar '{{$employee->name}}'">👁️</a>
                                             @endcan
                                             @if($employee->status !== \App\Enums\UserStatus::UNACTIVE->name)
                                                 @can('update employee')
-                                                    <a href="{{ route('employee.edit', ['buffet'=>$buffet->slug, 'employee'=>$employee->id]) }}" title="Editar '{{$employee->name}}'">✏️</a>
+                                                    <a href="{{ route('employee.edit', ['buffet'=>$buffet->slug, 'employee'=>$employee->hashed_id]) }}" title="Editar '{{$employee->name}}'">✏️</a>
                                                 @endcan
                                                 @can('delete employee')
-                                                    <form action="{{ route('employee.destroy', ['buffet'=>$buffet->slug, 'employee'=>$employee->id]) }}" method="post" class="inline">
+                                                    <form action="{{ route('employee.destroy', ['buffet'=>$buffet->slug, 'employee'=>$employee->hashed_id]) }}" method="post" class="inline">
                                                         @csrf
                                                         @method('delete')
                                                         <button type="submit" title="Deletar '{{ $employee->name }}'">❌</button>

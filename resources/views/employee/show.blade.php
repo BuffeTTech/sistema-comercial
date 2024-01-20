@@ -23,7 +23,7 @@
                         </p><br> --}}
 
                     <div class="flex items-center ml-auto float-down">
-                        <a href="{{ route('employee.edit', ['buffet'=>$buffet->slug, 'employee'=>$employee->id]) }}" class="bg-amber-300 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded">
+                        <a href="{{ route('employee.edit', ['buffet'=>$buffet->slug, 'employee'=>$employee->hashed_id]) }}" class="bg-amber-300 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded">
                             <div class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4">
                                 Editar
                             </div>

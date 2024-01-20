@@ -11,6 +11,7 @@ use App\Models\BuffetSubscription;
 use App\Models\Phone;
 use App\Models\User;
 use Carbon\Carbon;
+use Hashids\Hashids;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -21,6 +22,8 @@ use Spatie\Permission\Models\Role;
 
 class EmployeeController extends Controller
 {
+    protected Hashids $hashids;
+
     public function __construct(
         protected User $user, 
         protected Buffet $buffet, 
@@ -31,8 +34,9 @@ class EmployeeController extends Controller
         protected Permission $permission
     )
     {
-        
+        $this->hashids = new Hashids(config('app.name'));
     }
+
     public function index(Request $request){
         $buffet_slug = $request->buffet;
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
@@ -79,24 +83,24 @@ class EmployeeController extends Controller
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
 
         if(!$buffet || !$buffet_slug) {
-            return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado.'])->withInput();
         }
         $buffet_subscription = $this->buffet_subscription->where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
         if($buffet_subscription->expires_in < Carbon::now()) {
-            return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
+            return redirect()->back()->withErrors(['buffet'=> "Este buffet não está mais ativo."])->withInput();
         }
         
         $mail_exists = $this->user->where('buffet_id', $buffet->id)->where('email', $request->email)->first();
         if($mail_exists) {
-            return redirect()->back()->withErrors(['email'=>'Email already exists'])->withInput();
+            return redirect()->back()->withErrors(['email'=>'Este e-mail já esta cadastrado.'])->withInput();
         }
         $document_exists = $this->user->where('buffet_id', $buffet->id)->where('document', $request->document)->first();
         if($document_exists) {
-            return redirect()->back()->withErrors(['document'=> 'Document already exists'])->withInput();
+            return redirect()->back()->withErrors(['document'=> 'Este documento já está cadastrado.'])->withInput();
         }
         $role_exists = $this->role->where('name', $request->role)->get()->first();
         if(!$role_exists) {
-            return redirect()->back()->withErrors(['role'=> 'Role not found'])->withInput();
+            return redirect()->back()->withErrors(['role'=> 'Cargo não encontrado.'])->withInput();
         }
 
         $phone = $this->phone->create(['number'=>$request->phone1]);
@@ -130,31 +134,78 @@ class EmployeeController extends Controller
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
 
         if(!$buffet || !$buffet_slug) {
-            return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
+
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
+        }
+
+        $roles = $this->role->where('name', 'like', $buffet_subscription->subscription->slug.'.%')->get();
+
+        $user_id = $this->hashids->decode($request->employee)[0];
 
         $employee = $this->user
             ->with(['user_phone2', 'user_phone1', 'user_address'])
             ->where('buffet_id', $buffet->id)
-            ->find($request->employee); 
+            ->find($user_id); 
 
         if(!$employee){
-            return redirect()->back()->withErrors(['user'=>'user not found'])->withInput();
+            return redirect()->back()->withErrors(['user'=>'Funcionário não encontrado.'])->withInput();
         }
 
-        return view('employee.update', ['buffet'=>$buffet, 'employee'=>$employee]);
-        // $this->authorize('update', Employee::class);
-        
-        // $commercial = $this->commercial->with(['user.user_phone1','user.user_phone2', 'user.user_address'])->find($request->commercial);
-        // if(!$commercial) {
-        //     return back()->with('errors', 'User not found');
-        // }
-        
-        // return view('commercial.update', compact(['commercial']))->with('success', 'Usuário deletado com sucesso');
+        return view('employee.update', ['buffet'=>$buffet, 'employee'=>$employee, 'roles'=>$roles, 'buffet_subscription'=>$buffet_subscription]);
     }
 
-    public function update(){
+    public function update(Request $request){
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
 
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
+        }
+
+        $roles = $this->role->where('name', 'like', $buffet_subscription->subscription->slug.'.%')->get();
+
+        $user_id = $this->hashids->decode($request->employee)[0];
+
+        $employee = $this->user
+            ->with(['user_phone2', 'user_phone1', 'user_address'])
+            ->where('buffet_id', $buffet->id)
+            ->find($user_id); 
+
+        if(!$employee){
+            return redirect()->back()->withErrors(['user'=>'Funcionário não encontrado.'])->withInput();
+        }
+            
+        if($request->phone1) {
+            if($employee->phone1) {
+                $this->phone->find($employee->phone1)->update(['number'=>$request->phone1]);
+            } else {
+                $employee->update(['phone1'=>$this->phone->create(['number'=>$request->phone1])->id]);
+            }
+        }
+        if($request->phone2) {
+            if($employee->phone2) {
+                $this->phone->find($employee->phone2)->update(['number'=>$request->phone2]);
+            } else {
+                $employee->update(['phone2'=>$this->phone->create(['number'=>$request->phone2])->id]);
+            }
+        }
+
+        $employee->update($request->except(['phone1', 'phone2', 'role']));
+
+        if($employee->roles[0]->name !== $request->role) {
+            $employee->syncRoles($request->role);
+        }
+
+        return back()->with('success', "Usuário atualizado com sucesso!");
     }
     
     public function show(Request $request){
@@ -162,16 +213,18 @@ class EmployeeController extends Controller
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
 
         if(!$buffet || !$buffet_slug) {
-            return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado.'])->withInput();
         }
+
+        $user_id = $this->hashids->decode($request->employee)[0];
 
         $employee = $this->user
             ->with(['user_phone2', 'user_phone1', 'user_address'])
             ->where('buffet_id', $buffet->id)
-            ->find($request->employee); 
+            ->find($user_id); 
 
         if(!$employee){
-            return redirect()->back()->withErrors(['user'=>'user not found'])->withInput();
+            return redirect()->back()->withErrors(['user'=>'Funcionário não encontrado.'])->withInput();
         }
 
         return view('employee.show', ['buffet'=>$buffet, 'employee'=>$employee]);
