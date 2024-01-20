@@ -289,4 +289,20 @@ class FoodController extends Controller
 
         return redirect()->route('food.index', ['buffet'=>$buffet_slug]);
      }
+
+     // API
+     public function api_get_food(Request $request) {
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return response()->json(['message' => 'Buffet not found'], 422);
+        }
+        
+        if(!$food = $this->food->where('slug', $request->food)->where('buffet', $buffet->id)->with('photos')->get()->first()){
+            return response()->json(['message' => 'Food not found'], 422);;
+        }
+
+        return response()->json(['data'=>$food], 200);;
+     }
 }

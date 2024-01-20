@@ -21,7 +21,7 @@ return new class extends Migration
             $table->date('start_block')->nullable();
             $table->date('end_block')->nullable();
             $table->enum('status', array_column(ScheduleStatus::cases(), 'name')); 
-            $table->foreignId('buffet')->constrained(
+            $table->foreignId('buffet_id')->constrained(
                 table: 'buffets', indexName: 'schedules_buffet_id'
             );
             $table->timestamps();

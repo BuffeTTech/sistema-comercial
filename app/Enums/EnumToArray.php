@@ -28,6 +28,15 @@ trait EnumToArray
     }
 
     throw new \ValueError("$status is not valid");
-}
+  }
+
+  public static function is_in_name(string $name): bool
+  {
+    return in_array($name, self::names());
+  }
+  public static function is_in_value(string $name): bool
+  {
+    return in_array($name, self::values());
+  }
 
 }

@@ -40,7 +40,7 @@
                                 <tr class="bg-white">
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['id'] }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                    <a href="{{ route('schedule.show', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" class="font-bold text-blue-500 hover:underline">{{ $value['day_week'] }}</a>
+                                    <a href="{{ route('schedule.show', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" class="font-bold text-blue-500 hover:underline">{{ App\Enums\DayWeek::getEnumByName($value['day_week']) }}</a>
                                     </td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap">{{$value['start_time']}}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{$value['duration']}} minutos</td>
@@ -56,8 +56,8 @@
                                     @endif
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.schedule_status :status="$value['status']" /></td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                        <a href="{{ route('schedule.show', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" title="Visualizar '{{$value['day_week']}}'">👁️</a>
-                                        <a href="{{ route('schedule.edit', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" title="Editar '{{$value['day_week']}}'">✏️</a>
+                                        <a href="{{ route('schedule.show', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" title="Visualizar '{{ App\Enums\DayWeek::getEnumByName($value['day_week']) }}'">👁️</a>
+                                        <a href="{{ route('schedule.edit', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" title="Editar '{{ App\Enums\DayWeek::getEnumByName($value['day_week']) }}'">✏️</a>
                                         <form action="{{ route('schedule.destroy', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" method="post" class="inline">
                                             @csrf
                                             @method('delete')

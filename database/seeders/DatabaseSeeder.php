@@ -27,6 +27,8 @@ class DatabaseSeeder extends Seeder
             BuffetSeeder::class,
             UserSeeder::class,
             FoodSeeder::class, 
+
+            TestsSeeder::class
         ]);
 
         // $user = User::create([

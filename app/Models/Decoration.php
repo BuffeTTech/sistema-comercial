@@ -11,4 +11,9 @@ class Decoration extends Model
 
     protected $guarded = [];
 
+    public function photos()
+    {
+        return $this->hasMany(DecorationPhotos::class, 'decorations');
+    }
+
 }

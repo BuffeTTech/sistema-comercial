@@ -29,9 +29,12 @@ class ScheduleController extends Controller
         if (!$buffet || !$buffet_slug){
             return null; 
         }
-        $schedules = $this->schedule->where('buffet', $buffet->id)->paginate($request->get('per page', 5), ['*'], 'page', $request->get('page', 1)); 
+        $schedules = $this->schedule->where('buffet_id', $buffet->id)
+        ->orderByRaw("FIELD(day_week, '" . implode("', '", DayWeek::array()) . "')")
+        ->orderBy('start_time', 'asc')
+        ->paginate($request->get('per page', 5), ['*'], 'page', $request->get('page', 1)); 
         
-        return view('schedule .index', ['buffet'=>$buffet_slug, 'schedules'=>$schedules]); 
+        return view('schedule.index', ['buffet'=>$buffet_slug, 'schedules'=>$schedules]); 
     }
 
     /**
@@ -47,7 +50,7 @@ class ScheduleController extends Controller
             return null; 
         }
         
-        return view('schedule .create', ['buffet'=>$buffet_slug]);
+        return view('schedule.create', ['buffet'=>$buffet_slug]);
     }
 
     /**
@@ -55,12 +58,34 @@ class ScheduleController extends Controller
      */
     public function store(StoreScheduleRequest $request)
     {
-
         $buffet_slug = $request->buffet; 
         $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
 
-        if($this->schedule->where('id', $request->schedule)->where('buffet', $buffet->id)->get()->first()){
-            return redirect()->back()->withErrors(['schedule' => 'schedule already exists'])->withInput();
+        if(!$buffet || !$buffet_slug){
+            return null; 
+        }
+
+        $startDateTime = \Carbon\Carbon::parse($request->start_time);
+        $endDateTime = $startDateTime->copy()->addMinutes($request->duration);
+
+        // Verifica conflitos de horário e dia da semana
+        $conflictingSchedules = $this->schedule
+            ->where('buffet_id', $buffet->id)
+            ->where('day_week', $request->day_week)
+            ->where(function ($query) use ($startDateTime, $endDateTime) {
+                $query->where(function ($q) use ($startDateTime, $endDateTime) {
+                    $q->where('start_time', '>=', $startDateTime)
+                        ->where('start_time', '<', $endDateTime);
+                })
+                ->orWhere(function ($q) use ($startDateTime, $endDateTime) {
+                    $q->where('start_time', '<', $startDateTime)
+                        ->where('start_time', '>', $endDateTime);
+                });
+            })
+            ->get();
+
+        if (count($conflictingSchedules) !== 0) {
+            return redirect()->back()->withErrors(['start_time' => 'Schedule conflicts with existing schedules for the selected day of the week'])->withInput();
         }
 
         $schedule = $this->schedule->create([
@@ -70,7 +95,7 @@ class ScheduleController extends Controller
             'start_block'=> $request->start_block,
             'end_block' => $request->end_block, 
             'status' => $request->status ?? ScheduleStatus::ACTIVE->name, 
-            'buffet'=> $buffet->id, 
+            'buffet_id'=> $buffet->id, 
         ]); 
 
         return redirect()->route('schedule.show', ['buffet'=>$buffet_slug, 'schedule' =>$schedule]);
@@ -84,7 +109,7 @@ class ScheduleController extends Controller
         $buffet_slug = $request->buffet; 
         $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
 
-        if(!$schedule = $this->schedule->where('id', $request->schedule)->where('buffet', $buffet->id)->first()){
+        if(!$schedule = $this->schedule->where('id', $request->schedule)->where('buffet_id', $buffet->id)->first()){
             return redirect()->route('schedule.index', ['buffet'=>$buffet_slug])->withErrors(['schedule'=>'schedule not found'])->withInput();
         }
         
@@ -98,12 +123,12 @@ class ScheduleController extends Controller
     {
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
-        $schedule = Schedule::where('id', $request->schedule)->where('buffet', $buffet->id)->first(); 
+        $schedule = Schedule::where('id', $request->schedule)->where('buffet_id', $buffet->id)->first(); 
         if(!$schedule){
             return redirect()->back()->withErrors(['schedule'=>'schedule not found'])->withInput();
         }
 
-        return view('schedule .update', ['buffet'=>$buffet_slug, 'schedule'=>$schedule]);
+        return view('schedule.update', ['buffet'=>$buffet_slug, 'schedule'=>$schedule]);
     }
 
     /**
@@ -114,14 +139,37 @@ class ScheduleController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
 
-        $schedule = Schedule::where('id', $request->schedule)->where('buffet', $buffet->id)->first(); 
+        $schedule = Schedule::where('id', $request->schedule)->where('buffet_id', $buffet->id)->first(); 
         if(!$schedule){
             return redirect()->back()->withErrors(['schedule'=>'schedule not found'])->withInput();
         }
 
-        $schedule_exists = $this->schedule->where('id', $request->schedule)->where('buffet', $buffet->id)->get()->first();
-        if($schedule_exists && $schedule_exists->id !== $schedule->id) {
-            return redirect()->back()->withErrors(['slug' => 'schedule already exists.'])->withInput();
+        $schedule_exists = $this->schedule->where('id', $request->schedule)->where('buffet_id', $buffet->id)->get()->first();
+        // if($schedule_exists && $schedule_exists->id !== $schedule->id) {
+        //     return redirect()->back()->withErrors(['slug' => 'schedule already exists.'])->withInput();
+        // }
+
+        $startDateTime = \Carbon\Carbon::parse($request->start_time);
+        $endDateTime = $startDateTime->copy()->addMinutes($request->duration);
+
+        // Verifica conflitos de horário e dia da semana
+        $conflictingSchedules = $this->schedule
+            ->where('buffet_id', $buffet->id)
+            ->where('day_week', $request->day_week)
+            ->where(function ($query) use ($startDateTime, $endDateTime) {
+                $query->where(function ($q) use ($startDateTime, $endDateTime) {
+                    $q->where('start_time', '>=', $startDateTime)
+                        ->where('start_time', '<', $endDateTime);
+                })
+                ->orWhere(function ($q) use ($startDateTime, $endDateTime) {
+                    $q->where('start_time', '<', $startDateTime)
+                        ->where('start_time', '>', $endDateTime);
+                });
+            })
+            ->get();
+
+        if (count($conflictingSchedules) > 1 || ($schedule_exists->id !== $schedule->id && count($conflictingSchedules) === 1)) {
+            return redirect()->back()->withErrors(['start_time' => 'Schedule conflicts with existing schedules for the selected day of the week'])->withInput();
         }
 
         $schedule->update([
@@ -131,7 +179,7 @@ class ScheduleController extends Controller
             'start_block'=> $request->start_block,
             'end_block' => $request->end_block, 
             'status' => $request->status ?? ScheduleStatus::ACTIVE->name, 
-            'buffet'=> $buffet->id, 
+            'buffet_id'=> $buffet->id, 
         ]); 
 
         return redirect()->route('schedule.show', ['buffet'=>$buffet_slug, 'schedule'=>$schedule->id]);
@@ -145,7 +193,7 @@ class ScheduleController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->get()->first(); 
 
-        $schedule = Schedule::where('id', $request->schedule)->where('buffet', $buffet->id)->first(); 
+        $schedule = Schedule::where('id', $request->schedule)->where('buffet_id', $buffet->id)->first(); 
         if(!$schedule){
             return redirect()->back()->withErrors(['schedule'=>'schedule not found'])->withInput();
         }
@@ -159,7 +207,7 @@ class ScheduleController extends Controller
         $buffet_slug = $request->buffet; 
         $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
         
-        $schedule = $this->schedule->where('id', $request->schedule)->where('buffet', $buffet->id)->first();
+        $schedule = $this->schedule->where('id', $request->schedule)->where('buffet_id', $buffet->id)->first();
         if(!$schedule){
             return redirect()->back()->withErrors(['schedule' => 'schedule not found'])->withInput();
         }

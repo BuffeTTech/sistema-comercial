@@ -5,7 +5,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 float-left" style="width: 50%; border-right: 3px solid #000000;">
                     <div class="bg-gray-50 border-b-2 border-gray-200">
-                        <p><strong>Dia da semana</strong> {{ $schedule->day_week }}</p><br>
+                        <p><strong>Dia da semana</strong> {{ App\Enums\DayWeek::getEnumByName($schedule->day_week) }}</p><br>
                         <p><strong>Horário de início</strong> {{ $schedule->start_time}}</p><br>
                         <p><strong>Duração</strong> {{ $schedule->duration }}</p><br>
                         @if($schedule['start_block']!== null)
