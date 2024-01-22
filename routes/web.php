@@ -6,6 +6,7 @@ use App\Http\Controllers\FoodController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\DecorationController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,6 +41,8 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
 
     Route::resource('{buffet}/schedule', ScheduleController::class);
     Route::patch('/{buffet}/schedule/{schedule}/change_status', [ScheduleController::class,'change_status'])->name('schedule.change_status');
+
+    Route::resource('{buffet}/employee', EmployeeController::class);
     
     Route::get('/{buffet}/booking/list', [BookingController::class, 'list'])->name('booking.list');
     Route::patch('/{buffet}/booking/{booking}/change_status', [BookingController::class,'change_status'])->name('booking.change_status');

@@ -3,6 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Hashids\Hashids;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -46,6 +49,14 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    protected function hashedId(): Attribute
+    {
+        $hashids = new Hashids(config('app.name'));
+        return Attribute::make(
+            get: fn (mixed $value, array $attributes) => $hashids->encode($attributes['id']),
+        );
+    }
+
     public function phone1() {
         return $this->belongsTo(Phone::class, 'phone1');
     }
@@ -61,7 +72,15 @@ class User extends Authenticatable
         return $this->hasMany(Buffet::class, 'owner_id');
     }
 
-
+    public function user_phone1() {
+        return $this->belongsTo(Phone::class, 'phone1');
+    }
+    public function user_phone2() {
+        return $this->belongsTo(Phone::class, 'phone2');
+    }
+    public function user_address() {
+        return $this->belongsTo(Address::class, 'address');
+    }
 
     public function isBuffet(): bool {
         return !!$this->buffet_id;

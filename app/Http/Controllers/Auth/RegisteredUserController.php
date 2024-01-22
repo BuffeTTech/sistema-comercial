@@ -63,20 +63,20 @@ class RegisteredUserController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         if(!$buffet || !$buffet_slug || $buffet->status == BuffetStatus::UNACTIVE->name) {
-            return redirect()->back()->withErrors('buffet', "Buffet not found")->withInput();
+            return redirect()->back()->withErrors(['buffet'=> "Buffet not found"])->withInput();
         }
         $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
         if($buffet_subscription->expires_in < Carbon::now()) {
-            return redirect()->back()->withErrors('buffet', "Buffet is not active")->withInput();
+            return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
         }
 
         $mail_exists = User::where('buffet_id', $buffet->id)->where('email', $request->email)->first();
         if($mail_exists) {
-            return redirect()->back()->withErrors('email', 'Email already exists')->withInput();
+            return redirect()->back()->withErrors(['email'=>'Email already exists'])->withInput();
         }
         $document_exists = User::where('buffet_id', $buffet->id)->where('document', $request->document)->first();
         if($document_exists) {
-            return redirect()->back()->withErrors('document', 'Document already exists')->withInput();
+            return redirect()->back()->withErrors(['document'=> 'Document already exists'])->withInput();
         }
         
         $user = User::create([
