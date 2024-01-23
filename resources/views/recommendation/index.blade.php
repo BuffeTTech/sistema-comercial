@@ -17,6 +17,7 @@
                                 
                                 <th class="w-20 p-3 text-sm font-semibold tracking-wide text-center">ID</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-left">Conteúdo da decoração</th>
+                                <th class="p-3 text-sm font-semibold tracking-wide text-left">Status</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">Ações</th>
 
                             </tr>
@@ -38,9 +39,17 @@
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
                                     <a href="{{ route('recommendation.show', ['buffet'=>$buffet,'recommendation'=>$value]) }}" class="font-bold text-blue-500 hover:underline">{{ $value['content'] }}</a>
                                     </td>
+                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{$value['status']}}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
                                         <a href="{{ route('recommendation.show', ['buffet'=>$buffet,'recommendation'=>$value]) }}" title="Visualizar '{{$value['content']}}'">👁️</a>
                                         <a href="{{ route('recommendation.edit', ['buffet'=>$buffet, 'recommendation'=>$value]) }}" title="Editar '{{$value['content']}}'">✏️</a>
+
+                                        <form action="{{ route('recommendation.destroy', ['buffet'=>$buffet, 'recommendation'=>$value]) }}" method="POST">
+                                            @csrf
+                                            @method('delete')
+                                            <button type="submit" class="bg-red-100 hover:bg-red-100 text-black font-bold py-1 px-2 rounded">❌</button>                                        
+                                        </form>
+
                                         <!-- Se a pessoa está vendo esta página, ela por padrão ja é ADM ou comercial, logo nao preciso validar aqui! -->
 
                                     </td>

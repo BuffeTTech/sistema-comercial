@@ -11,7 +11,7 @@
                         @endphp
 
                     <div class="flex items-center ml-auto float-down">
-                        <a href="{{ route('recommendation.edit', ['buffet'=>$buffet, 'recommendation'=>$recommendation]) }}" class="bg-amber-300 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded">
+                        <a href="{{ route('recommendation.edit', ['buffet'=>$buffet->slug, 'recommendation'=>$recommendation]) }}" class="bg-amber-300 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded">
                             <div class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4">
                                 Editar
                             </div>
