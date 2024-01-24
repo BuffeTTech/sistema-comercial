@@ -44,9 +44,10 @@ class GuestController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = $this->buffet->where('slug',$buffet_slug)->get()->first();
         $booking = $this->booking->where('id',$request->booking)->get()->first();
+        $guest = $this->guest->where('id',$request->guest)->get()->first();
 
 
-        return view('guest.show',['buffet'=>$buffet,'booking'=>$booking]);
+        return view('guest.show',['buffet'=>$buffet,'booking'=>$booking, 'guest'=>$guest]);
 
     }
 

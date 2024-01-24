@@ -52,7 +52,7 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
 
     Route::get('{buffet}/guest/invite/{booking}',[GuestController::class, 'create'])->name('guest.invite');
     Route::post('{buffet}/guest/store',[GuestController::class, 'store'])->name('guest.store');
-    Route::get('{buffet}/guest/show/{booking}',[GuestController::class, 'show'])->name('guest.show');
+    Route::get('{buffet}/guest/show/{guest}',[GuestController::class, 'show'])->name('guest.show');
 
 
 });

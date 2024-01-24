@@ -63,13 +63,13 @@
                                 <tr class="bg-white">
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $key+1 }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                    <a href="{{ route('guest.show', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" class="font-bold text-blue-500 hover:underline">{{ $guest->name }}</a>
+                                    <a href="{{ route('guest.show', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug, 'guest'=>$guest['id']]) }}" class="font-bold text-blue-500 hover:underline">{{ $guest->name }}</a>
                                     </td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $guest->document }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $guest->age}}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $guest->status }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                        <a href="{{ route('guest.show', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" title="Visualizar '{{$guest->name_birthdayperson}}'">👁️</a>
+                                        <a href="{{ route('guest.show', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug, 'guest'=>$guest['id']]) }}" title="Visualizar '{{$guest->name}}'">👁️</a>
                                         {{-- <form action="{{ route('guest.destroy', ['guest'=>$guest['id'], 'buffet'=>$buffet->slug]) }}" method="post" class="inline">
                                             @csrf
                                             @method('delete')
