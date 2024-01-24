@@ -8,6 +8,7 @@ use App\Http\Controllers\SiteController;
 use App\Http\Controllers\DecorationController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\SatisfactionSurveyController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -49,6 +50,11 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     Route::patch('/{buffet}/booking/{booking}/reschedule', [BookingController::class,'reschedule_party'])->name('booking.reschedule');
     Route::resource('{buffet}/booking', BookingController::class);
 
+
+    Route::patch('/{buffet}/survey/{survey}/change_question_status', [SatisfactionSurveyController::class,'change_question_status'])->name('survey.change_status');
+    Route::resource('{buffet}/survey', SatisfactionSurveyController::class);
+
+    //Route::post('/survey/answer', [SatisfactionSurveyController::class, 'answer'])->name('survey.answer');
 });
 
 
