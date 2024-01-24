@@ -17,6 +17,7 @@ use App\Models\Booking;
 use App\Models\Buffet;
 use App\Models\Decoration;
 use App\Models\Food;
+use App\Models\Guest;
 use App\Models\Schedule;
 use Carbon\Carbon;
 use DateTime;
@@ -30,7 +31,8 @@ class BookingController extends Controller
         protected Schedule $schedule,
         protected Booking $booking,
         protected Food $food,
-        protected Decoration $decoration
+        protected Decoration $decoration,
+        protected Guest $guest,
     )
     {
         
@@ -225,6 +227,7 @@ class BookingController extends Controller
     {
         $buffet_slug = $request->buffet;
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+        $guests = $this->guest->where('booking',$request->booking)->get();
 
         if(!$buffet || !$buffet_slug) {
             return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
@@ -232,7 +235,7 @@ class BookingController extends Controller
 
         $booking = $this->booking->where('id',$request->booking)->with(['food', 'decoration', 'schedule'])->get()->first();
 
-        return view('bookings.show', ['buffet'=>$buffet,'booking'=>$booking]);
+        return view('bookings.show', ['buffet'=>$buffet,'booking'=>$booking, 'guests'=>$guests]);
     }
 
     /**
