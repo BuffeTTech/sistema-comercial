@@ -42,7 +42,6 @@ class AuthenticatedSessionController extends Controller
         // }
 
         $request->authenticate();
-
         $request->session()->regenerate();
 
         $user = auth()->user();
@@ -51,7 +50,7 @@ class AuthenticatedSessionController extends Controller
         }
         // Caso seja um buffet
         $buffet = Buffet::find($user->buffet_id);
-        return redirect()->route('dashboard_buffet', $buffet->slug);
+        return redirect()->route('dashboard_buffet', ['buffet'=>$buffet->slug]);
 
     }
 

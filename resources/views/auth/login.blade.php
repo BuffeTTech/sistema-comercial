@@ -2,7 +2,7 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <h1 class="text-white text-xl font-bold mb-4 ">Buffet {{ $buffet->trading_name }}</h1>
+    <h1 class="text-black text-xl font-bold mb-4 "> {{ $buffet->trading_name }}</h1>
 
     <form method="POST" action="{{ route('login', ['buffet'=>$buffet->slug]) }}">
         @csrf
@@ -42,7 +42,7 @@
             @endif
 
             <x-primary-button class="ms-3">
-                {{ __('Log in') }}
+                {{ __('Log   in') }}
             </x-primary-button>
         </div>
     </form>

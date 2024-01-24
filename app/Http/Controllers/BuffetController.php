@@ -27,8 +27,11 @@ class BuffetController extends Controller
     {
         
     }
-    public function dashboard() {
-        dd('Dashboard do buffet');
+    public function dashboard(Request $request) {
+
+        $buffet = $this->buffet->where('slug', $request->buffet)->first();
+        return view("buffet_dashboard",['buffet'=>$buffet]);
+
     }
 
     /**
