@@ -27,6 +27,11 @@
                         <p><strong>Pacote de Decoração:</strong> {{ $booking->decoration->main_theme }}</p><br>
                    {{-- <p><strong>Preço da Decoração:</strong> {{ $booking->price_decoration }}</p><br> --}}
                         <p><strong>Preço:</strong> {{ $booking->price_food + $booking->price_decoration + $booking->price_schedule}}</p><br>
+                        <p><strong>Recomendações:</strong>
+                            @foreach ($recommendations as $value)
+                            <ul>{{$value['content']}}</ul>
+                            @endforeach
+                        </p><br>
                         
                    {{-- <p><strong>Valor do desconto:</strong> {{ $booking->discount}}</p><br> --}}
 
