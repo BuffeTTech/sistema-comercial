@@ -3,7 +3,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <h1 class="text-3xl font-bold mb-4">Adicionar Convidado</h1>
+                    <h1 class="text-3xl font-bold mb-4">Adicionar Convidado para a festa de {{$booking->name_birthdayperson}}</h1>
                     <div>
                         <form method="POST" action="{{ route('guest.store', ['buffet'=>$buffet->slug, 'booking'=>$booking]) }}" enctype="multipart/form-data">
                             @csrf
