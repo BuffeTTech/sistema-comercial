@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Enums\BookingStatus;
 use App\Enums\BuffetStatus;
 use App\Enums\DayWeek;
+use App\Enums\QuestionType;
+use App\Enums\SatisfactionQuestionStatus;
 use App\Enums\SubscriptionStatus;
 use App\Enums\UserStatus;
 use App\Models\Booking;
@@ -14,6 +16,7 @@ use App\Models\Decoration;
 use App\Models\DecorationPhotos;
 use App\Models\Food;
 use App\Models\FoodPhoto;
+use App\Models\SatisfactionQuestion;
 use App\Models\Schedule;
 use App\Models\Subscription;
 use App\Models\User;
@@ -209,6 +212,14 @@ class TestsSeeder extends Seeder
             'discount'=>0,
             'status'=>BookingStatus::APPROVED->name,
             'user_id'=>$user1->id
+        ]);
+
+        $question = SatisfactionQuestion::create([
+            'question' => 'Qualidade da comida', 
+            'status'  => SatisfactionQuestionStatus::ACTIVE->name,
+            'answers'  => 4,
+            'question_type' => QuestionType::M->name,
+            'buffet_id' => $buffet->id,
         ]);
     }
 }

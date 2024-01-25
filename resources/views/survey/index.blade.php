@@ -31,7 +31,7 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100">
-                                @if($questions->total() === 0)
+                                @if($surveys->total() === 0)
                                 <tr>
                                     <td colspan="7" class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">Nenhuma pergunta encontrada</td>
                                 </tr>
@@ -41,17 +41,17 @@
                                     $class_active = "p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50";
                                     $class_unactive = 'p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50';
                                     @endphp
-                                    @foreach($questions->items() as $question)
+                                    @foreach($surveys->items() as $value)
                                     <tr class="bg-white">
                                         <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['id'] }}</td>
-                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-left">{!! mb_strimwidth($value['question'], 0, $limite_char, " ...") !!} <a href="{{route('survey.show_question', $value['id'])}}" class="p-1 text-xs font-medium uppercase text-green-700 bg-green-400 rounded-lg bg-opacity-50">Ver mais</a></td>
+                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-left">{!! mb_strimwidth($value['question'], 0, $limite_char, " ...") !!} <a href="{{route('survey.show', ['survey'=>$value['id'], 'buffet'=>$buffet->slug])}}" class="p-1 text-xs font-medium uppercase text-green-700 bg-green-400 rounded-lg bg-opacity-50">Ver mais</a></td>
                                         <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['answers'] }}</td>
                                         <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ App\Enums\QuestionType::fromValue($value['question_type']) }}</td>
                                         <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.survey_status :status="$value['status']" /></td>
                                         <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                            <a href="{{ route('survey.show_question', $value['id']) }}" title="Visualizar pergunta {{$value['id']}}">👁️</a>
-                                            <a href="{{ route('survey.edit_question', $value['id']) }}" title="Editar pergunta {{$value['id']}}">✏️</a>
-                                            <form action="{{ route('survey.change_question_status', $value['id']) }}" method="post" class="inline">
+                                            <a href="{{ route('survey.show',  ['survey'=>$value['id'], 'buffet'=>$buffet->slug]) }}" title="Visualizar pergunta {{$value['id']}}">👁️</a>
+                                            <a href="{{ route('survey.edit',  ['survey'=>$value['id'], 'buffet'=>$buffet->slug]) }}" title="Editar pergunta {{$value['id']}}">✏️</a>
+                                            {{--<form action="{{ route('survey.change_question_status', $value['id']) }}" method="post" class="inline">
                                                 @csrf
                                                 @method('patch')
                                                 @if($value['status'] == true)
@@ -59,14 +59,14 @@
                                                 @else
                                                     <button type="submit" title="Ativar pergunta {{$value['id']}}">✅</button>
                                                 @endif
-                                            </form>
+                                            </form>--}}
                                         </td>
                                     </tr>
                                     @endforeach
                                 @endif
                             </tbody>
                         </table>
-                        {{ $questions->links('components.pagination') }}
+                        {{ $surveys->links('components.pagination') }}
                     </div>
 
                 </div>

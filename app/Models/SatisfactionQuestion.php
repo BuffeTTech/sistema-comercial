@@ -9,7 +9,7 @@ class SatisfactionQuestion extends Model
 {
     use HasFactory;
 
-    protected $table = "satisfaction_question";
+    protected $table = "satisfaction_questions";
 
     protected $guarded = [];
 }

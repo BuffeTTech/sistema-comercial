@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('satisfaction_answers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('question_id')->constrained(
-                table: 'satisfaction_question', indexName:'answer_question_id')->onDelete('cascade');
+                table: 'satisfaction_questions', indexName:'answer_question_id')->onDelete('cascade');
             $table->foreignId('booking_id')->constrained(
                 table:'bookings', indexName: 'answer_booking_id')->onDelete('cascade');
             $table->text('answer'); 

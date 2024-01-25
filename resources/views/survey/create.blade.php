@@ -4,7 +4,7 @@
 
     <h1>Criar Horário</h1>
     <div>
-        <form method="POST" action="{{ route('survey.store', ['buffet'=>$buffet]) }}" enctype="multipart/form-data" id="form">
+        <form method="POST" action="{{ route('survey.store', ['buffet'=>$buffet->slug]) }}" enctype="multipart/form-data" id="form">
             @csrf
 
             @if (session('success'))
@@ -62,6 +62,6 @@
             .catch( error => {
                 console.error( error );
             } );
-    </script>
+    </script> 
     
 </x-app-layout>
