@@ -53,6 +53,7 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     Route::get('{buffet}/guest/invite/{booking}',[GuestController::class, 'create'])->name('guest.invite');
     Route::post('{buffet}/guest/store',[GuestController::class, 'store'])->name('guest.store');
     Route::get('{buffet}/guest/show/{guest}',[GuestController::class, 'show'])->name('guest.show');
+    Route::patch('{buffet}/guest/change_status/{guest}',[GuestController::class,'change_status'])->name('guest.change_status');
 
 
 });

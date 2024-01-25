@@ -67,7 +67,20 @@
                                     </td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $guest->document }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $guest->age}}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $guest->status }}</td>
+                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
+                                        <form action="{{ route('guest.change_status', ['buffet' => $buffet->slug, 'guest' => $guest['id'], 'booking' => $booking]) }}" method="post" class="inline">
+                                            @csrf
+                                            @method('patch')
+                        
+                                            <label for="status" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"></label>
+                                            <select name="status" id="status" required onchange="this.form.submit()">
+                                                @foreach( App\Enums\GuestStatus::array() as $key=>$status )
+                                                    <option value="{{$status}}" {{ $guest['status'] == $status ? 'selected' : ""}}>{{$key}}</option>
+                                                @endforeach
+                                                <!-- <option value="invalid2"  disabled>Nenhum horario disponivel neste dia, tente novamente!</option> -->
+                                            </select>
+                                        </form>
+                                    </td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
                                         <a href="{{ route('guest.show', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug, 'guest'=>$guest['id']]) }}" title="Visualizar '{{$guest->name}}'">👁️</a>
                                         {{-- <form action="{{ route('guest.destroy', ['guest'=>$guest['id'], 'buffet'=>$buffet->slug]) }}" method="post" class="inline">

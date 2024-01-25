@@ -51,4 +51,18 @@ class GuestController extends Controller
 
     }
 
+    public function change_status(Request $request){
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug',$buffet_slug)->get()->first();
+        $booking = $this->booking->where('id',$request->booking)->get()->first();
+        
+
+        $guest = $this->guest->where('id',$request->guest)->update([
+            'status'=>$request->status
+        ]);
+
+
+        return redirect()->route('booking.show',['buffet'=>$buffet_slug,'booking'=>$booking]);
+    }
+
 }
