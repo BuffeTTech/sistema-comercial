@@ -9,8 +9,16 @@ class SatisfactionAnswer extends Model
 {
     use HasFactory;
 
-    protected $table = "satisfaction_answer";
+    protected $table = "satisfaction_answers";
 
     protected $guarded = [];
+
+    public function question(){
+        return $this->belongsTo(SatisfactionQuestion::class, 'question_id');
+    }
+
+    public function bookings(){
+        return $this->belongsTo(Booking::class, 'booking_id');
+    }
 
 }

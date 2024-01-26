@@ -2,9 +2,10 @@
 
     <script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
 
-    <h1>Criar Horário</h1>
+    <h1>Atualizar Pergunta</h1>
     <div>
-        <form method="POST" action="{{ route('survey.store', ['buffet'=>$buffet->slug]) }}" enctype="multipart/form-data" id="form">
+        <form method="POST" action="{{ route('survey.update', ['buffet'=>$buffet->slug, 'survey'=>$survey->id]) }}" enctype="multipart/form-data" id="form">
+            @method('put')
             @csrf
 
             @if (session('success'))
@@ -38,7 +39,7 @@
 
             <div class="flex items-center justify-end mt-4">
                 <x-primary-button class="ms-4">
-                    Criar Pergunta 
+                    Atualizar Pergunta 
                 </x-primary-button>
             </div>
         </form>
@@ -49,7 +50,7 @@
 
         form.addEventListener('submit', async function(e) {
             e.preventDefault()
-            const userConfirmed = await confirm(`Deseja criar esta pergunta?`)
+            const userConfirmed = await confirm(`Deseja ataulizar esta pergunta?`)
 
             if (userConfirmed) {
                 this.submit();

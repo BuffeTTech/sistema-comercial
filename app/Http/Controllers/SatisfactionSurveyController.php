@@ -56,25 +56,25 @@ class SatisfactionSurveyController extends Controller
         $buffet_slug = $request->buffet; 
         $buffet = Buffet::where('slug', $buffet_slug)->first(); 
 
-        if($question = $this->survey->where('id', $request->survey)->where('buffet_id', $buffet->id)->get()->first()){
+        if($survey = $this->survey->where('id', $request->survey)->where('buffet_id', $buffet->id)->get()->first()){
             return redirect()->back()->withErrors(['id' => 'question already exists.'])->withInput();
         }
 
-        $question->create([
+        $survey = $this->survey->create([
             "question"=>$request->question, 
             "status"=>$request->status ?? SatisfactionQuestionStatus::ACTIVE->name, 
             "question_type"=>$request->question_type ?? QuestionType::D->name, 
             "buffet_id"=>$buffet->id
         ]);
 
-        return redirect()->route('survey.show', ['buffet'=>$buffet, 'question'=>$question]);
+        return redirect()->route('survey.show', ['buffet'=>$buffet_slug, 'survey'=>$survey->id]);
     }
 
     public function show(Request $request){
         $buffet_slug = $request->buffet; 
         $buffet = Buffet::where('slug', $buffet_slug)->first(); 
 
-        $survey = $this->survey->where('id', $request->survey)->where('buffet_id', $buffet->id)->get()->first(); 
+        $survey = $this->survey->where('id', $request->survey)->where('buffet_id', $buffet->id)->with('user_answers')->get()->first();
         if(!$survey){
             return redirect()->route('survey.index', $buffet_slug)->withErrors(['id' => 'question not found'])->withInput();
         }
@@ -85,33 +85,35 @@ class SatisfactionSurveyController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         
-        if (!$question = $this->survey->where('id', $request->survey)->where('buffet_id', $buffet->id)->get()->first()) {
+        if (!$survey = $this->survey->where('id', $request->survey)->where('buffet_id', $buffet->id)->get()->first()) {
             return redirect()->back()->withErrors(['id' => 'question not found.'])->withInput();   
         }
 
-        return view('survey.update', ['buffet'=>$buffet, 'question'=> $question ]);
+        return view('survey.update', ['buffet'=>$buffet, 'survey'=> $survey ]);
     }
 
     public function update(UpdateSatisfactionQuestionRequest $request){
         $buffet_slug = $request->buffet;
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
 
-        $question = $this->survey->where('id', $request->question)->where('buffet_id', $buffet->id)->get()->first();
-        if(!$question){
+        $survey = $this->survey->where('id', $request->survey)->where('buffet_id', $buffet->id)->get()->first();
+        if(!$survey){
             return redirect()->back()->withErrors(['slug' => 'question not found.'])->withInput();
         }
 
-        $question_exists = $this->survey->where('id', $request->slug)->where('buffet', $buffet->id)->get()->first();
-        if($question_exists && $question_exists->id !== $question->id) {
+        $survey_exists = $this->survey->where('id', $request->slug)->where('buffet_id', $buffet->id)->get()->first();
+        if($survey_exists && $survey_exists->id !== $survey->id) {
             return redirect()->back()->withErrors(['slug' => 'question already exists.'])->withInput();
         }
 
-        $question->update([
+        $survey->update([
             "question"=>$request->question, 
             "status"=>$request->status ?? SatisfactionQuestionStatus::ACTIVE->name, 
             "question_type"=>$request->question_type ?? QuestionType::D->name, 
             "buffet_id"=>$buffet->id
         ]);
+
+        return redirect()->route('survey.show', ['buffet'=>$buffet_slug, 'survey'=>$survey->id]);
 
     }
 
