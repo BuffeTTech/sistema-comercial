@@ -4,6 +4,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BuffetController;
 use App\Http\Controllers\DecorationController;
 use App\Http\Controllers\FoodController;
+use App\Http\Controllers\SatisfactionSurveyController;
 use App\Http\Controllers\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,3 +28,6 @@ Route::post('/subscription/role', [SubscriptionController::class, 'create_role']
 // Route::post('/subscription/permission/{permission}', [SubscriptionController::class, 'create_permission'])->name('buffet.permission.store');
 Route::post('/subscription/permission/{permission}', [SubscriptionController::class, 'insert_role_in_permission'])->name('buffet.permission.insert_role');
 Route::delete('/subscription/permission/{permission}', [SubscriptionController::class, 'remove_role_from_permission'])->name('buffet.permission.remove_role');
+
+
+Route::get('/{buffet}/survey/user/{user_id}', [SatisfactionSurveyController::class, 'api_get_question_by_user_id'])->name('api.bookings.get_questions_by_user_id'); //API

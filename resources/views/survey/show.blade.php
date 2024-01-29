@@ -36,7 +36,7 @@
                                             <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $key+1 }}</td>
                                             <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-left">{{ $value->answer }}</td>
                                             <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                                <a href="{{ route('booking.show', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" class="font-bold text-blue-500 hover:underline">{{ $value->bookings['name_birthdayperson'] }}</a>
+                                                <a href="{{ route('booking.show', ['booking'=>$value->booking->hashed_id, 'buffet'=>$buffet->slug]) }}" class="font-bold text-blue-500 hover:underline">{{ $value->booking['name_birthdayperson'] }}</a>
                                             </td>
                                         </tr>
                                         @endforeach
@@ -46,7 +46,7 @@
                         <br><br>
 
                         <div class="flex items-center ml-auto float-down">
-                            <a href="{{ route('survey.edit', ['survey'=>$survey->id, 'buffet'=>$buffet->slug]) }}" class="bg-amber-300 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded">
+                            <a href="{{ route('survey.edit', ['survey'=>$survey->hashed_id, 'buffet'=>$buffet->slug]) }}" class="bg-amber-300 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded">
                                 <div class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4">
                                     Editar
                                 </div>

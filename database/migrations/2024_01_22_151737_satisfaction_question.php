@@ -17,7 +17,7 @@ return new class extends Migration
         Schema::create('satisfaction_questions', function (Blueprint $table) {
             $table->id();
             $table->string('question');
-            $table->enum('status', array_column(SatisfactionQuestionStatus::cases(), 'name'));
+            $table->boolean('status');
             $table->integer('answers')->default(0); // quantidade de respostas
             $table->enum('question_type', array_column(QuestionType::cases(), 'name'));
             $table->foreignId('buffet_id')->constrained(

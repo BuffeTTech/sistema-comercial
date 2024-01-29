@@ -17,7 +17,7 @@ class SatisfactionAnswer extends Model
         return $this->belongsTo(SatisfactionQuestion::class, 'question_id');
     }
 
-    public function bookings(){
+    public function booking(){
         return $this->belongsTo(Booking::class, 'booking_id');
     }
 

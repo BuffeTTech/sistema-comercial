@@ -25,6 +25,8 @@ use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
+    protected Hashids $hashids;
+
     public function __construct(
         protected Buffet $buffet,
         protected Schedule $schedule,
@@ -33,7 +35,7 @@ class BookingController extends Controller
         protected Decoration $decoration
     )
     {
-        
+        $this->hashids = new Hashids(config('app.name'));
     }
 
     private static int $min_days = 5;

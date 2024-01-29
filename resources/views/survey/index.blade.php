@@ -44,13 +44,13 @@
                                     @foreach($surveys->items() as $value)
                                     <tr class="bg-white">
                                         <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['id'] }}</td>
-                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-left">{!! mb_strimwidth($value['question'], 0, $limite_char, " ...") !!} <a href="{{route('survey.show', ['survey'=>$value['id'], 'buffet'=>$buffet->slug])}}" class="p-1 text-xs font-medium uppercase text-green-700 bg-green-400 rounded-lg bg-opacity-50">Ver mais</a></td>
+                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-left">{!! mb_strimwidth($value['question'], 0, $limite_char, " ...") !!} <a href="{{route('survey.show', ['survey'=>$value['hashed_id'], 'buffet'=>$buffet->slug])}}" class="p-1 text-xs font-medium uppercase text-green-700 bg-green-400 rounded-lg bg-opacity-50">Ver mais</a></td>
                                         <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['answers'] }}</td>
                                         <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ App\Enums\QuestionType::fromValue($value['question_type']) }}</td>
                                         <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.survey_status :status="$value['status']" /></td>
                                         <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                            <a href="{{ route('survey.show',  ['survey'=>$value['id'], 'buffet'=>$buffet->slug]) }}" title="Visualizar pergunta {{$value['id']}}">👁️</a>
-                                            <a href="{{ route('survey.edit',  ['survey'=>$value['id'], 'buffet'=>$buffet->slug]) }}" title="Editar pergunta {{$value['id']}}">✏️</a>
+                                            <a href="{{ route('survey.show',  ['survey'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" title="Visualizar pergunta {{$value['hashed_id']}}">👁️</a>
+                                            <a href="{{ route('survey.edit',  ['survey'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" title="Editar pergunta {{$value['hashed_id']}}">✏️</a>
                                             {{--<form action="{{ route('survey.change_question_status', $value['id']) }}" method="post" class="inline">
                                                 @csrf
                                                 @method('patch')
