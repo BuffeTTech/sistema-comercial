@@ -18,10 +18,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('document');
             $table->integer('age');
-            $table->foreignId('booking')->constrained(
+            $table->foreignId('booking_id')->constrained(
                 table:"bookings",indexName:'guests_booking_id'
             );
-            $table->foreignId('buffet')->constrained(
+            $table->foreignId('buffet_id')->constrained(
                 table:"buffets",indexName:'guests_buffet_id'
             );
             $table->enum('status', array_column(GuestStatus::cases(),'name'));

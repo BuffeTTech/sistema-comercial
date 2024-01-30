@@ -1,0 +1,1 @@
+<h1>Voce foi cadastrado na festa</h1>

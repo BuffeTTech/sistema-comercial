@@ -227,7 +227,7 @@ class BookingController extends Controller
     {
         $buffet_slug = $request->buffet;
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
-        $guests = $this->guest->where('booking',$request->booking)->get();
+        $guests = $this->guest->where('booking_id',$request->booking)->get();
 
         if(!$buffet || !$buffet_slug) {
             return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();

@@ -7,11 +7,7 @@
                         <p><strong>Nome do Convidado:</strong> {{ $guest->name }}</p><br>
                         <p><strong>CPF:</strong> {{ $guest->document }}</p><br>
                         <p><strong>Idade:</strong> {{ $guest->age }}</p><br>
-                        @php
-                        $class_active = "p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50";
-                        $class_unactive = 'p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50';
-                        @endphp
-                        <p><strong>Status:</strong>{{$guest->status}}</p><br>
+                        <p><strong>Status:</strong><x-status.guest_status :status="$guest->status" /></p><br>
             </div>
         </div>
     </div>
