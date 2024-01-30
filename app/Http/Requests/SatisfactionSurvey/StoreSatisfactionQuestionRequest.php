@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\SatisfactionSurvey;
 
+use App\Enums\QuestionType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreSatisfactionQuestionRequest extends FormRequest
 {
@@ -23,6 +25,11 @@ class StoreSatisfactionQuestionRequest extends FormRequest
     {
         $rules = [
             'question' => 'required|max:255',
+            'question_type' => [
+                'required',
+                'string',
+                Rule::in(array_column(QuestionType::cases(), 'name'))
+            ]
             
         ];
 

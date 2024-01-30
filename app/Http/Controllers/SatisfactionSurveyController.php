@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Enums\BookingStatus;
 use App\Enums\QuestionType;
-use App\Enums\SatisfactionQuestionStatus;
 use Illuminate\Http\Request;
 use App\Models\SatisfactionQuestion; 
 use App\Models\SatisfactionAnswer; 
@@ -39,18 +38,23 @@ class SatisfactionSurveyController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
+        $this->authorize('viewAnyBuffet', [SatisfactionQuestion::class, $buffet]);  
+
         $surveys = $this->survey->where('buffet_id', $buffet->id)->paginate($request->get('per page', 5), ['*'], 'page', $request->get('page', 1));
 
         return view('survey.index',['buffet'=>$buffet, 'surveys'=>$surveys]); 
     }
 
     public function create(Request $request){
+        
         $buffet_slug = $request->buffet; 
         $buffet = Buffet::where('slug', $buffet_slug)->first(); 
-
+        
         if(!$buffet || !$buffet_slug) {
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
+        
+        $this->authorize('create', [SatisfactionQuestion::class, $buffet]);        
 
         return view('survey.create', ['buffet'=>$buffet]);
     }
@@ -63,9 +67,7 @@ class SatisfactionSurveyController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
-        if($survey = $this->survey->where('id', $request->survey)->where('buffet_id', $buffet->id)->get()->first()){
-            return redirect()->back()->withErrors(['id' => 'question already exists.'])->withInput();
-        }
+        $this->authorize('create', [SatisfactionQuestion::class,$buffet]);  
 
         $survey = $this->survey->create([
             "question"=>$request->question, 
@@ -92,6 +94,8 @@ class SatisfactionSurveyController extends Controller
             return redirect()->route('survey.index', $buffet_slug)->withErrors(['id' => 'question not found'])->withInput();
         }
 
+        $this->authorize('view', [$survey, $buffet]);  
+
         return view('survey.show', ['buffet'=>$buffet, 'survey'=>$survey]);
     }
     public function edit(Request $request){
@@ -106,6 +110,8 @@ class SatisfactionSurveyController extends Controller
         if (!$survey = $this->survey->where('id', $survey_id)->where('buffet_id', $buffet->id)->get()->first()) {
             return redirect()->back()->withErrors(['id' => 'question not found.'])->withInput();   
         }
+
+        $this->authorize('update', [SatisfactionQuestion::class, $survey, $buffet]);  
 
         return view('survey.update', ['buffet'=>$buffet, 'survey'=> $survey ]);
     }
@@ -122,13 +128,10 @@ class SatisfactionSurveyController extends Controller
 
         $survey = $this->survey->where('id', $survey_id)->where('buffet_id', $buffet->id)->get()->first();
         if(!$survey){
-            return redirect()->back()->withErrors(['slug' => 'question not found.'])->withInput();
+            return redirect()->back()->withErrors(['message' => 'question not found.'])->withInput();
         }
 
-        $survey_exists = $this->survey->where('id', $request->slug)->where('buffet_id', $buffet->id)->get()->first();
-        if($survey_exists && $survey_exists->id !== $survey->id) {
-            return redirect()->back()->withErrors(['slug' => 'question already exists.'])->withInput();
-        }
+        $this->authorize('update', [SatisfactionQuestion::class, $survey, $buffet]);  
 
         $survey->update([
             "question"=>$request->question, 
