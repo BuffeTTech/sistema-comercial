@@ -107,7 +107,6 @@
 							}
 						})
 						const events = data.data.map((dt) => {
-                            console.log(dt)
 							const date = new Date(dt.party_day + "T" + dt.schedule.start_time);
 							const minutes = date.getMinutes() > 9 ? date.getMinutes() : `0${date.getMinutes()}`
 							return {
@@ -116,7 +115,6 @@
 								event_theme: 'red'
 							}
 						})
-                        console.log(events)
 						return events;
 					}
 
@@ -132,8 +130,6 @@
 								try {
 									const registros = await getEvents();
 									this.events = registros;
-									console.log(registros)
-									console.log('Página carregada. Eventos:', this.events);
 								} catch (error) {
 									console.error('Erro na inicialização:', error);
 								}
@@ -200,7 +196,6 @@
 
 								this.events.push(obj);
 
-								console.log(this.events);
 
 								// clear the form data
 								this.event_title = '';

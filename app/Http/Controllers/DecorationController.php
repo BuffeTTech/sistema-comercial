@@ -253,17 +253,17 @@ class DecorationController extends Controller
 
     // API
     public function api_get_decoration(Request $request) {
-    $buffet_slug = $request->buffet;
-    $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
 
-    if(!$buffet || !$buffet_slug) {
-        return response()->json(['message' => 'Buffet not found'], 422);
-    }
-    
-    if(!$decoration = $this->decoration->where('slug', $request->decoration)->where('buffet', $buffet->id)->with('photos')->get()->first()){
-        return response()->json(['message' => 'Decoration not found'], 422);;
-    }
+        if(!$buffet || !$buffet_slug) {
+            return response()->json(['message' => 'Buffet not found'], 422);
+        }
+        
+        if(!$decoration = $this->decoration->where('slug', $request->decoration)->where('buffet', $buffet->id)->with('photos')->get()->first()){
+            return response()->json(['message' => 'Decoration not found'], 422);;
+        }
 
-    return response()->json(['data'=>$decoration], 200);;
+        return response()->json(['data'=>$decoration], 200);;
     }
 }

@@ -21,12 +21,11 @@ class EnsureBuffetExistsURL
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         
+
         if(!$buffet || !$buffet_slug || $buffet->status == BuffetStatus::UNACTIVE->name) {
             if(auth()->user()) {
-                dd('aaa');
                 return redirect()->intended(RouteServiceProvider::HOME);
             }
-            dd('bbb');  
             return route('home');
         }
 
