@@ -21,17 +21,17 @@
                                 <div>
                                     <!-- show package -->
                                     <div style="padding-bottom: 10%;" class="border-gray-200">
-                                        <p><strong>{{ $booking->package['name_package'] }}</strong></p>
+                                        <p><strong>{{ $booking->food['name_food'] }}</strong></p>
                                         <br>
-                                        <p><strong>Slug:</strong> {{ $booking->package['slug'] }}</p>
-                                        <p><strong>Preço p/pessoa:</strong> R${{ $booking->package['price'] }}</p>
+                                        <p><strong>Slug:</strong> {{ $booking->food['slug'] }}</p>
+                                        <p><strong>Preço p/pessoa:</strong> R${{ $booking->food['price'] }}</p>
                                         <br>
                                         <p><strong>Descricao das comidas:</strong></p>
-                                        {!! $booking->package['food_description'] !!}
+                                        {!! $booking->food['food_description'] !!}
                                         <br>
                                         <br>
                                         <p><strong>Descricao das bebidas:</strong></p>
-                                        {!! $booking->package['beverages_description'] !!}
+                                        {!! $booking->food['beverages_description'] !!}
                                     </div>
                                 </div>
                             </div>
@@ -45,45 +45,51 @@
                 
                                     <h1><strong>Convidados Extras:</strong></h1>
                 
-                                    <form class="w-full max-w-lg" method="POST" enctype="multipart/form-data" id="form">
+                                    <form class="w-full max-w-lg" method="POST" action="{{ route('guest.store', ['buffet'=>$buffet, 'booking'=>$booking]) }}" enctype="multipart/form-data" id="form">
                 
                                         @csrf
-                
+
                                         <input type="hidden" name="booking_id" value="{{ $booking->id }}">
                 
                                         <div id="form-rows">
                                             <div class="form-row">
                                                 <div class="flex flex-wrap -mx-3 mb-6">
                                                     <div class="w-full px-3 mb-6 md:mb-0">
-                                                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="nome">
+                                                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="name">
                                                             Nome do convidado
                                                         </label>
-                                                        <input required class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="nome" type="text" placeholder="Nome do Convidado" name="rows[0][nome]" value="{{old('nome')}}">
+                                                        <input required class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="name" type="text" placeholder="name do Convidado" name="name" value="{{old('name')}}">
                                                     </div>
                                                 </div>
                                                 <div class="flex flex-wrap -mx-3 mb-6">
                                                     <div class="w-full px-3 mb-6 md:mb-0">
-                                                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="cpf">
+                                                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="document">
                                                             CPF
                                                         </label>
-                                                        <input required class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white cpfs" id="cpf" type="text" placeholder="CPF do Convidado" name="rows[0][cpf]" value="{{old('cpf')}}" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" title="Digite um CPF válido (XXX.XXX.XXX-XX)">
+                                                        <input required class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white cpfs" id="document" type="text" placeholder="document do Convidado" name="document" value="{{old('document')}}" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" title="Digite um CPF válido (XXX.XXX.XXX-XX)">
                                                     </div>
                                                 </div>
                                                 <div class="flex flex-wrap -mx-3 mb-6">
                                                     <div class="w-full  px-3 mb-6 md:mb-0">
-                                                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="idade">
+                                                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="age">
                                                             Idade 
                                                         </label>
-                                                    <input required type="number" id="idade" name="rows[0][idade]" placeholder="Idade do Convidado">{{old('idade')}}
+                                                    <input required type="number" id="age" name="age" placeholder="Idade do Convidado">{{old('age')}}
                                                     </div>
                                                 </div>
+                                                <div>
+                                                    <input type="hidden" name="status" id= 'status' value={{app\enums\GuestStatus::PRESENT->name}}>
+                                                </div>
+                    
                                             </div>
                                             
                                         </div>
                                         
-                                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-                                            Adicionar convidado
-                                        </button>
+                                        <div class="flex items-center justify-end mt-4">
+                                            <x-primary-button class="ms-4">
+                                                {{ __('Adcionar Convidado') }}
+                                            </x-primary-button>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -122,15 +128,15 @@
                                                 @foreach($guests as $key=>$value)
                                                 <tr class="bg-white">
                                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['id'] }}</td>
-                                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-left">{{ $value['nome'] }}</td>
-                                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ mb_strimwidth($value['cpf'], 0, $limite_char, " ...") }}</td>
-                                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ (int)$value['idade'] }}</td>
-                                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.guest_status :status="$guest->status" /></td>
+                                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-left">{{ $value['name'] }}</td>
+                                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ mb_strimwidth($value['document'], 0, $limite_char, " ...") }}</td>
+                                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ (int)$value['age'] }}</td>
+                                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.guest_status :status="$value->status" /></td>
                                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
                                                         <div class="flex flex-wrap -mx-3 mb-6">
                                                         <div class="w-full  px-3 mb-6 md:mb-0">
 
-                                                            <form action="{{route('guests.updateStatus',$value['id'])}}" method="POST">
+                                                            <form action="{{ route('guest.change_status', ['buffet' => $buffet, 'guest' => $value['id'], 'booking' => $booking]) }}" method="POST">
                                                                 @csrf
                                                                 @method('PATCH')
 
@@ -152,7 +158,6 @@
 
                                         </tbody>
                                     </table>
-                                    {{ $guests->links('components.pagination') }}
                                 </div>
                             @endif
                         </div>

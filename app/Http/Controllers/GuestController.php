@@ -67,7 +67,7 @@ class GuestController extends Controller
             'age'=>$request->age,
             'booking_id'=>$booking->id,
             'buffet_id'=>$buffet->id,
-            'status'=> GuestStatus::PENDENT->name
+            'status'=> $request->status ?? GuestStatus::PENDENT->name
         ]);
 
         return view('guest.guest_invited', ['buffet'=>$buffet, 'booking'=>$booking, 'guest'=>$guest]);
