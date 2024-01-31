@@ -118,7 +118,7 @@ class GuestController extends Controller
         ]);
 
 
-        return redirect()->route('booking.show',['buffet'=>$buffet_slug,'booking'=>$booking]);
+        return redirect()->back();
     }
 
 }

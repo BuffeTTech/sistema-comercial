@@ -31,6 +31,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     Route::get('{buffet}/dashboard', [BuffetController::class, 'dashboard'])->name('dashboard_buffet');
+    
+    Route::get('{buffet}/booking/{booking}/guest/invite/',[GuestController::class, 'create'])->name('guest.invite');
+    Route::patch('{buffet}/booking/{booking}/guest/{guest}/change_status',[GuestController::class,'change_status'])->name('guest.change_status');
+    Route::post('{buffet}/booking/{booking}/guest',[GuestController::class, 'store'])->name('guest.store');
+    Route::get('{buffet}/booking/{booking}/guest/{guest}',[GuestController::class, 'show'])->name('guest.show');
 
     Route::resource('{buffet}/food', FoodController::class);
     Route::patch('/{buffet}/food/{food}/change_status', [FoodController::class,'change_status'])->name('food.change_status');
@@ -48,13 +53,9 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     Route::get('/{buffet}/booking/party_mode', [BookingController::class, 'party_mode'])->name('booking.party_mode');
     Route::get('/{buffet}/booking/list', [BookingController::class, 'list'])->name('booking.list');
     Route::patch('/{buffet}/booking/{booking}/change_status', [BookingController::class,'change_status'])->name('booking.change_status');
-    Route::patch('/{buffet}/booking/{booking}/reschedule', [BookingController::class,'reschedule_party'])->name('booking.reschedule');
     Route::resource('{buffet}/booking', BookingController::class);
+    Route::patch('/{buffet}/booking/{booking}/reschedule', [BookingController::class,'reschedule_party'])->name('booking.reschedule');
 
-    Route::get('{buffet}/booking/{booking}/guest/invite/',[GuestController::class, 'create'])->name('guest.invite');
-    Route::post('{buffet}/booking/{booking}/guest',[GuestController::class, 'store'])->name('guest.store');
-    Route::get('{buffet}/booking/{booking}/guest/{guest}',[GuestController::class, 'show'])->name('guest.show');
-    Route::patch('{buffet}/booking/{booking}/guest/{guest}/change_status',[GuestController::class,'change_status'])->name('guest.change_status');
 
 
 });
