@@ -506,4 +506,13 @@ class BookingController extends Controller
 
         return response()->json(['day'=>$date, 'day_week'=>$dayOfWeek, 'schedules'=>$schedules], 200);
     }
+
+    public function party_mode(Request $request){
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+        dd('teste');
+        $booking = $this->booking->where('id',$request->booking)->with(['food', 'decoration', 'schedule'])->get()->first();
+
+        return view('booking.party_mode',['booking'=>$booking,'buffet'=>$buffet_slug]);
+    }
 }

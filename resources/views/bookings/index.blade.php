@@ -12,7 +12,7 @@
                         </div>
                         @if($isPartyHappening == true)
                             <div>
-                                <h2><a href="{{ route('booking.show', ['buffet'=>$buffet->slug,'booking'=>$current_party])}}"><strong>Acessar Festa em Andamento!</strong></a></h2>
+                                <h2><a href="{{ route('booking.party_mode', ['buffet'=>$buffet->slug])}}"><strong>Acessar Festa em Andamento!</strong></a></h2>
 
                             </div>
                         @endif
