@@ -86,34 +86,6 @@ class GuestController extends Controller
         }
     }
 
-    public function show(Request $request){
-        $buffet_slug = $request->buffet; 
-        $buffet = Buffet::where('slug', $buffet_slug)->first(); 
-        
-        if(!$buffet || !$buffet_slug) {
-            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
-        }
-
-        $booking_id = $this->hashids->decode($request->booking)[0];
-
-        $booking = $this->booking->where('id',$booking_id)->get()->first();
-        if(!$booking) {
-            return redirect()->back()->withErrors(['booking_id'=>'Reserva não encontrada'])->withInput();
-        }
-
-        $this->authorize('view', [Guest::class, $booking, $buffet]);
-
-        $guest_id = $this->hashids->decode($request->guest)[0];
-
-        $guest = $this->guest->where('id',$guest_id)->get()->first();
-        if(!$guest) {
-            return redirect()->back()->withErrors(['guest'=>'Convidado não encontrado'])->withInput();
-        }
-
-        return view('guest.show',['buffet'=>$buffet,'booking'=>$booking, 'guest'=>$guest]);
-
-    }
-
     public function change_status(Request $request){
         $buffet_slug = $request->buffet; 
         $buffet = Buffet::where('slug', $buffet_slug)->first(); 

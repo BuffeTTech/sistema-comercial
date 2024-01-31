@@ -57,25 +57,4 @@ class GuestPolicy
 
         return false;
     }
-    public function view(User $user, Booking $booking, Guest $guest, Buffet $buffet): bool
-    {
-        if($user == null) {
-            return false;
-        }
-
-        // Verifica se o usuário é cadastrado no buffet
-        if($user->buffet_id == $buffet->id) {
-            if($booking->user_id == $user->id) {
-                return true;
-            }
-            return $user->can('show guest');
-        }
-
-        // Verifica se usuário é o dono do buffet
-        if($user->id == $buffet->owner_id) {
-            return $user->can('show guest');
-        }
-
-        return false;
-    }
 }
