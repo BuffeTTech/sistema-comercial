@@ -10,9 +10,9 @@
                             <h2><a href="{{ route('booking.create', ['buffet'=> $buffet->slug]) }}">Criar Reserva</a></h2>
                             <h2><a href="{{ route('booking.list', ['buffet'=>$buffet->slug])}}">Listar todas reservas</a></h2>
                         </div>
-                        @if($isPartyHappening == true)
+                        @if($current_party)
                             <div>
-                                <h2><a href="{{ route('booking.show', ['buffet'=>$buffet->slug,'booking'=>$current_party])}}"><strong>Acessar Festa em Andamento!</strong></a></h2>
+                                <h2><a href="{{ route('booking.party_mode', ['buffet'=>$buffet->slug])}}"><strong>Acessar Festa em Andamento!</strong></a></h2>
 
                             </div>
                         @endif

@@ -112,7 +112,7 @@ class TestsSeeder extends Seeder
             'buffet_id'=>$buffet->id
         ]);
         $schedule6 = Schedule::create([
-            'day_week'=>DayWeek::FRIDAY->name,
+            'day_week'=>DayWeek::WEDNESDAY->name,
             'start_time'=>'18:00',
             'duration'=>120,
             'buffet_id'=>$buffet->id
@@ -198,13 +198,13 @@ class TestsSeeder extends Seeder
             'name_birthdayperson'=>'Aniversario top',
             'years_birthdayperson'=>15,
             'num_guests'=>15,
-            'party_day'=>'2024-01-18',
+            'party_day'=>'2024-01-31',
             'buffet_id'=>$buffet->id,
             'food_id'=>$food->id,
             'price_food'=>$food->price,
             'decoration_id'=>$decoration->id,
             'price_decoration'=>$decoration->price,
-            'schedule_id'=>$schedule10->id,
+            'schedule_id'=>$schedule6->id,
             'price_schedule'=>0,
             'discount'=>0,
             'status'=>BookingStatus::APPROVED->name,

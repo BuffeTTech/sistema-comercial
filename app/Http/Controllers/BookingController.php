@@ -7,6 +7,7 @@ use App\Enums\BuffetStatus;
 use App\Enums\DayWeek;
 use App\Enums\DecorationStatus;
 use App\Enums\FoodStatus;
+use App\Enums\GuestStatus;
 use App\Enums\ScheduleStatus;
 use App\Events\BookingCreatedEvent;
 use App\Events\BookingUpdatedEvent;
@@ -39,6 +40,37 @@ class BookingController extends Controller
     }
 
     private static int $min_days = 5;
+
+    private function current_party(){
+        // Lista de somente as próximas reservas 
+        $bookings = $this->booking
+            ->with(['schedule'=>function ($query) {
+                $query->orderBy('start_time', 'asc');
+            }, 'food','decoration', 'user'])
+            ->where('status', BookingStatus::APPROVED->name)
+            ->where('party_day', '>=', date('Y-m-d'))
+            ->get();
+
+        $dataAgora = Carbon::now()->locale('pt-BR');
+
+        $current_party = null;
+
+        foreach($bookings as $key => $booking)
+        {
+            $schedule = $this->schedule->where('id',$booking->schedule_id)->get()->first();
+            $booking_start = Carbon::parse($booking->party_day . ' ' . $schedule->start_time);
+            $booking_end = Carbon::parse($booking->party_day . ' ' . $schedule->start_time);
+            $booking_end->addMinutes($schedule->duration);
+
+            if($dataAgora < $booking_end && $dataAgora > $booking_start){
+                $current_party = $booking;
+                break;
+            }
+        }
+
+        return $current_party;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -82,25 +114,9 @@ class BookingController extends Controller
         }, 'food','decoration', 'user'])->where('status', BookingStatus::APPROVED->name)->where('party_day', '>=', date('Y-m-d'))->orderBy('party_day', 'asc')->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
 
 
-        $dataAgora = Carbon::now()->locale('pt-BR');
+        $current_party = $this->current_party();
 
-        $current_party = null;
-        $isPartyHappening = false;
-
-        foreach($bookings->items() as $key => $booking)
-        {
-            $schedule = $this->schedule->where('id',$booking->schedule_id)->get()->first();
-            $booking_start = Carbon::parse($booking->party_day . ' ' . $schedule->start_time);
-            $booking_end = Carbon::parse($booking->party_day . ' ' . $schedule->start_time);
-            $booking_end->addMinutes($schedule->duration);
-
-            if($dataAgora < $booking_end && $dataAgora > $booking_start){
-                $current_party = $booking;
-                $isPartyHappening = true;
-                break;
-            }
-        }
-        return view('bookings.index', ['bookings'=>$bookings,'buffet' => $buffet, 'current_party'=>$current_party, 'isPartyHappening'=> $isPartyHappening]);
+        return view('bookings.index', ['bookings'=>$bookings,'buffet' => $buffet, 'current_party'=>$current_party]);
     }
 
     /**
@@ -508,5 +524,40 @@ class BookingController extends Controller
 
 
         return response()->json(['day'=>$date, 'day_week'=>$dayOfWeek, 'schedules'=>$schedules], 200);
+    }
+
+    public function party_mode(Request $request){
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+        
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
+        }
+        
+        $current_party = $this->current_party();
+        if(!$current_party) {
+            // a propria blade tem um if pra validar se existe ou não
+            return view('bookings.party_mode',['booking'=>$current_party,'buffet'=>$buffet_slug]);
+        }
+
+        $guests = $this->guest
+                       ->where('booking_id',$current_party->id)
+                       ->where('buffet_id', $buffet->id)
+                       ->get();
+
+        $unblocked_guests = $this->guest
+                               ->where('booking_id',$current_party->id)
+                               ->where('buffet_id', $buffet->id)
+                               ->where('status','!=', GuestStatus::BLOCKED->name)
+                               ->get();
+        $present_guests  = $this->guest
+                               ->where('booking_id',$current_party->id)
+                               ->where('buffet_id', $buffet->id)
+                               ->where('status',GuestStatus::PRESENT->name)
+                               ->get();
+
+        $guest_counter = ['present'=>$present_guests->count(), 'unblocked'=>$unblocked_guests->count()];
+
+        return view('bookings.party_mode',['booking'=>$current_party,'buffet'=>$buffet_slug, 'guests'=>$guests, 'guest_counter'=>$guest_counter]);
     }
 }

@@ -45,6 +45,7 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
 
     Route::resource('{buffet}/employee', EmployeeController::class);
     
+    Route::get('/{buffet}/booking/party_mode', [BookingController::class, 'party_mode'])->name('booking.party_mode');
     Route::get('/{buffet}/booking/list', [BookingController::class, 'list'])->name('booking.list');
     Route::patch('/{buffet}/booking/{booking}/change_status', [BookingController::class,'change_status'])->name('booking.change_status');
     Route::patch('/{buffet}/booking/{booking}/reschedule', [BookingController::class,'reschedule_party'])->name('booking.reschedule');
