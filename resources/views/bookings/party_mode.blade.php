@@ -32,6 +32,8 @@
                                         <br>
                                         <p><strong>Descricao das bebidas:</strong></p>
                                         {!! $booking->food['beverages_description'] !!}
+                                        <p><strong>Decoração:</strong></p>
+                                        {!! $booking->decoration['main_theme'] !!}
                                     </div>
                                 </div>
                             </div>
@@ -45,11 +47,12 @@
                 
                                     <h1><strong>Convidados Extras:</strong></h1>
                 
-                                    <form class="w-full max-w-lg" method="POST" action="{{ route('guest.store', ['buffet'=>$buffet, 'booking'=>$booking]) }}" enctype="multipart/form-data" id="form">
+                                    <form class="w-full max-w-lg" method="POST" action="{{ route('guest.store', ['buffet'=>$buffet, 'booking'=>$booking->hashed_id]) }}" enctype="multipart/form-data" id="form">
                 
                                         @csrf
 
-                                        <input type="hidden" name="booking_id" value="{{ $booking->id }}">
+                                        {{-- <input type="hidden" name="booking_id" value="{{ $booking->hashed_id }}"> --}}
+                                        <input type="hidden" name="status" id= 'status' value={{App\Enums\GuestStatus::PRESENT->name}}>
                 
                                         <div id="form-rows">
                                             <div class="form-row">
@@ -67,7 +70,8 @@
                                                             CPF
                                                         </label>
                                                         <input required class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white cpfs" id="document" type="text" placeholder="document do Convidado" name="document" value="{{old('document')}}" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" title="Digite um CPF válido (XXX.XXX.XXX-XX)">
-                                                    </div>
+                                                    <span class="text-sm text-red-600 dark:text-red-400 space-y-1" id="document-error"></span>
+                                                </div>
                                                 </div>
                                                 <div class="flex flex-wrap -mx-3 mb-6">
                                                     <div class="w-full  px-3 mb-6 md:mb-0">
@@ -76,9 +80,6 @@
                                                         </label>
                                                     <input required type="number" id="age" name="age" placeholder="Idade do Convidado">{{old('age')}}
                                                     </div>
-                                                </div>
-                                                <div>
-                                                    <input type="hidden" name="status" id= 'status' value={{app\enums\GuestStatus::PRESENT->name}}>
                                                 </div>
                     
                                             </div>
@@ -108,7 +109,6 @@
                                             <tr>
                                                 <!-- w-24 p-3 text-sm font-semibold tracking-wide text-left -->
                                                 
-                                                <th class="w-20 p-3 text-sm font-semibold tracking-wide text-center">ID</th>
                                                 <th class="p-3 text-sm font-semibold tracking-wide text-left">Nome</th>
                                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">CPF</th>
                                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">Idade</th>
@@ -127,7 +127,6 @@
                                                 @endphp
                                                 @foreach($guests as $key=>$value)
                                                 <tr class="bg-white">
-                                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['id'] }}</td>
                                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-left">{{ $value['name'] }}</td>
                                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ mb_strimwidth($value['document'], 0, $limite_char, " ...") }}</td>
                                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ (int)$value['age'] }}</td>
@@ -169,63 +168,45 @@
         </div>
 
     </div>
-
     <script>
+        const doc = document.querySelector("#document")
+        const doc_error = document.querySelector("#document-error")
         const form = document.querySelector("#form")
+        //const button = document.querySelector("#button");
 
-        function validarCPF(cpf) {
-            cpf = cpf.replace(/[^\d]/g, '');
-
-            if (cpf.length !== 11) {
-                return false;
-            }
-
-            if (/^(\d)\1+$/.test(cpf)) {
-                return false;
-            }
-
-            let soma = 0;
-            for (let i = 0; i < 9; i++) {
-                soma += parseInt(cpf.charAt(i)) * (10 - i);
-            }
-            let digito1 = 11 - (soma % 11);
-            digito1 = (digito1 >= 10) ? 0 : digito1;
-
-            if (parseInt(cpf.charAt(9)) !== digito1) {
-                return false;
-            }
-
-            soma = 0;
-            for (let i = 0; i < 10; i++) {
-                soma += parseInt(cpf.charAt(i)) * (11 - i);
-            }
-            let digito2 = 11 - (soma % 11);
-            digito2 = (digito2 >= 10) ? 0 : digito2;
-
-            if (parseInt(cpf.charAt(10)) !== digito2) {
-                return false;
-            }
-
-            return true;
-        }
-
-        form.addEventListener('submit', async function (e){
+        form.addEventListener('submit', async function (e) {
             e.preventDefault()
-            const cpf = document.querySelector('#cpf')
-
-            const cpf_valid = validarCPF(cpf.value)
+            const cpf_valid = validarCPF(doc.value)
             if(!cpf_valid) {
-                error("O cpf é invalido")
-                return;
+                error('Documento inválido')
+                return
             }
-            const userConfirmed = await confirm(`Deseja cadastrar este usuário na festa?`)
+
+            const userConfirmed = await confirm(`Deseja cadastrar este funcionário?`)
 
             if (userConfirmed) {
                 this.submit();
-                basic("Usuário cadastrado com sucesso")
             } else {
                 error("Ocorreu um erro!")
+                return;
             }
+        })
+
+        doc.addEventListener('input', (e)=>{
+            e.target.value = replaceCPF(e.target.value);
+            return;
+        })
+
+        doc.addEventListener('focusout', (e)=>{
+            const cpf_valid = validarCPF(doc.value)
+            if(!cpf_valid) {
+                //button.disabled = true;
+                doc_error.innerHTML = "Documento inválido"
+                return
+            }
+            doc_error.innerHTML = ""
+            //button.disabled = false;
+            return;
         })
     </script>
 
