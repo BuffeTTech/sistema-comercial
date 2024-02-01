@@ -353,7 +353,6 @@
                 const data = agora.toISOString().split('T')[0]
                 this.value = data;
                 error(`Você só pode marcar festas após 5 dias contados a partir da data de hoje (${data}).`)
-                return;
             }
 
             const dates = await getDates(this.value)

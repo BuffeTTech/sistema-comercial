@@ -21,6 +21,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class TestsSeeder extends Seeder
@@ -42,6 +43,32 @@ class TestsSeeder extends Seeder
         $commercial_role = Role::create(['name' => $pacote_alegria->slug.'.commercial']);
         $operational_role = Role::create(['name' => $pacote_alegria->slug.'.operational']);
         $administrative_role = Role::create(['name' => $pacote_alegria->slug.'.administrative']);
+
+        $p1 = Permission::create(['name'=>'show party mode']);
+        $p2 = Permission::create(['name'=>'view pendent bookings']);
+        $p3 = Permission::create(['name'=>'view next bookings']);
+        $p4 = Permission::create(['name'=>'list booking']);
+        $p5 = Permission::create(['name'=>'show booking']);
+        $p6 = Permission::create(['name'=>'create booking']);
+        $p7 = Permission::create(['name'=>'update booking']);
+        $p8 = Permission::create(['name'=>'cancel booking']);
+        $p9 = Permission::create(['name'=>'change booking status']);
+        $p10 = Permission::create(['name'=>'create guest']);
+        $p11 = Permission::create(['name'=>'change guest status']);
+        $p12 = Permission::create(['name'=>'show guest']);
+        $user_role->givePermissionTo($p3->name);
+        $administrative_role->givePermissionTo($p1->name);
+        $administrative_role->givePermissionTo($p2->name);
+        $administrative_role->givePermissionTo($p3->name);
+        $administrative_role->givePermissionTo($p4->name);
+        $administrative_role->givePermissionTo($p5->name);
+        $administrative_role->givePermissionTo($p6->name);
+        $administrative_role->givePermissionTo($p7->name);
+        $administrative_role->givePermissionTo($p8->name);
+        $administrative_role->givePermissionTo($p9->name);
+        $administrative_role->givePermissionTo($p10->name);
+        $administrative_role->givePermissionTo($p11->name);
+        $administrative_role->givePermissionTo($p12->name);
         
         $user = User::create([
             'name' => "Guilherme",
@@ -53,7 +80,7 @@ class TestsSeeder extends Seeder
             'status' => UserStatus::ACTIVE->name,
             'buffet_id' => null,
         ]);
-        $user->assignRole($user_role->name);
+        $user->assignRole($administrative_role->name);
 
         $buffet = Buffet::create([
             'trading_name' => 'Buffet Alegria',
@@ -112,8 +139,8 @@ class TestsSeeder extends Seeder
             'buffet_id'=>$buffet->id
         ]);
         $schedule6 = Schedule::create([
-            'day_week'=>DayWeek::FRIDAY->name,
-            'start_time'=>'18:00',
+            'day_week'=>DayWeek::WEDNESDAY->name,
+            'start_time'=>'19:00',
             'duration'=>120,
             'buffet_id'=>$buffet->id
         ]);
@@ -198,13 +225,13 @@ class TestsSeeder extends Seeder
             'name_birthdayperson'=>'Aniversario top',
             'years_birthdayperson'=>15,
             'num_guests'=>15,
-            'party_day'=>'2024-01-18',
+            'party_day'=>'2024-01-31',
             'buffet_id'=>$buffet->id,
             'food_id'=>$food->id,
             'price_food'=>$food->price,
             'decoration_id'=>$decoration->id,
             'price_decoration'=>$decoration->price,
-            'schedule_id'=>$schedule10->id,
+            'schedule_id'=>$schedule6->id,
             'price_schedule'=>0,
             'discount'=>0,
             'status'=>BookingStatus::APPROVED->name,

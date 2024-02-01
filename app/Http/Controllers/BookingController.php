@@ -7,6 +7,7 @@ use App\Enums\BuffetStatus;
 use App\Enums\DayWeek;
 use App\Enums\DecorationStatus;
 use App\Enums\FoodStatus;
+use App\Enums\GuestStatus;
 use App\Enums\ScheduleStatus;
 use App\Events\BookingCreatedEvent;
 use App\Events\BookingUpdatedEvent;
@@ -26,6 +27,8 @@ use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
+    protected Hashids $hashids;
+
     public function __construct(
         protected Buffet $buffet,
         protected Schedule $schedule,
@@ -35,10 +38,41 @@ class BookingController extends Controller
         protected Guest $guest,
     )
     {
-        
+        $this->hashids = new Hashids(config('app.name'));
     }
 
     private static int $min_days = 5;
+
+    private function current_party(){
+        // Lista de somente as próximas reservas 
+        $bookings = $this->booking
+            ->with(['schedule'=>function ($query) {
+                $query->orderBy('start_time', 'asc');
+            }, 'food','decoration', 'user'])
+            ->where('status', BookingStatus::APPROVED->name)
+            ->where('party_day', '>=', date('Y-m-d'))
+            ->get();
+
+        $dataAgora = Carbon::now()->locale('pt-BR');
+
+        $current_party = null;
+
+        foreach($bookings as $key => $booking)
+        {
+            $schedule = $this->schedule->where('id',$booking->schedule_id)->get()->first();
+            $booking_start = Carbon::parse($booking->party_day . ' ' . $schedule->start_time);
+            $booking_end = Carbon::parse($booking->party_day . ' ' . $schedule->start_time);
+            $booking_end->addMinutes($schedule->duration);
+
+            if($dataAgora < $booking_end && $dataAgora > $booking_start){
+                $current_party = $booking;
+                break;
+            }
+        }
+
+        return $current_party;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -57,9 +91,11 @@ class BookingController extends Controller
             $bookings = $this->booking->with(['schedule'=>function ($query) {
                 $query->orderBy('start_time', 'asc');
             }, 'food','decoration', 'user'])->where('status', $status)->where('party_day', '>=', date('Y-m-d'))->orderBy('party_day', 'asc')->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
+            $this->authorize('viewPendentBookings', [Booking::class, $buffet]);
         } else {
             $format = 'all';
             $bookings =  $this->booking->where('buffet_id', $buffet->id)->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
+            $this->authorize('viewAllBookings', [Booking::class, $buffet]);
         }
 
         $min_days = self::$min_days; 
@@ -81,26 +117,10 @@ class BookingController extends Controller
             $query->orderBy('start_time', 'asc');
         }, 'food','decoration', 'user'])->where('status', BookingStatus::APPROVED->name)->where('party_day', '>=', date('Y-m-d'))->orderBy('party_day', 'asc')->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
 
+        $this->authorize('viewNextBookings', [Booking::class, $buffet]);
+        $current_party = $this->current_party();
 
-        $dataAgora = Carbon::now()->locale('pt-BR');
-
-        $current_party = null;
-        $isPartyHappening = false;
-
-        foreach($bookings->items() as $key => $booking)
-        {
-            $schedule = $this->schedule->where('id',$booking->schedule_id)->get()->first();
-            $booking_start = Carbon::parse($booking->party_day . ' ' . $schedule->start_time);
-            $booking_end = Carbon::parse($booking->party_day . ' ' . $schedule->start_time);
-            $booking_end->addMinutes($schedule->duration);
-
-            if($dataAgora < $booking_end && $dataAgora > $booking_start){
-                $current_party = $booking;
-                $isPartyHappening = true;
-                break;
-            }
-        }
-        return view('bookings.index', ['bookings'=>$bookings,'buffet' => $buffet, 'current_party'=>$current_party, 'isPartyHappening'=> $isPartyHappening]);
+        return view('bookings.index', ['bookings'=>$bookings,'buffet' => $buffet, 'current_party'=>$current_party]);
     }
 
     /**
@@ -114,6 +134,7 @@ class BookingController extends Controller
         if(!$buffet || !$buffet_slug) {
             return null;
         }
+        $this->authorize('create', [Booking::class, $buffet]);
 
         $foods = $this->food->where('buffet', $buffet->id)->where('status', FoodStatus::ACTIVE->name)->get();
         $decorations = $this->decoration->where('buffet', $buffet->id)->where('status', DecorationStatus::ACTIVE->name)->get();
@@ -133,9 +154,11 @@ class BookingController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
         }
 
+        $this->authorize('create', [Booking::class, $buffet]);
+        
         // valida a hora
         $schedule = $this->schedule->where('id', $request->schedule_id)->where('buffet_id', $buffet->id)->get()->first();
-
+        
         if(!$schedule) {
             return redirect()->back()->withErrors(['schedule_id'=>'Schedule not found'])->withInput();
         }
@@ -143,10 +166,10 @@ class BookingController extends Controller
         if($schedule->status !== ScheduleStatus::ACTIVE->name) {
             return redirect()->back()->withErrors(['schedule_id'=>'Schedule is not active'])->withInput();
         }
-
+        
         // valida o dia
         $party_day = $request->party_day;
-
+        
         $today_date = date('Y-m-d');
         $party_start = date("Y-m-d H:i",strtotime(Carbon::parse($party_day)->setHours($schedule['start_time'])));
         $party_end = date("Y-m-d H:i",strtotime(Carbon::parse($party_day)->setHours($schedule['start_time'])->addMinutes($schedule['duration'])));
@@ -158,32 +181,32 @@ class BookingController extends Controller
         if($party_end < $party_start) {
             return redirect()->back()->withErrors(['party_day'=>"Party can not end before start"])->withInput();
         }
-
+        
         // Valida se existe alguma reserva neste horário
         $booking_exists_in_time = $this->booking
-            ->where('buffet_id', $buffet->id)
-            ->where('party_day', $party_day)
-            ->where('schedule_id', $schedule->id)
-            ->where('status', BookingStatus::APPROVED->name)
-            ->get()->first();
-            
-            
+        ->where('buffet_id', $buffet->id)
+        ->where('party_day', $party_day)
+        ->where('schedule_id', $schedule->id)
+        ->where('status', BookingStatus::APPROVED->name)
+        ->get()->first();
+        
+        
         if($booking_exists_in_time) {
             return redirect()->back()->withErrors(['party_day'=>"Booking already exists in this time"])->withInput();
         }
-
+        
         // Valida o pacote de comida
         $food = $this->food
-            ->where('slug', $request->food_id)
-            ->where('buffet', $buffet->id)
-            ->where('status', FoodStatus::ACTIVE->name)
-            ->get()
-            ->first();
-
+        ->where('slug', $request->food_id)
+        ->where('buffet', $buffet->id)
+        ->where('status', FoodStatus::ACTIVE->name)
+        ->get()
+        ->first();
+        
         if(!$food) {
             return redirect()->back()->withErrors(['food_id'=>"Food not found"])->withInput();
         }
-
+        
         // Valida o pacote de decorações
         $decoration = $this->decoration
             ->where('slug', $request->decoration_id)
@@ -191,11 +214,11 @@ class BookingController extends Controller
             ->where('status', DecorationStatus::ACTIVE->name)
             ->get()
             ->first();
-
+            
         if(!$decoration) {
             return redirect()->back()->withErrors(['decoration_id'=>"Decoration not found"])->withInput();
         }
-
+            
         // Cria a reserva
         $booking = $this->booking->create([
             'name_birthdayperson'=>$request->name_birthdayperson,
@@ -216,7 +239,7 @@ class BookingController extends Controller
 
         event(new BookingCreatedEvent($booking));
 
-        return redirect()->route('booking.show', ['buffet'=>$buffet->slug, 'booking'=>$booking->id]);
+        return redirect()->route('booking.show', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id]);
 
     }
 
@@ -227,13 +250,24 @@ class BookingController extends Controller
     {
         $buffet_slug = $request->buffet;
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
-        $guests = $this->guest->where('booking_id',$request->booking)->get();
 
         if(!$buffet || !$buffet_slug) {
             return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
         }
 
-        $booking = $this->booking->where('id',$request->booking)->with(['food', 'decoration', 'schedule'])->get()->first();
+        $booking_id = $this->hashids->decode($request->booking)[0];
+
+        $booking = $this->booking
+                    ->where('id',$booking_id)
+                    ->where('buffet_id', $buffet->id)
+                    ->with(['food', 'decoration', 'schedule'])->get()->first();
+        
+        $guests = $this->guest
+                        ->where('booking_id',$booking_id)
+                        ->where('buffet_id', $buffet->id)
+                        ->get();
+        
+        $this->authorize('view', [Booking::class, $booking, $buffet]);
 
         return view('bookings.show', ['buffet'=>$buffet,'booking'=>$booking, 'guests'=>$guests]);
     }
@@ -251,12 +285,16 @@ class BookingController extends Controller
         if(!$buffet || !$buffet_slug) {
             return redirect()->back()->withErrors(['errors'=>'Buffet not found'])->withInput();
         }
+
+        $booking_id = $this->hashids->decode($request->booking)[0];
         
-        $booking = $this->booking->where('id', $request->booking)->where('buffet_id', $buffet->id)->get()->first();
+        $booking = $this->booking->where('id', $booking_id)->where('buffet_id', $buffet->id)->get()->first();
         
         if(!$booking) {
             return redirect()->back()->withErrors(['errors'=>'Booking not found'])->withInput();
         }
+
+        $this->authorize('update', [Booking::class, $booking, $buffet]);
 
         $foods = $this->food->where('buffet', $buffet->id)->where('status', FoodStatus::ACTIVE->name)->get();
         $decorations = $this->decoration->where('buffet', $buffet->id)->where('status', DecorationStatus::ACTIVE->name)->get();
@@ -276,9 +314,15 @@ class BookingController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
-        // valida se o booking existe
-        $booking = $this->booking->where('buffet_id', $buffet->id)->where('id', $request->booking)->get()->first();
+        $booking_id = $this->hashids->decode($request->booking)[0];
 
+        // valida se o booking existe
+        $booking = $this->booking->where('buffet_id', $buffet->id)->where('id', $booking_id)->get()->first();
+        if(!$booking) {
+            return redirect()->back()->withErrors(['errors'=>'Booking not found'])->withInput();
+        }
+        
+        $this->authorize('update', [Booking::class, $booking, $buffet]);
 
         // valida a hora
         $schedule = $this->schedule->where('id', $request->schedule_id)->where('buffet_id', $buffet->id)->get()->first();
@@ -364,18 +408,32 @@ class BookingController extends Controller
         return redirect()->route('booking.edit', ['buffet'=>$buffet->slug, 'booking'=>$booking->id]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Booking $booking)
+    public function destroy(Request $request)
     {
-        //
+
     }
+
     public function change_status(Request $request)
     {
         $buffet_slug = $request->buffet;
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
-        $booking = $this->booking->where('id',$request->booking)->with(['food', 'decoration', 'schedule'])->get()->first();
+
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+
+        $booking_id = $this->hashids->decode($request->booking)[0];
+
+        $booking = $this->booking->where('id',$booking_id)->with(['food', 'decoration', 'schedule'])->get()->first();
+
+        if($request->status == BookingStatus::CANCELED->name) {
+            $this->authorize('cancel', [Booking::class, $booking, $buffet]);
+        } else {
+            $this->authorize('change_status', [Booking::class, $booking, $buffet]);
+        }
 
         $booking->update(['status'=>$request->status]);
 
@@ -508,5 +566,41 @@ class BookingController extends Controller
 
 
         return response()->json(['day'=>$date, 'day_week'=>$dayOfWeek, 'schedules'=>$schedules], 200);
+    }
+
+    public function party_mode(Request $request){
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+        
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
+        }
+        $this->authorize('party_mode', [Booking::class, $buffet]);
+        
+        $current_party = $this->current_party();
+        if(!$current_party) {
+            // a propria blade tem um if pra validar se existe ou não
+            return view('bookings.party_mode',['booking'=>$current_party,'buffet'=>$buffet_slug]);
+        }
+
+        $guests = $this->guest
+                       ->where('booking_id',$current_party->id)
+                       ->where('buffet_id', $buffet->id)
+                       ->get();
+
+        $unblocked_guests = $this->guest
+                               ->where('booking_id',$current_party->id)
+                               ->where('buffet_id', $buffet->id)
+                               ->where('status','!=', GuestStatus::BLOCKED->name)
+                               ->get();
+        $present_guests  = $this->guest
+                               ->where('booking_id',$current_party->id)
+                               ->where('buffet_id', $buffet->id)
+                               ->where('status',GuestStatus::PRESENT->name)
+                               ->get();
+
+        $guest_counter = ['present'=>$present_guests->count(), 'unblocked'=>$unblocked_guests->count()];
+
+        return view('bookings.party_mode',['booking'=>$current_party,'buffet'=>$buffet_slug, 'guests'=>$guests, 'guest_counter'=>$guest_counter]);
     }
 }

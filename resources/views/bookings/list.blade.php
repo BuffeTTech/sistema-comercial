@@ -17,7 +17,6 @@
                         <thead class="bg-gray-50 border-b-2 border-gray-200">
                             <tr>
                                 <!-- w-24 p-3 text-sm font-semibold tracking-wide text-left -->
-                                <th class="w-20 p-3 text-sm font-semibold tracking-wide text-center">ID</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-left">Nome Aniversariante</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">Máx. Convidados</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">Comida</th>
@@ -37,9 +36,8 @@
                             @else   
                             @foreach($bookings->items() as $booking)
                                 <tr class="bg-white">
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $booking['id'] }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                    <a href="{{ route('booking.show', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" class="font-bold text-blue-500 hover:underline">{{ $booking->name_birthdayperson }}</a>
+                                    <a href="{{ route('booking.show', ['booking'=>$booking->hashed_id, 'buffet'=>$buffet->slug]) }}" class="font-bold text-blue-500 hover:underline">{{ $booking->name_birthdayperson }}</a>
                                     </td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $booking->num_guests }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $booking->food['slug'] }}</td>
@@ -54,20 +52,20 @@
                                                 // $date = $date->subDays($min_days);
                                             @endphp
                                             @if($booking->status === App\Enums\BookingStatus::PENDENT->name && $format == 'pendent')
-                                                <form action="{{ route('booking.change_status', ['buffet'=>$buffet->slug, 'booking'=>$booking->id]) }}" method="post" class="inline">
+                                                <form action="{{ route('booking.change_status', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id]) }}" method="post" class="inline">
                                                     @csrf
                                                     @method('patch')
                                                     <input type="hidden" name="status" value="{{App\Enums\BookingStatus::APPROVED->name}}">
                                                     <button type="submit" title="Aprovar festa '{{$booking->name_birthdayperson}}'">✅</button>
                                                 </form>
-                                                <form action="{{ route('booking.change_status', ['buffet'=>$buffet->slug, 'booking'=>$booking->id]) }}"  method="post" class="inline">
+                                                <form action="{{ route('booking.change_status', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id]) }}"  method="post" class="inline">
                                                     @csrf
                                                     @method('patch')
                                                     <button type="submit" title="Negar festa '{{$booking->name_birthdayperson}}'">❌</button>
                                                 </form>
                                             @endif
-                                        <a href="{{ route('booking.show', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" title="Visualizar '{{$booking->name_birthdayperson}}'">👁️</a>
-                                        <a href="{{ route('booking.edit', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" title="Editar '{{$booking->name_birthdayperson}}'">✏️</a>
+                                        <a href="{{ route('booking.show', ['booking'=>$booking->hashed_id, 'buffet'=>$buffet->slug]) }}" title="Visualizar '{{$booking->name_birthdayperson}}'">👁️</a>
+                                        <a href="{{ route('booking.edit', ['booking'=>$booking->hashed_id, 'buffet'=>$buffet->slug]) }}" title="Editar '{{$booking->name_birthdayperson}}'">✏️</a>
                                     </td>
                                 </tr>
                                 </tr>

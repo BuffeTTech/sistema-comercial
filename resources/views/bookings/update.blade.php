@@ -28,7 +28,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <h1 class="text-3xl font-bold mb-4">Agendar reserva</h1>
-                    <form method="POST" action="{{ route('booking.update', ['buffet'=>$buffet->slug, 'booking'=>$booking->id]) }}">
+                    <form method="POST" action="{{ route('booking.update', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id]) }}">
                         @csrf
                         @method('put')
 
@@ -381,7 +381,7 @@
 
         async function getDates(day) {
             const csrf = document.querySelector('meta[name="csrf-token"]').content
-            const data = await axios.get(SITEURL + '/api/{{$buffet->slug}}/booking/schedule/' + day + '?booking={{ $booking->id }}', {
+            const data = await axios.get(SITEURL + '/api/{{$buffet->slug}}/booking/schedule/' + day + '?booking={{ $booking->hashed_id }}', {
                 headers: {
                     'X-CSRF-TOKEN': csrf
                 }
