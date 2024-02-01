@@ -10,9 +10,9 @@
                             <h2><a href="{{ route('booking.create', ['buffet'=> $buffet->slug]) }}">Criar Reserva</a></h2>
                             <h2><a href="{{ route('booking.list', ['buffet'=>$buffet->slug])}}">Listar todas reservas</a></h2>
                         </div>
-                        @if($isPartyHappening == true)
+                        @if($current_party)
                             <div>
-                                <h2><a href="{{ route('booking.show', ['buffet'=>$buffet->slug,'booking'=>$current_party])}}"><strong>Acessar Festa em Andamento!</strong></a></h2>
+                                <h2><a href="{{ route('booking.party_mode', ['buffet'=>$buffet->slug])}}"><strong>Acessar Festa em Andamento!</strong></a></h2>
 
                             </div>
                         @endif
@@ -29,7 +29,6 @@
                             <tr>
                                 <!-- w-24 p-3 text-sm font-semibold tracking-wide text-left -->
                                 
-                                <th class="w-20 p-3 text-sm font-semibold tracking-wide text-center">ID</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-left">Nome Aniversariante</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">Máx. Convidados</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">Comida</th>
@@ -50,9 +49,8 @@
                             @else
                                 @foreach($bookings as $key=>$booking)
                                 <tr class="bg-white">
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $key+1 }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                    <a href="{{ route('booking.show', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" class="font-bold text-blue-500 hover:underline">{{ $booking->name_birthdayperson }}</a>
+                                    <a href="{{ route('booking.show', ['booking'=>$booking['hashed_id'], 'buffet'=>$buffet->slug]) }}" class="font-bold text-blue-500 hover:underline">{{ $booking->name_birthdayperson }}</a>
                                     </td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $booking->num_guests }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $booking->food['slug'] }}</td>
@@ -62,13 +60,8 @@
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ date("H:i", strtotime(\Carbon\Carbon::parse($booking->schedule['start_time'])->addMinutes($booking->schedule['duration']))) }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.booking_status :status="$booking['status']" /></td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                        <a href="{{ route('booking.show', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" title="Visualizar '{{$booking->name_birthdayperson}}'">👁️</a>
-                                        <a href="{{ route('booking.edit', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" title="Editar '{{$booking->name_birthdayperson}}'">✏️</a>
-                                        <form action="{{ route('booking.destroy', ['booking'=>$booking['id'], 'buffet'=>$buffet->slug]) }}" method="post" class="inline">
-                                            @csrf
-                                            @method('delete')
-                                            <button type="submit" title="Deletar '{{ $booking['start_time'] }}'">❌</button>
-                                        </form>
+                                        <a href="{{ route('booking.show', ['booking'=>$booking['hashed_id'], 'buffet'=>$buffet->slug]) }}" title="Visualizar '{{$booking->name_birthdayperson}}'">👁️</a>
+                                        <a href="{{ route('booking.edit', ['booking'=>$booking['hashed_id'], 'buffet'=>$buffet->slug]) }}" title="Editar '{{$booking->name_birthdayperson}}'">✏️</a>
                                     </td>
                                 </tr>
                                 @endforeach
