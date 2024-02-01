@@ -9,8 +9,10 @@ use App\Enums\QuestionType;
 use App\Enums\SatisfactionQuestionStatus;
 use App\Enums\SubscriptionStatus;
 use App\Enums\UserStatus;
+use App\Models\Address;
 use App\Models\Booking;
 use App\Models\Buffet;
+use App\Models\BuffetSchedule;
 use App\Models\BuffetSubscription;
 use App\Models\Decoration;
 use App\Models\DecorationPhotos;
@@ -99,6 +101,21 @@ class TestsSeeder extends Seeder
         ]);
         $user->assignRole($administrative_role->name);
 
+        $buffet_address = Address::create([
+            "zipcode"=>fake()->postcode(),
+            "street"=>fake()->streetName(),
+            "number"=>fake()->buildingNumber(),
+            "neighborhood"=>fake()->secondaryAddress(),
+            "state"=>fake()->state(),
+            "city"=>fake()->city(),
+            "country"=>fake()->country(),
+            "complement"=>""
+        ]);
+
+        $buffet_phone1 = Phone::create([
+            'number'=>'(19) 99999-9999'
+        ]);
+
         $buffet = Buffet::create([
             'trading_name' => 'Buffet Alegria',
             'email' => 'buffet@alegria.com',
@@ -106,7 +123,25 @@ class TestsSeeder extends Seeder
             'document' => "47.592.257/0001-43",
             'owner_id' => $user->id,
             'status' => BuffetStatus::ACTIVE->name,
+            'phone1'=>$buffet_phone1->id,
+            'address'=>$buffet_address->id
         ]);
+
+        $start = ['08:00', '08:00', '08:00', '08:00', '08:00', '08:00', '08:00'];
+        $end = ['17:00', '17:00', '17:00', '17:00', '17:00', '17:00', '17:00'];
+        $buffet_schedules = [];
+        foreach(DayWeek::names() as $key=>$day) {
+            $sch = BuffetSchedule::create([
+                'day_week'=>$day,
+                'opened'=>true,
+                'start'=>$start[$key],
+                'end'=>$end[$key],
+                'buffet_id'=>$buffet->id,
+            ]);
+            array_push($buffet_schedules, $sch);
+        }
+        $buffet_schedules[3]->update(['opened'=>false, 'start'=>null, 'end'=>null]);
+        $buffet_schedules[5]->update(['opened'=>false, 'start'=>null, 'end'=>null]);
 
         $buffet_subscription = BuffetSubscription::create([
             'buffet_id'=>$buffet->id,

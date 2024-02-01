@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Enums\BuffetStatus;
+use App\Enums\DayWeek;
 use App\Http\Requests\StoreBuffetRequest;
 use App\Http\Requests\UpdateBuffetRequest;
 use App\Models\Address;
 use App\Models\Buffet;
+use App\Models\BuffetSchedule;
 use App\Models\BuffetSubscription;
 use App\Models\Phone;
 use App\Models\Subscription;
@@ -22,7 +24,8 @@ class BuffetController extends Controller
         protected Address $address,
         protected Phone $phone,
         protected Subscription $subscription,
-        protected BuffetSubscription $buffet_subscription
+        protected BuffetSubscription $buffet_subscription,
+        protected BuffetSchedule $buffet_schedule
     )
     {
         
@@ -36,6 +39,48 @@ class BuffetController extends Controller
         }
 
         return view('dashboard_buffet', ['buffet'=>$buffet]);
+    }
+
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Buffet $buffet)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Request $request)
+    {
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->with(['buffet_phone1','buffet_phone2', 'buffet_address'])->where('slug', $buffet_slug)->get()->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
+        }
+
+        $buffet_schedules = $this->buffet_schedule->where('buffet_id', $buffet->id)->get();
+
+        return view('buffet.update',['buffet'=>$buffet, 'buffet_schedules'=>$buffet_schedules]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateBuffetRequest $request, Buffet $buffet)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Buffet $buffet)
+    {
+        //
     }
 
     /**
@@ -152,9 +197,17 @@ class BuffetController extends Controller
             'subscription_id'=>$subscription->id,
             'expires_in'=>$expires_in->format('Y-m-d H:i:s')
         ]);
-        return response()->json(['data'=>[$request->buffet_subscription]], 201);
-        return response()->json(['data'=>[$buffet, $buffet_subscription, $owner]], 201);
 
+        foreach(DayWeek::names() as $day) {
+            $this->buffet_schedule->create([
+                'day_week'=>$day,
+                'opened'=>false,
+                'start'=>null,
+                'end'=>null,
+                'buffet_id'=>$buffet->id,
+            ]);
+        }
+        return response()->json(['data'=>[$buffet, $buffet_subscription, $owner]], 201);
     }
 
     public function update_buffet_api(Request $request) {
@@ -233,37 +286,5 @@ class BuffetController extends Controller
     }
         return response()->json(['data'=>[$buffet]], 201); // passar update de inscrição em funcao diferente 
 
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Buffet $buffet)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Buffet $buffet)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateBuffetRequest $request, Buffet $buffet)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Buffet $buffet)
-    {
-        //
     }
 }
