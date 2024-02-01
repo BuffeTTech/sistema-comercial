@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Enums\BookingStatus;
 use App\Enums\BuffetStatus;
 use App\Enums\DayWeek;
+use App\Enums\QuestionType;
+use App\Enums\SatisfactionQuestionStatus;
 use App\Enums\SubscriptionStatus;
 use App\Enums\UserStatus;
 use App\Models\Booking;
@@ -14,6 +16,8 @@ use App\Models\Decoration;
 use App\Models\DecorationPhotos;
 use App\Models\Food;
 use App\Models\FoodPhoto;
+use App\Models\Phone;
+use App\Models\SatisfactionQuestion;
 use App\Models\Schedule;
 use App\Models\Subscription;
 use App\Models\User;
@@ -69,6 +73,19 @@ class TestsSeeder extends Seeder
         $administrative_role->givePermissionTo($p10->name);
         $administrative_role->givePermissionTo($p11->name);
         $administrative_role->givePermissionTo($p12->name);
+      
+        $create_survey = Permission::create(['name'=>'create survey question']);
+        $show_survey = Permission::create(['name'=>'show survey question']);
+        $update_survey = Permission::create(['name'=>'update survey question']);
+        $delete_survey = Permission::create(['name'=>'delete survey question']);
+        $list_all_survey = Permission::create(['name'=>'list all survey question']);
+        $list_all_buffet_survey = Permission::create(['name'=>'list all buffet survey question']);
+        $administrative_role->givePermissionTo($create_survey->id);
+        $administrative_role->givePermissionTo($show_survey->id);
+        $administrative_role->givePermissionTo($update_survey->id);
+        $administrative_role->givePermissionTo($delete_survey->id);
+        $administrative_role->givePermissionTo($list_all_survey->id);
+        $administrative_role->givePermissionTo($list_all_buffet_survey->id);
         
         $user = User::create([
             'name' => "Guilherme",
@@ -97,6 +114,9 @@ class TestsSeeder extends Seeder
             'expires_in'=>Carbon::now()->addDays(2)
         ]);
 
+        $user1_phone = Phone::create([
+            'number'=>'(19) 99999-9999'
+        ]);
         $user1 = User::create([
             'name' => "GuilhermeX",
             'email' => "usuarioee@teste.com",
@@ -106,7 +126,9 @@ class TestsSeeder extends Seeder
             'document_type' => "CPF",
             'status' => UserStatus::ACTIVE->name,
             'buffet_id' => $buffet->id,
+            'phone1'=>$user1_phone->id
         ]);
+        $user1->assignRole($operational_role->name);
 
         $schedule1 = Schedule::create([
             'day_week'=>DayWeek::SUNDAY->name,
@@ -234,8 +256,46 @@ class TestsSeeder extends Seeder
             'schedule_id'=>$schedule6->id,
             'price_schedule'=>0,
             'discount'=>0,
-            'status'=>BookingStatus::APPROVED->name,
+            'status'=>BookingStatus::FINISHED->name,
             'user_id'=>$user1->id
         ]);
+
+        $question1 = SatisfactionQuestion::create([
+            'question' => 'Qualidade da comida', 
+            'status'  => true,
+            'answers'  => 0,
+            'question_type' => QuestionType::M->name,
+            'buffet_id' => $buffet->id,
+        ]);
+
+        $question2 = SatisfactionQuestion::create([
+            'question'=>'O atendimento da equipe atendeu às suas expectativas?',
+            'status'=>true,
+            'question_type'=>QuestionType::M->name,
+            'answers'=>0,
+            'buffet_id'=>$buffet->id
+        ]);
+        $question3 = SatisfactionQuestion::create([
+            'question'=>'Deixe-nos saber mais sobre sua experiência. O que você achou mais notável ou o que poderia ser melhorado?',
+            'status'=>true,
+            'question_type'=>QuestionType::D->name,
+            'answers'=>0,
+            'buffet_id'=>$buffet->id
+        ]);
+        $question4 = SatisfactionQuestion::create([
+            'question'=>'O quanto recomendaria este evento para amigos e familiares',
+            'status'=>true,
+            'question_type'=>QuestionType::M->name,
+            'answers'=>0,
+            'buffet_id'=>$buffet->id
+        ]);
+        $question5 = SatisfactionQuestion::create([
+            'question'=>'Como você classificaria a variedade de opções de alimentação durante o evento?',
+            'status'=>true,
+            'question_type'=>QuestionType::M->name,
+            'answers'=>0,
+            'buffet_id'=>$buffet->id
+        ]);
+
     }
 }
