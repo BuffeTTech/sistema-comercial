@@ -137,7 +137,7 @@ class DecorationController extends Controller
 
         //$decoration = $this->decoration->where('slug',$request->decoration)->get()->first();
         $decoration_slug = $request->decoration; 
-        $decoration_photos = DecorationPhotos::where('decorations', $decoration->id)->get(); 
+        $decoration_photos = DecorationPhotos::where('decorations_id', $decoration->id)->get(); 
         
 
         return view('decoration.show',['buffet'=>$buffet_slug, 'decoration'=>$decoration, 'decoration_photos'=>$decoration_photos]);
@@ -190,7 +190,7 @@ class DecorationController extends Controller
 
         $dec = $this->decoration->find($decoration->id);
         
-        $decoration_photos = $this->photos->where('id', $request->slug)->where('decorations', $decoration->id)->get(); 
+        $decoration_photos = $this->photos->where('id', $request->slug)->where('decorations_id', $decoration->id)->get(); 
 
         return redirect()->back(); // para ser possivel update foto e conteudos ao mesmo tempo 
 
