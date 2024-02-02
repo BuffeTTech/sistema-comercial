@@ -19,6 +19,7 @@ use App\Models\Buffet;
 use App\Models\Decoration;
 use App\Models\Food;
 use App\Models\Guest;
+use App\Models\Recommendation;
 use App\Models\Schedule;
 use Carbon\Carbon;
 use DateTime;
@@ -36,6 +37,7 @@ class BookingController extends Controller
         protected Food $food,
         protected Decoration $decoration,
         protected Guest $guest,
+        protected Recommendation $recommendation
     )
     {
         $this->hashids = new Hashids(config('app.name'));
@@ -251,25 +253,15 @@ class BookingController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
 
+        $recommendations = $this->recommendation->where('buffet',$buffet->id)->get();
+
         if(!$buffet || !$buffet_slug) {
             return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
         }
 
-        $booking_id = $this->hashids->decode($request->booking)[0];
+        $booking = $this->booking->where('id',$request->booking)->with(['food', 'decoration', 'schedule'])->get()->first();
 
-        $booking = $this->booking
-                    ->where('id',$booking_id)
-                    ->where('buffet_id', $buffet->id)
-                    ->with(['food', 'decoration', 'schedule'])->get()->first();
-        
-        $guests = $this->guest
-                        ->where('booking_id',$booking_id)
-                        ->where('buffet_id', $buffet->id)
-                        ->get();
-        
-        $this->authorize('view', [Booking::class, $booking, $buffet]);
-
-        return view('bookings.show', ['buffet'=>$buffet,'booking'=>$booking, 'guests'=>$guests]);
+        return view('bookings.show', ['buffet'=>$buffet,'booking'=>$booking]);
     }
 
     /**
