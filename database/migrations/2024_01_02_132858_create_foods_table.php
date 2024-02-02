@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum('status', array_column(FoodStatus::cases(), 'name'));
             $table->float('price');
             $table->string('slug')->unique();
-            $table->foreignId('buffet')->constrained(
+            $table->foreignId('buffet_id')->constrained(
                 table: 'buffets', indexName: 'foods_buffet_id'
             );
             $table->timestamps();

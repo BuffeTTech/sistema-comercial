@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('file_extension');
             $table->string('mime_type'); // "image/jpeg", "image/png"
             $table->unsignedBigInteger('file_size');
-            $table->foreignId('decorations')->constrained(
+            $table->foreignId('decorations_id')->constrained(
                 table: 'decorations', indexName: 'decoration_id'
             );
             $table->timestamps();

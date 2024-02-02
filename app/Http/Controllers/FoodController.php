@@ -24,7 +24,7 @@ class FoodController extends Controller
 
      private function getFoodPhotos($foodId)
     {
-        return FoodPhoto::where('food', $foodId)->get();
+        return FoodPhoto::where('food_id', $foodId)->get();
     }   
 
     /**
@@ -40,7 +40,7 @@ class FoodController extends Controller
         }
 
         $buffet = Buffet::where('slug', $request->buffet)->get()->first();
-        $foods = $this->food->where('buffet', $buffet->id)->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
+        $foods = $this->food->where('buffet_id', $buffet->id)->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
         return view('foods.index', ['foods'=>$foods, 'buffet'=>$buffet_slug]);
     }
 
@@ -73,7 +73,7 @@ class FoodController extends Controller
         $slug = str_replace(' ', '-', $request->slug);
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
-        if($this->food->where('slug', $request->food)->where('buffet', $buffet->id)->get()->first()){
+        if($this->food->where('slug', $request->food)->where('buffet_id', $buffet->id)->get()->first()){
             return redirect()->back()->withErrors(['slug' => 'food already exists.'])->withInput();
         }
 
@@ -88,7 +88,7 @@ class FoodController extends Controller
             "status"=>$request->status ?? FoodStatus::ACTIVE->name,
             "price"=>$request->price,
             "slug"=>$slug,
-            "buffet"=>$buffet->id,
+            "buffet_id"=>$buffet->id,
         ]);
 
          if ($request->has('foods_photo')) {
@@ -102,7 +102,7 @@ class FoodController extends Controller
                             'file_extension'=>$upload['file_extension'],
                             'mime_type'=>$upload['mime_type'],
                             'file_size'=>$upload['file_size'],
-                            'food'=>$food->id,
+                            'food_id'=>$food->id,
                         ]);
     
                     } else {
@@ -123,7 +123,7 @@ class FoodController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         
-        if(!$food = $this->food->where('slug', $request->food)->where('buffet', $buffet->id)->get()->first()){
+        if(!$food = $this->food->where('slug', $request->food)->where('buffet_id', $buffet->id)->get()->first()){
             return redirect()->route('food.index', $buffet_slug)->withErrors(['slug' => 'food not found.'])->withInput();
         }
 
@@ -143,7 +143,7 @@ class FoodController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         // dd($request->buffet, $request->food); 
-        if (!$food = $this->food->where('slug', $request->food)->where('buffet', $buffet->id)->get()->first()) {
+        if (!$food = $this->food->where('slug', $request->food)->where('buffet_id', $buffet->id)->get()->first()) {
             return redirect()->back()->withErrors(['slug' => 'food not found.'])->withInput();
             
         }
@@ -162,7 +162,7 @@ class FoodController extends Controller
     {
         $food_slug = $request->food;
         $food = Food::where('slug', $food_slug)->first();
-        $foods_photo =  $this->photo->where('id', $request->foods_photo)->where('food', $food->id)->get()->first();
+        $foods_photo =  $this->photo->where('id', $request->foods_photo)->where('food_id', $food->id)->get()->first();
         if(!$foods_photo){
             return redirect()->route('food.index', ['buffet'=>$request->buffet])->withErrors(['photo'=>"Photo not found."])->withInput();
         }
@@ -190,7 +190,7 @@ class FoodController extends Controller
                         'file_extension'=>$upload['file_extension'],
                         'mime_type'=>$upload['mime_type'],
                         'file_size'=>$upload['file_size'],
-                        'food'=>$food->id,
+                        'food_id'=>$food->id,
                     ]);
 
                 } else {
@@ -232,12 +232,12 @@ class FoodController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
 
-        $food = $this->food->where('slug', $request->food)->where('buffet', $buffet->id)->get()->first();
+        $food = $this->food->where('slug', $request->food)->where('buffet_id', $buffet->id)->get()->first();
         if(!$food){
             return redirect()->back()->withErrors(['slug' => 'food not found.'])->withInput();
         }
 
-        $food_exists = $this->food->where('slug', $request->slug)->where('buffet', $buffet->id)->get()->first();
+        $food_exists = $this->food->where('slug', $request->slug)->where('buffet_id', $buffet->id)->get()->first();
         if($food_exists && $food_exists->id !== $food->id) {
             return redirect()->back()->withErrors(['slug' => 'food already exists.'])->withInput();
         }
@@ -249,10 +249,10 @@ class FoodController extends Controller
             "status" => $request->status ?? FoodStatus::ACTIVE->name,
             "price" => $request->price,
             "slug" => $request->slug,
-            "buffet" => $buffet->id,
+            "buffet_id" => $buffet->id,
         ]);
 
-        $foods_photo =  $this->photo->where('id', $request->slug)->where('food', $food->id)->get()->first(); 
+        $foods_photo =  $this->photo->where('id', $request->slug)->where('food_id', $food->id)->get()->first(); 
 
         $pk = $this->food->find($food->id);
 
@@ -266,7 +266,7 @@ class FoodController extends Controller
      {
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
-         if ($food = $this->food->where('slug', $request->food)->where('buffet', $buffet->id)->get()->first()) {
+         if ($food = $this->food->where('slug', $request->food)->where('buffet_id', $buffet->id)->get()->first()) {
              return redirect()->route('food.not_found');
          }
 
@@ -280,7 +280,7 @@ class FoodController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
 
-        $food = $this->food->where('slug', $request->food)->where('buffet', $buffet->id)->get()->first();
+        $food = $this->food->where('slug', $request->food)->where('buffet_id', $buffet->id)->get()->first();
         if (!$food) {
             return redirect()->back()->withErrors(['slug' => 'food not found.'])->withInput();
         }
@@ -299,7 +299,7 @@ class FoodController extends Controller
             return response()->json(['message' => 'Buffet not found'], 422);
         }
         
-        if(!$food = $this->food->where('slug', $request->food)->where('buffet', $buffet->id)->with('photos')->get()->first()){
+        if(!$food = $this->food->where('slug', $request->food)->where('buffet_id', $buffet->id)->with('photos')->get()->first()){
             return response()->json(['message' => 'Food not found'], 422);;
         }
 
