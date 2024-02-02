@@ -114,7 +114,7 @@ class DecorationController extends Controller
                             'file_extension'=>$upload['file_extension'],
                             'mime_type'=>$upload['mime_type'],
                             'file_size'=>$upload['file_size'],
-                            'decorations'=>$decoration->id,
+                            'decorations_id'=>$decoration->id,
                         ]);
                     }
                 }
@@ -156,7 +156,7 @@ class DecorationController extends Controller
         }
 
         $decoration_slug = $request->decoration; 
-        $decoration_photos = DecorationPhotos::where('decorations', $decoration->id)->get(); 
+        $decoration_photos = DecorationPhotos::where('decorations_id', $decoration->id)->get(); 
 
         return view('decoration.update',['buffet'=>$buffet,'decoration'=>$decoration, 'decoration_photos'=>$decoration_photos]);
     }
@@ -222,7 +222,7 @@ class DecorationController extends Controller
                         'file_extension'=>$upload['file_extension'],
                         'mime_type'=>$upload['mime_type'],
                         'file_size'=>$upload['file_size'],
-                        'decorations'=>$decoration->id,
+                        'decorations_id'=>$decoration->id,
                     ]);
                 } else {
                     return redirect()->back()->withErrors(['photo'=>"error photo not valid"])->withInput();
