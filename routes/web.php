@@ -38,11 +38,13 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     Route::post('{buffet}/booking/{booking}/guest',[GuestController::class, 'store'])->name('guest.store');
     Route::get('{buffet}/booking/{booking}/guest/{guest}',[GuestController::class, 'show'])->name('guest.show');
 
-    Route::resource('{buffet}/food', FoodController::class);
     Route::patch('/{buffet}/food/{food}/change_status', [FoodController::class,'change_status'])->name('food.change_status');
+    Route::patch('/{buffet}/food/{food}/activate', [FoodController::class,'activate_food'])->name('food.activate_food');
     Route::patch('/{buffet}/food/{food}/{foods_photo} ',[FoodController::class,'update_photo'])->name('food.update_photo');
+    Route::resource('{buffet}/food', FoodController::class);
 
     Route::resource('{buffet}/decoration', DecorationController::class);
+    Route::patch('/{buffet}/decoration/{decoration}/activate', [DecorationController::class,'activate_decoration'])->name('decoration.activate_decoration');
     Route::patch('/{buffet}/decoration/{decoration}/change_status', [DecorationController::class,'change_status'])->name('decoration.change_status');
     Route::patch('/{buffet}/decoration/{decoration}/{decoration_photos} ',[DecorationController::class,'update_photo'])->name('decoration.update_photo');
 

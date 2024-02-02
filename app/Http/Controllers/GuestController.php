@@ -101,14 +101,14 @@ class GuestController extends Controller
             return redirect()->back()->withErrors(['booking_id'=>'Reserva não encontrada'])->withInput();
         }
         
-        $this->authorize('change_status', [Guest::class,$booking, $buffet]);
-
         $guest_id = $this->hashids->decode($request->guest)[0];
-
+        
         $guest = $this->guest->where('id',$guest_id)->get()->first();
         if(!$guest) {
             return redirect()->back()->withErrors(['guest'=>'Convidado não encontrado'])->withInput();
         }
+        
+        $this->authorize('change_status', [Guest::class, $booking, $guest, $buffet]);
         
         $guest->update([
             'status'=>$request->status

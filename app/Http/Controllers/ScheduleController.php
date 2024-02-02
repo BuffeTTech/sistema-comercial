@@ -8,14 +8,18 @@ use App\Models\Buffet;
 use App\Models\Schedule;
 use App\Enums\ScheduleStatus;
 use App\Enums\DayWeek;
+use Hashids\Hashids;
 use Illuminate\Http\Request; 
 
 class ScheduleController extends Controller
 {
+    protected Hashids $hashids;
+    
     public function __construct(
         protected Schedule $schedule,
         protected Buffet $buffet
     ) {
+        $this->hashids = new Hashids(config('app.name'));
     }
 
     /**
@@ -27,12 +31,14 @@ class ScheduleController extends Controller
         $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
 
         if (!$buffet || !$buffet_slug){
-            return null; 
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
         $schedules = $this->schedule->where('buffet_id', $buffet->id)
-        ->orderByRaw("FIELD(day_week, '" . implode("', '", DayWeek::array()) . "')")
-        ->orderBy('start_time', 'asc')
-        ->paginate($request->get('per page', 5), ['*'], 'page', $request->get('page', 1)); 
+            ->orderByRaw("FIELD(day_week, '" . implode("', '", DayWeek::array()) . "')")
+            ->orderBy('start_time', 'asc')
+            ->paginate($request->get('per page', 5), ['*'], 'page', $request->get('page', 1)); 
+
+        // $this->authorize('viewAny', [Schedule::class, $buffet]);
         
         return view('schedule.index', ['buffet'=>$buffet_slug, 'schedules'=>$schedules]); 
     }
@@ -47,10 +53,11 @@ class ScheduleController extends Controller
         $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
 
         if(!$buffet || !$buffet_slug){
-            return null; 
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
+        $this->authorize('create', [Schedule::class, $buffet]);
         
-        return view('schedule.create', ['buffet'=>$buffet_slug]);
+        return view('schedule.create', ['buffet'=>$buffet]);
     }
 
     /**
@@ -62,8 +69,9 @@ class ScheduleController extends Controller
         $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
 
         if(!$buffet || !$buffet_slug){
-            return null; 
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
+        $this->authorize('create', [Schedule::class, $buffet]);
 
         $startDateTime = \Carbon\Carbon::parse($request->start_time);
         $endDateTime = $startDateTime->copy()->addMinutes($request->duration);
@@ -98,7 +106,7 @@ class ScheduleController extends Controller
             'buffet_id'=> $buffet->id, 
         ]); 
 
-        return redirect()->route('schedule.show', ['buffet'=>$buffet_slug, 'schedule' =>$schedule]);
+        return redirect()->route('schedule.show', ['buffet'=>$buffet_slug, 'schedule' =>$schedule->hashed_id]);
     }
 
     /**
@@ -109,9 +117,13 @@ class ScheduleController extends Controller
         $buffet_slug = $request->buffet; 
         $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
 
-        if(!$schedule = $this->schedule->where('id', $request->schedule)->where('buffet_id', $buffet->id)->first()){
+        $schedule_id = $this->hashids->decode($request->schedule)[0];
+
+        if(!$schedule = $this->schedule->where('id', $schedule_id)->where('buffet_id', $buffet->id)->first()){
             return redirect()->route('schedule.index', ['buffet'=>$buffet_slug])->withErrors(['schedule'=>'schedule not found'])->withInput();
         }
+        $this->authorize('view', [Schedule::class, $schedule, $buffet]);
+
         
         return view('schedule.show',['buffet'=>$buffet_slug, 'schedule'=>$schedule]); 
     }
@@ -123,10 +135,14 @@ class ScheduleController extends Controller
     {
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
-        $schedule = Schedule::where('id', $request->schedule)->where('buffet_id', $buffet->id)->first(); 
+
+        $schedule_id = $this->hashids->decode($request->schedule)[0];
+
+        $schedule = Schedule::where('id', $schedule_id)->where('buffet_id', $buffet->id)->first(); 
         if(!$schedule){
             return redirect()->back()->withErrors(['schedule'=>'schedule not found'])->withInput();
         }
+        $this->authorize('update', [Schedule::class, $schedule, $buffet]);
 
         return view('schedule.update', ['buffet'=>$buffet_slug, 'schedule'=>$schedule]);
     }
@@ -139,10 +155,13 @@ class ScheduleController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
 
-        $schedule = Schedule::where('id', $request->schedule)->where('buffet_id', $buffet->id)->first(); 
+        $schedule_id = $this->hashids->decode($request->schedule)[0];
+        
+        $schedule = Schedule::where('id', $schedule_id)->where('buffet_id', $buffet->id)->first(); 
         if(!$schedule){
             return redirect()->back()->withErrors(['schedule'=>'schedule not found'])->withInput();
         }
+        $this->authorize('update', [Schedule::class, $schedule, $buffet]);
 
         $schedule_exists = $this->schedule->where('id', $request->schedule)->where('buffet_id', $buffet->id)->get()->first();
         // if($schedule_exists && $schedule_exists->id !== $schedule->id) {
@@ -192,11 +211,14 @@ class ScheduleController extends Controller
     {
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->get()->first(); 
+        
+        $schedule_id = $this->hashids->decode($request->schedule)[0];
 
-        $schedule = Schedule::where('id', $request->schedule)->where('buffet_id', $buffet->id)->first(); 
+        $schedule = Schedule::where('id', $schedule_id)->where('buffet_id', $buffet->id)->first(); 
         if(!$schedule){
             return redirect()->back()->withErrors(['schedule'=>'schedule not found'])->withInput();
         }
+        $this->authorize('destroy', [Schedule::class, $schedule, $buffet]);
 
         $schedule->update(['status'=> ScheduleStatus::UNACTIVE->name]);
 
@@ -206,12 +228,14 @@ class ScheduleController extends Controller
     public function change_status(Request $request){
         $buffet_slug = $request->buffet; 
         $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
+        $schedule_id = $this->hashids->decode($request->schedule)[0];
         
-        $schedule = $this->schedule->where('id', $request->schedule)->where('buffet_id', $buffet->id)->first();
+        $schedule = $this->schedule->where('id', $schedule_id)->where('buffet_id', $buffet->id)->first();
         if(!$schedule){
             return redirect()->back()->withErrors(['schedule' => 'schedule not found'])->withInput();
         }
-
+        $this->authorize('change_status', [Schedule::class, $schedule, $buffet]);
+        
         $schedule->update(['status'=>$request->status]); 
 
         return redirect()->route('schedule.index', ['buffet'=>$buffet_slug]); 

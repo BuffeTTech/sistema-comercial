@@ -3,12 +3,15 @@
 namespace App\Policies;
 
 use App\Models\Buffet;
-use App\Models\Decoration;
+use App\Models\Food;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class DecorationPolicy
+class FoodPolicy
 {
+    /**
+     * Determine whether the user can view any models.
+     */
     public function viewAny(User $user, Buffet $buffet): bool
     {
         if($user == null) {
@@ -17,12 +20,12 @@ class DecorationPolicy
 
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {
-            return $user->can('list decoration');
+            return $user->can('list food');
         }
 
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('list decoration');
+            return $user->can('list food');
         }
 
         return false;
@@ -31,7 +34,7 @@ class DecorationPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Decoration $decoration, Buffet $buffet): bool
+    public function view(User $user, Food $food, Buffet $buffet): bool
     {
         if($user == null) {
             return false;
@@ -39,12 +42,12 @@ class DecorationPolicy
 
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {
-            return $user->can('show decoration');
+            return $user->can('show food');
         }
 
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('show decoration');
+            return $user->can('show food');
         }
 
         return false;
@@ -61,12 +64,12 @@ class DecorationPolicy
 
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {
-            return $user->can('create decoration');
+            return $user->can('create food');
         }
 
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('create decoration');
+            return $user->can('create food');
         }
 
         return false;
@@ -75,7 +78,7 @@ class DecorationPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Decoration $decoration, Buffet $buffet): bool
+    public function update(User $user, Food $food, Buffet $buffet): bool
     {
         if($user == null) {
             return false;
@@ -83,12 +86,12 @@ class DecorationPolicy
 
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {
-            return $user->can('update decoration');
+            return $user->can('update food');
         }
 
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('update decoration');
+            return $user->can('update food');
         }
 
         return false;
@@ -97,7 +100,7 @@ class DecorationPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Decoration $decoration, Buffet $buffet): bool
+    public function delete(User $user, Food $food, Buffet $buffet): bool
     {
         if($user == null) {
             return false;
@@ -105,18 +108,18 @@ class DecorationPolicy
 
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {
-            return $user->can('delete decoration');
+            return $user->can('delete food');
         }
 
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('delete decoration');
+            return $user->can('delete food');
         }
 
         return false;
     }
 
-    public function change_status(User $user, Decoration $decoration, Buffet $buffet): bool
+    public function change_status(User $user, Food $food, Buffet $buffet): bool
     {
         if($user == null) {
             return false;
@@ -124,12 +127,12 @@ class DecorationPolicy
 
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {
-            return $user->can('change decoration status');
+            return $user->can('change food status');
         }
 
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('change decoration status');
+            return $user->can('change food status');
         }
 
         return false;

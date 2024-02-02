@@ -50,9 +50,19 @@
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
                                         <a href="{{ route('food.show', ['food'=>$value['slug'], 'buffet'=>$buffet]) }}" title="Visualizar '{{$value['name_food']}}'">👁️</a>
                                         <a href="{{ route('food.edit', ['food'=>$value['slug'], 'buffet'=>$buffet]) }}" title="Editar '{{$value['name_food']}}'">✏️</a>
-                                        
-                                        <!-- Se a pessoa está vendo esta página, ela por padrão ja é ADM ou comercial, logo nao preciso validar aqui! -->
-
+                                        @if($value['status'] !== App\Enums\FoodStatus::UNACTIVE->name)
+                                            <form action="{{ route('food.destroy', ['food'=>$value['slug'], 'buffet'=>$buffet]) }}" method="post" class="inline">
+                                                @csrf
+                                                @method('delete')
+                                                <button type="submit" title="Deletar '{{ $value['name_food'] }}'">❌</button>
+                                            </form>
+                                            @else
+                                            <form action="{{ route('food.activate_food', ['food'=>$value['slug'], 'buffet'=>$buffet]) }}" method="post" class="inline">
+                                                @csrf
+                                                @method('patch')
+                                                <button type="submit" title="Deletar '{{ $value['name_food'] }}'">✅</button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach

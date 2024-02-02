@@ -28,7 +28,7 @@ class EnsureBuffetExistsURL
             }
             return route('home');
         }
-
+        
         return $next($request);
     }
 }

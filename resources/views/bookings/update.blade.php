@@ -327,33 +327,34 @@
             })
         })
 
-
-
-        async function execute() {
-            // const food = document.querySelector('input[name=food_id]:checked')
-            // const decoration = document.querySelector('input[name=decoration_id]:checked')
-            // const invited = num_guests.value ?? 0
-            // let price_local = 0;
-            // if (food) {
-            //     const food_local = await get_food(food.value)
-            //     food_selected = food_local;
-            //     price_local += invited * food_local.price
-            // }
-            // if(decoration) {
-            //     const decoration_local = await get_decoration(decoration.value)
-            //     decoration_selected = decoration_local;
-            //     price_local += invited * decoration_local.price
-            // }
-            // price.innerHTML = price_local;
-
-            if (party_day.value) {
-                const dates = await getDates(party_day.value)
-
-                printDates(dates)
+        document.addEventListener("DOMContentLoaded", (event) => {
+            async function execute() {
+                // const food = document.querySelector('input[name=food_id]:checked')
+                // const decoration = document.querySelector('input[name=decoration_id]:checked')
+                // const invited = num_guests.value ?? 0
+                // let price_local = 0;
+                // if (food) {
+                //     const food_local = await get_food(food.value)
+                //     food_selected = food_local;
+                //     price_local += invited * food_local.price
+                // }
+                // if(decoration) {
+                //     const decoration_local = await get_decoration(decoration.value)
+                //     decoration_selected = decoration_local;
+                //     price_local += invited * decoration_local.price
+                // }
+                // price.innerHTML = price_local;
+    
+                if (party_day.value) {
+                    const dates = await getDates(party_day.value)
+    
+                    printDates(dates)
+                }
             }
-        }
-        
-        execute()
+            
+            execute()
+        });
+
 
 
 

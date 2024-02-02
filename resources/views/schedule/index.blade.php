@@ -14,7 +14,6 @@
                             <tr>
                                 <!-- w-24 p-3 text-sm font-semibold tracking-wide text-left -->
                                 
-                                <th class="w-20 p-3 text-sm font-semibold tracking-wide text-center">ID</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-left">Dia da semana</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">Hora de início</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">Duração</th>
@@ -33,14 +32,11 @@
                             @else
                                 @php
                                     $limite_char = 30; // O número de caracteres que você deseja exibir
-                                    $class_active = "p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50";
-                                    $class_unactive = 'p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50';
                                 @endphp
                                 @foreach($schedules as $value)
                                 <tr class="bg-white">
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['id'] }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                    <a href="{{ route('schedule.show', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" class="font-bold text-blue-500 hover:underline">{{ App\Enums\DayWeek::getEnumByName($value['day_week']) }}</a>
+                                    <a href="{{ route('schedule.show', ['schedule'=>$value['hashed_id'], 'buffet'=>$buffet]) }}" class="font-bold text-blue-500 hover:underline">{{ App\Enums\DayWeek::getEnumByName($value['day_week']) }}</a>
                                     </td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap">{{$value['start_time']}}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{$value['duration']}} minutos</td>
@@ -56,13 +52,22 @@
                                     @endif
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.schedule_status :status="$value['status']" /></td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                        <a href="{{ route('schedule.show', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" title="Visualizar '{{ App\Enums\DayWeek::getEnumByName($value['day_week']) }}'">👁️</a>
-                                        <a href="{{ route('schedule.edit', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" title="Editar '{{ App\Enums\DayWeek::getEnumByName($value['day_week']) }}'">✏️</a>
-                                        <form action="{{ route('schedule.destroy', ['schedule'=>$value['id'], 'buffet'=>$buffet]) }}" method="post" class="inline">
-                                            @csrf
-                                            @method('delete')
-                                            <button type="submit" title="Deletar '{{ $value['start_time'] }}'">❌</button>
-                                        </form>
+                                        <a href="{{ route('schedule.show', ['schedule'=>$value['hashed_id'], 'buffet'=>$buffet]) }}" title="Visualizar '{{ App\Enums\DayWeek::getEnumByName($value['day_week']) }}'">👁️</a>
+                                        <a href="{{ route('schedule.edit', ['schedule'=>$value['hashed_id'], 'buffet'=>$buffet]) }}" title="Editar '{{ App\Enums\DayWeek::getEnumByName($value['day_week']) }}'">✏️</a>
+                                        @if($value['status'] !== App\Enums\DecorationStatus::UNACTIVE->name)
+                                            <form action="{{ route('schedule.destroy', ['schedule'=>$value['hashed_id'], 'buffet'=>$buffet]) }}" method="post" class="inline">
+                                                @csrf
+                                                @method('delete')
+                                                <button type="submit" title="Deletar '{{ $value['start_time'] }}'">❌</button>
+                                            </form>
+                                            @else
+                                            <form action="{{ route('schedule.change_status', ['schedule'=>$value['hashed_id'], 'buffet'=>$buffet]) }}" method="post" class="inline">
+                                                @csrf
+                                                @method('patch')
+                                                <input type="hidden" name="status" value="{{App\Enums\ScheduleStatus::ACTIVE->name }}">
+                                                <button type="submit" title="Deletar '{{ $value['main_theme'] }}'">✅</button>
+                                            </form>
+                                        @endif                                        
                                     </td>
                                 </tr>
                                 @endforeach

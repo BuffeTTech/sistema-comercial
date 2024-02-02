@@ -20,7 +20,7 @@
                         $class_unactive = 'p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50';
                         @endphp
                         <p><strong>Status:</strong>
-                            <form action="{{ route('schedule.change_status', ['buffet' => $buffet, 'schedule' => $schedule['id']]) }}" method="post" class="inline">
+                            <form action="{{ route('schedule.change_status', ['buffet' => $buffet, 'schedule' => $schedule['hashed_id']]) }}" method="post" class="inline">
                                 @csrf
                                 @method('patch')
 
@@ -37,7 +37,7 @@
                     <br><br>
 
                     <div class="flex items-center ml-auto float-down">
-                        <a href="{{ route('schedule.edit', ['schedule'=>$schedule->id, 'buffet'=>$buffet]) }}" class="bg-amber-300 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded">
+                        <a href="{{ route('schedule.edit', ['schedule'=>$schedule->hashed_id, 'buffet'=>$buffet]) }}" class="bg-amber-300 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded">
                             <div class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4">
                                 Editar
                             </div>

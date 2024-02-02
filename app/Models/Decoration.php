@@ -13,7 +13,7 @@ class Decoration extends Model
 
     public function photos()
     {
-        return $this->hasMany(DecorationPhotos::class, 'decorations');
+        return $this->hasMany(DecorationPhotos::class, 'decorations_id');
     }
 
 }

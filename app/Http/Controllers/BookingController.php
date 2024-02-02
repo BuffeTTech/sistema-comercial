@@ -82,7 +82,7 @@ class BookingController extends Controller
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
         
         if(!$buffet || !$buffet_slug) {
-            return null;
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();;
         }
 
         $format = $request->get('format', 'all');
@@ -109,7 +109,7 @@ class BookingController extends Controller
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
         
         if(!$buffet || !$buffet_slug) {
-            return null;
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
         
         // Lista de somente as próximas reservas 
@@ -132,12 +132,12 @@ class BookingController extends Controller
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
 
         if(!$buffet || !$buffet_slug) {
-            return null;
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
         $this->authorize('create', [Booking::class, $buffet]);
 
-        $foods = $this->food->where('buffet', $buffet->id)->where('status', FoodStatus::ACTIVE->name)->get();
-        $decorations = $this->decoration->where('buffet', $buffet->id)->where('status', DecorationStatus::ACTIVE->name)->get();
+        $foods = $this->food->where('buffet_id', $buffet->id)->where('status', FoodStatus::ACTIVE->name)->get();
+        $decorations = $this->decoration->where('buffet_id', $buffet->id)->where('status', DecorationStatus::ACTIVE->name)->get();
 
         return view('bookings.create', ['buffet'=>$buffet, 'foods'=>$foods, 'decorations'=>$decorations]);
     }
@@ -198,7 +198,7 @@ class BookingController extends Controller
         // Valida o pacote de comida
         $food = $this->food
         ->where('slug', $request->food_id)
-        ->where('buffet', $buffet->id)
+        ->where('buffet_id', $buffet->id)
         ->where('status', FoodStatus::ACTIVE->name)
         ->get()
         ->first();
@@ -210,7 +210,7 @@ class BookingController extends Controller
         // Valida o pacote de decorações
         $decoration = $this->decoration
             ->where('slug', $request->decoration_id)
-            ->where('buffet', $buffet->id)
+            ->where('buffet_id', $buffet->id)
             ->where('status', DecorationStatus::ACTIVE->name)
             ->get()
             ->first();
@@ -296,8 +296,8 @@ class BookingController extends Controller
 
         $this->authorize('update', [Booking::class, $booking, $buffet]);
 
-        $foods = $this->food->where('buffet', $buffet->id)->where('status', FoodStatus::ACTIVE->name)->get();
-        $decorations = $this->decoration->where('buffet', $buffet->id)->where('status', DecorationStatus::ACTIVE->name)->get();
+        $foods = $this->food->where('buffet_id', $buffet->id)->where('status', FoodStatus::ACTIVE->name)->get();
+        $decorations = $this->decoration->where('buffet_id', $buffet->id)->where('status', DecorationStatus::ACTIVE->name)->get();
 
         return view('bookings.update', ['buffet'=>$buffet, 'foods'=>$foods, 'decorations'=>$decorations, 'booking'=>$booking]);
     }
@@ -364,7 +364,7 @@ class BookingController extends Controller
         // Valida o pacote de comida
         $food = $this->food
             ->where('slug', $request->food_id)
-            ->where('buffet', $buffet->id)
+            ->where('buffet_id', $buffet->id)
             ->where('status', FoodStatus::ACTIVE->name)
             ->get()
             ->first();
@@ -376,7 +376,7 @@ class BookingController extends Controller
         // Valida o pacote de decorações
         $decoration = $this->decoration
             ->where('slug', $request->decoration_id)
-            ->where('buffet', $buffet->id)
+            ->where('buffet_id', $buffet->id)
             ->where('status', DecorationStatus::ACTIVE->name)
             ->get()
             ->first();
@@ -405,7 +405,7 @@ class BookingController extends Controller
 
         event(new BookingUpdatedEvent($booking));
 
-        return redirect()->route('booking.edit', ['buffet'=>$buffet->slug, 'booking'=>$booking->id]);
+        return redirect()->route('booking.edit', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id]);
     }
 
     public function destroy(Request $request)
@@ -509,7 +509,9 @@ class BookingController extends Controller
         }
 
         if($request->booking) {
-            $booking = $this->booking->where('id', $request->booking)->get()->first();
+            $booking_id = $this->hashids->decode($request->booking)[0];
+
+            $booking = $this->booking->where('id', $booking_id)->get()->first();
             if(!$booking) {
                 return response()->json(['message' => 'Booking not found'], 422);
             }
