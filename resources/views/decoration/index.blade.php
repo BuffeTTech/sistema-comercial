@@ -50,7 +50,19 @@
                                         <a href="{{ route('decoration.show', ['buffet'=>$buffet,'decoration'=>$value->slug]) }}" title="Visualizar '{{$value['main_theme']}}'">👁️</a>
                                         <a href="{{ route('decoration.edit', ['buffet'=>$buffet, 'decoration'=>$value->slug]) }}" title="Editar '{{$value['main_theme']}}'">✏️</a>
                                         <!-- Se a pessoa está vendo esta página, ela por padrão ja é ADM ou comercial, logo nao preciso validar aqui! -->
-
+                                        @if($value['status'] !== App\Enums\DecorationStatus::UNACTIVE->name)
+                                            <form action="{{ route('decoration.destroy', ['decoration'=>$value['slug'], 'buffet'=>$buffet]) }}" method="post" class="inline">
+                                                @csrf
+                                                @method('delete')
+                                                <button type="submit" title="Deletar '{{ $value['main_theme'] }}'">❌</button>
+                                            </form>
+                                            @else
+                                            <form action="{{ route('decoration.activate_decoration', ['decoration'=>$value['slug'], 'buffet'=>$buffet]) }}" method="post" class="inline">
+                                                @csrf
+                                                @method('patch')
+                                                <button type="submit" title="Deletar '{{ $value['main_theme'] }}'">✅</button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach

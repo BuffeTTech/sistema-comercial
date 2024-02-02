@@ -61,6 +61,7 @@
                                                 <form action="{{ route('booking.change_status', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id]) }}"  method="post" class="inline">
                                                     @csrf
                                                     @method('patch')
+                                                    <input type="hidden" name="status" value="{{App\Enums\BookingStatus::REJECTED->name}}">
                                                     <button type="submit" title="Negar festa '{{$booking->name_birthdayperson}}'">❌</button>
                                                 </form>
                                             @endif

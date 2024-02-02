@@ -15,6 +15,6 @@ class Food extends Model
 
     public function photos()
     {
-        return $this->hasMany(FoodPhoto::class, 'food');
+        return $this->hasMany(FoodPhoto::class, 'food_id');
     }
 }

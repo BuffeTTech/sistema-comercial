@@ -55,7 +55,7 @@ class DecorationController extends Controller
         $buffet = Buffet::where('slug', $buffet_slug)->first();
 
         if(!$buffet || !$buffet_slug) {
-            return null;
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();        
         }
 
         $decorations = $this->decoration->where('buffet_id',$buffet->id)->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
@@ -75,7 +75,7 @@ class DecorationController extends Controller
         $buffet = Buffet::where('slug', $buffet_slug)->first();
 
         if(!$buffet || !$buffet_slug) {
-            return null;
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
         return view('decoration.create', ['buffet'=>$buffet]);
@@ -160,7 +160,7 @@ class DecorationController extends Controller
 
         return view('decoration.update',['buffet'=>$buffet,'decoration'=>$decoration, 'decoration_photos'=>$decoration_photos]);
     }
-    
+
     /**
      * Update the specified resource in storage.
      */
@@ -192,7 +192,7 @@ class DecorationController extends Controller
         
         $decoration_photos = $this->photos->where('id', $request->slug)->where('decorations_id', $decoration->id)->get(); 
 
-        return redirect()->back(); // para ser possivel update foto e conteudos ao mesmo tempo 
+        return redirect()->route('decoration.edit', ['buffet'=>$buffet->slug, 'decoration'=>$dec->slug]);
 
     }
 
@@ -232,6 +232,32 @@ class DecorationController extends Controller
         return redirect()->back()->withInput();
     }
 
+    public function destroy(Request $request)
+    {
+       $buffet_slug = $request->buffet;
+       $buffet = Buffet::where('slug', $buffet_slug)->first();
+        if (!$decoration = $this->decoration->where('slug', $request->decoration)->where('buffet_id', $buffet->id)->get()->first()) {
+           return redirect()->back()->withErrors(['slug' => 'Decoração não encontrada.'])->withInput();
+        }
+
+       $decoration->where('slug', $request->decoration)->update(['status' => DecorationStatus::UNACTIVE->name]);
+
+        return redirect()->back()->with(['message' => 'Deletado com sucesso.'])->withInput();
+    }
+
+    public function activate_decoration(Request $request) {
+        $buffet_slug = $request->buffet;
+        $buffet = Buffet::where('slug', $buffet_slug)->first();
+        if (!$decoration = $this->decoration->where('slug', $request->decoration)->where('buffet_id', $buffet->id)->get()->first()) {
+            return redirect()->back()->withErrors(['slug' => 'decoration not found.'])->withInput();
+        }
+        
+        $decoration->update(['status' => DecorationStatus::ACTIVE->name]);
+        
+        return redirect()->back()->with(['message' => 'Deletado com sucesso.'])->withInput();
+     }
+
+
     /**
      * Remove the specified resource from storage.
      */
@@ -260,7 +286,7 @@ class DecorationController extends Controller
             return response()->json(['message' => 'Buffet not found'], 422);
         }
         
-        if(!$decoration = $this->decoration->where('slug', $request->decoration)->where('buffet', $buffet->id)->with('photos')->get()->first()){
+        if(!$decoration = $this->decoration->where('slug', $request->decoration)->where('buffet_id', $buffet->id)->with('photos')->get()->first()){
             return response()->json(['message' => 'Decoration not found'], 422);;
         }
 

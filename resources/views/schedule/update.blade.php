@@ -5,7 +5,7 @@
     <h1>Editar Pacote</h1>
 
     <div>
-        <form method="POST" action="{{ route('schedule.update', ['buffet'=>$buffet, 'schedule'=>$schedule]) }}" >
+        <form method="POST" action="{{ route('schedule.update', ['buffet'=>$buffet, 'schedule'=>$schedule->hashed_id]) }}" >
             @method('put')
             @csrf
 
@@ -14,7 +14,6 @@
                     {{ session('success') }}
                 </div>
             @endif
-
             <div>
                 <label for="day_week" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Dia da semana</label>
                     <select name="day_week" id="day_week" :value="old('start_time')" required>

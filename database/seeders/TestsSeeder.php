@@ -198,7 +198,7 @@ class TestsSeeder extends Seeder
             'status'=>'ACTIVE',
             'price'=>55,
             'slug'=>'pacote-alegria',
-            'buffet'=>$buffet->id,
+            'buffet_id'=>$buffet->id,
         ]);
 
         FoodPhoto::create([
@@ -207,7 +207,7 @@ class TestsSeeder extends Seeder
             'file_extension'=>'jpg',
             'mime_type'=>'image/jpeg',
             'file_size'=>'40847',
-            'food'=>$food->id
+            'food_id'=>$food->id
         ]);
         FoodPhoto::create([
             'file_name'=>'169998221749.jpg',
@@ -215,7 +215,7 @@ class TestsSeeder extends Seeder
             'file_extension'=>'jpg',
             'mime_type'=>'image/jpeg',
             'file_size'=>'31904',
-            'food'=>$food->id
+            'food_id'=>$food->id
         ]);
 
         $decoration = Decoration::create([
@@ -224,7 +224,7 @@ class TestsSeeder extends Seeder
             'description'=>'Decoração com bonecos e personagens da Marvel',
             'price'=>66,
             'status'=>'ACTIVE',
-            'buffet'=>$buffet->id
+            'buffet_id'=>$buffet->id
         ]);
         DecorationPhotos::create([
             'file_name'=>'0_qdHImq1G588SB9Ii.jpg',
@@ -232,7 +232,7 @@ class TestsSeeder extends Seeder
             'file_extension'=>'jpg',
             'mime_type'=>'image/jpeg',
             'file_size'=>'191250',
-            'decorations'=>$decoration->id
+            'decorations_id'=>$decoration->id
         ]);
         DecorationPhotos::create([
             'file_name'=>'ordem-marvel-e1606754420868.jpg',
@@ -240,7 +240,7 @@ class TestsSeeder extends Seeder
             'file_extension'=>'jpg',
             'mime_type'=>'image/jpeg',
             'file_size'=>'113155',
-            'decorations'=>$decoration->id
+            'decorations_id'=>$decoration->id
         ]);
 
         $booking = Booking::create([

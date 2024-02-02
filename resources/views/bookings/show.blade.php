@@ -11,7 +11,7 @@
                         <p><strong>Horário da festa:</strong> {{ $booking->schedule['start_time'] }}</p><br>
                    {{-- <p><strong>Valor do Horário:</strong> {{ $booking->price_scheduçe }}</p><br> --}}
                         <p><strong>Status:</strong><x-status.booking_status :status="$booking->status" /></p>
-                            <form action="{{ route('booking.change_status', ['buffet' => $buffet->slug, 'booking' => $booking]) }}" method="post" class="inline">
+                            <form action="{{ route('booking.change_status', ['buffet' => $buffet->slug, 'booking' => $booking->hashed_id]) }}" method="post" class="inline">
                                 @csrf
                                 @method('patch')
             
@@ -70,7 +70,7 @@
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $guest->document }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $guest->age}}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                        <form action="{{ route('guest.change_status', ['buffet' => $buffet->slug, 'guest' => $guest['id'], 'booking' => $booking]) }}" method="post" class="inline">
+                                        <form action="{{ route('guest.change_status', ['buffet' => $buffet->slug, 'guest' => $guest->hashed_id, 'booking' => $booking->hashed_id]) }}" method="post" class="inline">
                                             @csrf
                                             @method('patch')
                         

@@ -6,7 +6,7 @@ use App\Models\Package;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class PackagePolicy
+class FoodPolicy
 {
     /**
      * Determine whether the user can view any models.

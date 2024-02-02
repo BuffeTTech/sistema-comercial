@@ -36,7 +36,7 @@ class FoodController extends Controller
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         
         if(!$buffet || !$buffet_slug) {
-            return null;
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
         $buffet = Buffet::where('slug', $request->buffet)->get()->first();
@@ -57,7 +57,7 @@ class FoodController extends Controller
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         
         if(!$buffet || !$buffet_slug) {
-            return null;
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
         // buffet exists
@@ -70,11 +70,11 @@ class FoodController extends Controller
      */
     public function store(StoreFoodRequest $request)
     {
-        $slug = str_replace(' ', '-', $request->slug);
+        $slug = sanitize_string($request->slug);
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
-        if($this->food->where('slug', $request->food)->where('buffet_id', $buffet->id)->get()->first()){
-            return redirect()->back()->withErrors(['slug' => 'food already exists.'])->withInput();
+        if($this->food->where('slug', $slug)->where('buffet_id', $buffet->id)->get()->first()){
+            return redirect()->back()->withErrors(['slug' => 'Este pacote de comida ja existe.'])->withInput();
         }
 
         // if(!isset($request->images) || count($request->images) != 3) {
@@ -234,12 +234,12 @@ class FoodController extends Controller
 
         $food = $this->food->where('slug', $request->food)->where('buffet_id', $buffet->id)->get()->first();
         if(!$food){
-            return redirect()->back()->withErrors(['slug' => 'food not found.'])->withInput();
+            return redirect()->back()->withErrors(['slug' => 'Pacote de comida não encontrado.'])->withInput();
         }
 
         $food_exists = $this->food->where('slug', $request->slug)->where('buffet_id', $buffet->id)->get()->first();
         if($food_exists && $food_exists->id !== $food->id) {
-            return redirect()->back()->withErrors(['slug' => 'food already exists.'])->withInput();
+            return redirect()->back()->withErrors(['slug' => 'Este pacote de comida já existe.'])->withInput();
         }
 
         $food->update([
@@ -255,24 +255,36 @@ class FoodController extends Controller
         $foods_photo =  $this->photo->where('id', $request->slug)->where('food_id', $food->id)->get()->first(); 
 
         $pk = $this->food->find($food->id);
-
-        return redirect()->back();
+        
+        return redirect()->route('food.edit', ['buffet'=>$buffet->slug, 'food'=>$pk->slug]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-     public function destroy(Food $food, Request $request)
+     public function destroy(Request $request)
      {
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
-         if ($food = $this->food->where('slug', $request->food)->where('buffet_id', $buffet->id)->get()->first()) {
-             return redirect()->route('food.not_found');
-         }
+        if (!$food = $this->food->where('slug', $request->food)->where('buffet_id', $buffet->id)->get()->first()) {
+            return redirect()->back()->withErrors(['slug' => 'food not found.'])->withInput();
+        }
+        
+        $food->update(['status' => FoodStatus::UNACTIVE->name]);
+        
+        return redirect()->back()->with(['message' => 'Deletado com sucesso.'])->withInput();
+     }
 
-         $food->update(['status' => FoodStatus::UNACTIVE->name]);
-
-         return redirect()->route('food.index', ['buffet'=>$buffet_slug]);
+     public function activate_food(Request $request) {
+        $buffet_slug = $request->buffet;
+        $buffet = Buffet::where('slug', $buffet_slug)->first();
+        if (!$food = $this->food->where('slug', $request->food)->where('buffet_id', $buffet->id)->get()->first()) {
+            return redirect()->back()->withErrors(['slug' => 'food not found.'])->withInput();
+        }
+        
+        $food->update(['status' => FoodStatus::ACTIVE->name]);
+        
+        return redirect()->back()->with(['message' => 'Deletado com sucesso.'])->withInput();
      }
 
      public function change_status(Request $request)
