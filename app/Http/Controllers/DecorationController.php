@@ -57,6 +57,7 @@ class DecorationController extends Controller
         if(!$buffet || !$buffet_slug) {
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();        
         }
+        $this->authorize('viewAny', [Decoration::class, $buffet]);
 
         $decorations = $this->decoration->where('buffet_id',$buffet->id)->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
         return view('decoration.index',['decorations'=>$decorations,'buffet'=>$buffet_slug],);
@@ -77,6 +78,7 @@ class DecorationController extends Controller
         if(!$buffet || !$buffet_slug) {
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
+        $this->authorize('create', [Decoration::class, $buffet]);
 
         return view('decoration.create', ['buffet'=>$buffet]);
     }
@@ -93,6 +95,8 @@ class DecorationController extends Controller
         if($this->decoration->where('slug', $request->decoration)->where('buffet_id', $buffet->id)->get()->first()){
             return redirect()->back()->withErrors(['slug' => 'decoration already exists.'])->withInput();
         }
+
+        $this->authorize('create', [Decoration::class, $buffet]);
 
         $decoration = $this->decoration->create([
             'main_theme'=>$request->main_theme,
@@ -135,6 +139,8 @@ class DecorationController extends Controller
             return redirect()->route('decoration.index', $buffet_slug)->withErrors(['slug' => 'decoration not found.'])->withInput();
         }
 
+        $this->authorize('view', [Decoration::class, $decoration, $buffet]);
+
         //$decoration = $this->decoration->where('slug',$request->decoration)->get()->first();
         $decoration_slug = $request->decoration; 
         $decoration_photos = DecorationPhotos::where('decorations_id', $decoration->id)->get(); 
@@ -149,11 +155,16 @@ class DecorationController extends Controller
     public function edit(Request $request)
     {
         $buffet_slug = $request->buffet;
-        $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
+        $buffet = Buffet::where('slug', $buffet_slug)->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
 
         if(!$decoration= $this->decoration->where('slug', $request->decoration)->where('buffet_id', $buffet->id)->get()->first()){
             return redirect()->route('decoration.index', $buffet_slug)->withErrors(['slug' => 'deoration not found.'])->withInput();
         }
+        $this->authorize('update', [Decoration::class, $decoration, $buffet]);
 
         $decoration_slug = $request->decoration; 
         $decoration_photos = DecorationPhotos::where('decorations_id', $decoration->id)->get(); 
@@ -167,12 +178,17 @@ class DecorationController extends Controller
     public function update(UpdateDecorationRequest $request)
     {
         $buffet_slug = $request->buffet;
-        $buffet = Buffet::where('slug',$buffet_slug)->get()->first();
+        $buffet = Buffet::where('slug', $buffet_slug)->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
 
         $decoration = $this->decoration->where('slug',$request->decoration)->where('buffet_id', $buffet->id)->get()->first();
         if(!$decoration){
             return redirect()->back()->whithErrors('slug', 'decoration not found')->withInput; 
         }
+        $this->authorize('update', [Decoration::class, $decoration, $buffet]);
 
         $decoration_exists = $this->decoration->where('slug', $request->slug)->where('buffet_id', $buffet->id)->get()->first();
         if($decoration_exists && $decoration_exists->id !== $decoration->id){
@@ -197,14 +213,23 @@ class DecorationController extends Controller
     }
 
     public function update_photo(Request $request){
-        $decoration_slug = $request->decoration; 
-        $decoration = Decoration::where('slug', $decoration_slug)->first();
+        $buffet_slug = $request->buffet;
+        $buffet = Buffet::where('slug', $buffet_slug)->first();
 
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+
+        $decoration = $this->decoration->where('slug',$request->decoration)->where('buffet_id', $buffet->id)->get()->first();
+        if(!$decoration){
+            return redirect()->back()->whithErrors('slug', 'decoration not found')->withInput; 
+        }
         $decoration_photos = $this->photos->where('id', $request->decoration_photos)->where('decorations', $decoration->id)->get()->first();
 
         if(!$decoration_photos){
             return redirect()->route('decoration.index', ['buffet'=>$request->buffet])->withErrors(['photo'=>"photo not found"])->withInput();
         }
+        $this->authorize('update', [Decoration::class, $decoration, $buffet]);
 
         $previous_file_path = storage_path(self::$image_repository).$decoration_photos->file_path; 
         $photo_id = $this->photos->find($decoration_photos->id);
@@ -234,13 +259,19 @@ class DecorationController extends Controller
 
     public function destroy(Request $request)
     {
-       $buffet_slug = $request->buffet;
-       $buffet = Buffet::where('slug', $buffet_slug)->first();
+        $buffet_slug = $request->buffet;
+        $buffet = Buffet::where('slug', $buffet_slug)->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+        
         if (!$decoration = $this->decoration->where('slug', $request->decoration)->where('buffet_id', $buffet->id)->get()->first()) {
            return redirect()->back()->withErrors(['slug' => 'Decoração não encontrada.'])->withInput();
         }
+        $this->authorize('update', [Decoration::class, $decoration, $buffet]);
 
-       $decoration->where('slug', $request->decoration)->update(['status' => DecorationStatus::UNACTIVE->name]);
+        $decoration->update(['status' => DecorationStatus::UNACTIVE->name]);
 
         return redirect()->back()->with(['message' => 'Deletado com sucesso.'])->withInput();
     }
@@ -248,9 +279,15 @@ class DecorationController extends Controller
     public function activate_decoration(Request $request) {
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+        
         if (!$decoration = $this->decoration->where('slug', $request->decoration)->where('buffet_id', $buffet->id)->get()->first()) {
             return redirect()->back()->withErrors(['slug' => 'decoration not found.'])->withInput();
         }
+        $this->authorize('change_status', [Decoration::class, $decoration, $buffet]);
         
         $decoration->update(['status' => DecorationStatus::ACTIVE->name]);
         
@@ -263,19 +300,22 @@ class DecorationController extends Controller
      */
 
     public function change_status(Request $request)
-     {
+    {
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
 
-        $decoration = $this->decoration->where('slug', $request->decoration)->where('buffet_id', $buffet->id)->get()->first();
-        if (!$decoration) {
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+        
+        if (!$decoration = $this->decoration->where('slug', $request->decoration)->where('buffet_id', $buffet->id)->get()->first()) {
             return redirect()->back()->withErrors(['slug' => 'decoration not found.'])->withInput();
         }
-
+        $this->authorize('change_status', [Decoration::class, $decoration, $buffet]);
         $decoration->update(['status'=>$request->status]);
 
         return redirect()->route('decoration.index', ['buffet'=>$buffet_slug]);
-     }
+    }
 
     // API
     public function api_get_decoration(Request $request) {
