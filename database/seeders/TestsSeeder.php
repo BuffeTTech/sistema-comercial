@@ -280,13 +280,6 @@ class TestsSeeder extends Seeder
             'user_id'=>$user1->id
         ]);
 
-        Guest::create([
-            'name'=> 'João',
-            'document'=>'292.795.610-30',
-            'age'=> 32,
-            'booking_id'=>$booking2->id,
-            'buffet_id'=>$buffet->id
-        ]);
 
         Guest::create([
             'name'=> 'João',

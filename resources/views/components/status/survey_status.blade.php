@@ -4,10 +4,10 @@
     @php
         $class = "";
         switch($status) {
-            case true:
+            case 1:
                 $class = "p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50";
                 break;
-            case false:
+            case 0:
                 $class = "p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50";
             break;
             default:

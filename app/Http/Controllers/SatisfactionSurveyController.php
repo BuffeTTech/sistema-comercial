@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\BookingStatus;
 use App\Enums\QuestionType;
+use App\Enums\ScheduleStatus;
 use Illuminate\Http\Request;
 use App\Models\SatisfactionQuestion; 
 use App\Models\SatisfactionAnswer; 
@@ -144,11 +145,41 @@ class SatisfactionSurveyController extends Controller
 
     }
 
-    public function delete(){
+    public function destroy(Request $request){
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+
+        $survey_id = $this->hashids->decode($request->survey)[0];
+        $survey = $this->survey->where('id',$survey_id)->update(['status'=> false]);
+
+        if(!$survey){
+            return redirect()->back()->withErrors(['message' => 'question not found.'])->withInput();
+        }
+
+        return redirect()->route('survey.index',['buffet'=>$buffet_slug]);
 
     }
 
-    public function change_question_status(){
+    public function change_question_status(Request $request){
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+
+        $survey_id = $this->hashids->decode($request->survey)[0];
+        $survey = $this->survey->where('id',$survey_id)->update(['status'=> true]);
+
+        if(!$survey){
+            return redirect()->back()->withErrors(['message' => 'question not found.'])->withInput();
+        }
+
+        return redirect()->route('survey.index',['buffet'=>$buffet_slug]);
 
     }
 
