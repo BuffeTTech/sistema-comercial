@@ -43,6 +43,7 @@ class BookingController extends Controller
         $this->hashids = new Hashids(config('app.name'));
     }
 
+
     private static int $min_days = 5;
 
     private function current_party(){
@@ -73,6 +74,35 @@ class BookingController extends Controller
         }
 
         return $current_party;
+    }
+
+    private function guest_counter(Booking $party, Request $request){
+        
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+
+
+        $unblocked_guests = $this->guest
+            ->where('booking_id',$party->id)
+            ->where('buffet_id', $buffet->id)
+            ->where('status','!=', GuestStatus::BLOCKED->name)
+            ->get();
+
+        $present_guests  = $this->guest
+            ->where('booking_id',$party->id)
+            ->where('buffet_id', $buffet->id)
+            ->where('status',GuestStatus::PRESENT->name)
+            ->get();
+
+        $extra_guests = $this->guest
+        ->where('booking_id',$party->id)
+        ->where('buffet_id', $buffet->id)
+        ->where('status',GuestStatus::EXTRA->name)
+        ->get();
+
+        $guest_counter = ['present'=>$present_guests->count(), 'unblocked'=>$unblocked_guests->count(), 'extras' =>$extra_guests->count()];
+
+        return $guest_counter;
     }
 
     /**
@@ -253,15 +283,34 @@ class BookingController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
 
-        $recommendations = $this->recommendation->where('buffet',$buffet->id)->get();
+        $recommendations = $this->recommendation->where('buffet_id',$buffet->id)->get();
 
         if(!$buffet || !$buffet_slug) {
             return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
         }
 
-        $booking = $this->booking->where('id',$request->booking)->with(['food', 'decoration', 'schedule'])->get()->first();
+        $booking_id = $this->hashids->decode($request->booking);
+        if(!$booking_id) {
+            return redirect()->back()->withErrors(['message'=>'Booking não encontrado'])->withInput();
+        }
+        
+        $booking_id = $booking_id[0];
 
-        return view('bookings.show', ['buffet'=>$buffet,'booking'=>$booking]);
+        $booking = $this->booking
+            ->where('id',$booking_id)
+            ->where('buffet_id', $buffet->id)
+            ->with(['food', 'decoration', 'schedule'])->get()->first();
+
+        $guests = $this->guest
+            ->where('booking_id',$booking_id)
+            ->where('buffet_id', $buffet->id)
+            ->get();
+
+        $guest_counter = $this->guest_counter($booking, $request);
+
+        $this->authorize('view', [Booking::class, $booking, $buffet]);
+
+        return view('bookings.show', ['buffet'=>$buffet,'booking'=>$booking, 'recommendations'=>$recommendations, 'guests'=>$guests, 'guest_counter' => $guest_counter]);
     }
 
     /**
@@ -278,7 +327,12 @@ class BookingController extends Controller
             return redirect()->back()->withErrors(['errors'=>'Buffet not found'])->withInput();
         }
 
-        $booking_id = $this->hashids->decode($request->booking)[0];
+        $booking_id = $this->hashids->decode($request->booking);
+        if(!$booking_id) {
+            return redirect()->back()->withErrors(['message'=>'Booking não encontrado'])->withInput();
+        }
+        
+        $booking_id = $booking_id[0];
         
         $booking = $this->booking->where('id', $booking_id)->where('buffet_id', $buffet->id)->get()->first();
         
@@ -306,7 +360,12 @@ class BookingController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
-        $booking_id = $this->hashids->decode($request->booking)[0];
+        $booking_id = $this->hashids->decode($request->booking);
+        if(!$booking_id) {
+            return redirect()->back()->withErrors(['message'=>'Booking não encontrado'])->withInput();
+        }
+        
+        $booking_id = $booking_id[0];
 
         // valida se o booking existe
         $booking = $this->booking->where('buffet_id', $buffet->id)->where('id', $booking_id)->get()->first();
@@ -417,8 +476,13 @@ class BookingController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
-        $booking_id = $this->hashids->decode($request->booking)[0];
-
+        $booking_id = $this->hashids->decode($request->booking);
+        if(!$booking_id) {
+            return redirect()->back()->withErrors(['message'=>'Booking não encontrado'])->withInput();
+        }
+        
+        $booking_id = $booking_id[0];
+        
         $booking = $this->booking->where('id',$booking_id)->with(['food', 'decoration', 'schedule'])->get()->first();
 
         if($request->status == BookingStatus::CANCELED->name) {
@@ -501,7 +565,12 @@ class BookingController extends Controller
         }
 
         if($request->booking) {
-            $booking_id = $this->hashids->decode($request->booking)[0];
+            $booking_id = $this->hashids->decode($request->booking);
+            if(!$booking_id) {
+                return redirect()->back()->withErrors(['message'=>'Booking não encontrado'])->withInput();
+            }
+            
+            $booking_id = $booking_id[0];
 
             $booking = $this->booking->where('id', $booking_id)->get()->first();
             if(!$booking) {
@@ -582,19 +651,8 @@ class BookingController extends Controller
                        ->where('buffet_id', $buffet->id)
                        ->get();
 
-        $unblocked_guests = $this->guest
-                               ->where('booking_id',$current_party->id)
-                               ->where('buffet_id', $buffet->id)
-                               ->where('status','!=', GuestStatus::BLOCKED->name)
-                               ->get();
-        $present_guests  = $this->guest
-                               ->where('booking_id',$current_party->id)
-                               ->where('buffet_id', $buffet->id)
-                               ->where('status',GuestStatus::PRESENT->name)
-                               ->get();
+        $guest_counter = $this->guest_counter($current_party, $request);
 
-        $guest_counter = ['present'=>$present_guests->count(), 'unblocked'=>$unblocked_guests->count()];
-
-        return view('bookings.party_mode',['booking'=>$current_party,'buffet'=>$buffet_slug, 'guests'=>$guests, 'guest_counter'=>$guest_counter]);
+        return view('bookings.party_mode',['booking'=>$current_party,'buffet'=>$buffet, 'guests'=>$guests, 'guest_counter'=>$guest_counter]);
     }
 }

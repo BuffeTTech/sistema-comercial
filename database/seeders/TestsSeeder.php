@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Enums\BookingStatus;
 use App\Enums\BuffetStatus;
 use App\Enums\DayWeek;
+use App\Enums\GuestStatus;
 use App\Enums\QuestionType;
 use App\Enums\SatisfactionQuestionStatus;
 use App\Enums\SubscriptionStatus;
@@ -16,6 +17,7 @@ use App\Models\Decoration;
 use App\Models\DecorationPhotos;
 use App\Models\Food;
 use App\Models\FoodPhoto;
+use App\Models\Guest;
 use App\Models\Phone;
 use App\Models\SatisfactionQuestion;
 use App\Models\Schedule;
@@ -47,6 +49,7 @@ class TestsSeeder extends Seeder
         $commercial_role = Role::create(['name' => $pacote_alegria->slug.'.commercial']);
         $operational_role = Role::create(['name' => $pacote_alegria->slug.'.operational']);
         $administrative_role = Role::create(['name' => $pacote_alegria->slug.'.administrative']);
+        $administrative = Role::create(['name' => 'Commercial-Admin']);
 
         $p1 = Permission::create(['name'=>'show party mode']);
         $p2 = Permission::create(['name'=>'view pendent bookings']);
@@ -98,6 +101,7 @@ class TestsSeeder extends Seeder
             'buffet_id' => null,
         ]);
         $user->assignRole($administrative_role->name);
+        $user->assignRole($administrative);
 
         $buffet = Buffet::create([
             'trading_name' => 'Buffet Alegria',
@@ -253,11 +257,89 @@ class TestsSeeder extends Seeder
             'price_food'=>$food->price,
             'decoration_id'=>$decoration->id,
             'price_decoration'=>$decoration->price,
-            'schedule_id'=>$schedule6->id,
+            'schedule_id'=>$schedule1->id,
             'price_schedule'=>0,
             'discount'=>0,
             'status'=>BookingStatus::FINISHED->name,
             'user_id'=>$user1->id
+        ]);
+        $booking2 = Booking::create([
+            'name_birthdayperson'=>'Aniversario top 2',
+            'years_birthdayperson'=>15,
+            'num_guests'=>15,
+            'party_day'=>'2024-02-04',
+            'buffet_id'=>$buffet->id,
+            'food_id'=>$food->id,
+            'price_food'=>$food->price,
+            'decoration_id'=>$decoration->id,
+            'price_decoration'=>$decoration->price,
+            'schedule_id'=>$schedule1->id,
+            'price_schedule'=>0,
+            'discount'=>0,
+            'status'=>BookingStatus::APPROVED->name,
+            'user_id'=>$user1->id
+        ]);
+
+        Guest::create([
+            'name'=> 'João',
+            'document'=>'292.795.610-30',
+            'age'=> 32,
+            'booking_id'=>$booking2->id,
+            'buffet_id'=>$buffet->id
+        ]);
+
+        Guest::create([
+            'name'=> 'João',
+            'document'=>'292.795.610-30',
+            'age'=> 32,
+            'booking_id'=>$booking2->id,
+            'buffet_id'=>$buffet->id,
+            'status'=>GuestStatus::CONFIRMED->name
+        ]);
+
+        Guest::create([
+            'name'=> 'Hamilton',
+            'document'=>'280.244.380-11',
+            'age'=> 55,
+            'booking_id'=>$booking2->id,
+            'buffet_id'=>$buffet->id,
+            'status'=>GuestStatus::PRESENT->name
+        ]);
+
+        Guest::create([
+            'name'=> 'Maria Flor',
+            'document'=>'000.841.410-69',
+            'age'=> 6,
+            'booking_id'=>$booking2->id,
+            'buffet_id'=>$buffet->id,
+            'status'=>GuestStatus::ABSENT->name
+        ]);
+
+        Guest::create([
+            'name'=> 'Robson',
+            'document'=>'030.410.060-90',
+            'age'=> 40,
+            'booking_id'=>$booking2->id,
+            'buffet_id'=>$buffet->id,
+            'status'=>GuestStatus::BLOCKED->name
+        ]);
+
+        Guest::create([
+            'name'=> 'Fernanda',
+            'document'=>'195.544.410-29',
+            'age'=> 20,
+            'booking_id'=>$booking2->id,
+            'buffet_id'=>$buffet->id,
+            'status'=>GuestStatus::CONFIRMED->name
+        ]);
+
+        Guest::create([
+            'name'=> 'Prado',
+            'document'=>'425.114.870-39',
+            'age'=> 18,
+            'booking_id'=>$booking2->id,
+            'buffet_id'=>$buffet->id,
+            'status'=>GuestStatus::PENDENT->name
         ]);
 
         $question1 = SatisfactionQuestion::create([

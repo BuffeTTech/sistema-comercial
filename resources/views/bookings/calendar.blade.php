@@ -109,9 +109,13 @@
 						const events = data.data.map((dt) => {
 							const date = new Date(dt.party_day + "T" + dt.schedule.start_time);
 							const minutes = date.getMinutes() > 9 ? date.getMinutes() : `0${date.getMinutes()}`
+							const end_date = new Date(date);
+							end_date.setMinutes(date.getMinutes() + dt.schedule.duration);
+							const minutes_end_date = end_date.getMinutes() > 9 ? end_date.getMinutes() : `0${end_date.getMinutes()}`
+
 							return {
 								event_date: date,
-								event_title: "Ocupado - " + date.getHours() + ":" + minutes,
+								event_title: date.getHours() + ":" + minutes + " - " + end_date.getHours() + ":" + minutes_end_date,
 								event_theme: 'red'
 							}
 						})

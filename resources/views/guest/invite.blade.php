@@ -6,6 +6,7 @@
                     <h1 class="text-3xl font-bold mb-4">Adicionar Convidado para a festa de {{$booking->name_birthdayperson}}</h1>
                     <div>
                         <form method="POST" action="{{ route('guest.store', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id]) }}" enctype="multipart/form-data" id="form">
+                            <x-input-error :messages="$errors->get('message')" class="mt-2" />
                             @csrf
 
                             @if (session('success'))
@@ -16,22 +17,22 @@
 
 
                             <!-- Name -->
-                            <div>
-                                <x-input-label for="name" :value="__('Nome')" />
-                                <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+                            <div class="form-row">
+                                <x-input-label for="name" :value="__('Nome')" class="dark:text-slate-800" />
+                                <x-text-input id="name" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" placeholder="Nome" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
                                 <x-input-error :messages="$errors->get('name')" class="mt-2" />
                             </div>
 
-                            <div>
-                                <x-input-label for="document" :value="__('CPF')" />
-                                <x-text-input id="document" class="block mt-1 w-full" type="text" name="document" :value="old('document')" required autofocus autocomplete="document" />
+                            <div class="form-row">
+                                <x-input-label for="document" :value="__('CPF')" class="dark:text-slate-800"/>
+                                <x-text-input id="document" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" placeholder="CPF" type="text" name="document" :value="old('document')" required autofocus autocomplete="document" />
                                 <x-input-error :messages="$errors->get('document')" class="mt-2" />
                                 <span class="text-sm text-red-600 dark:text-red-400 space-y-1" id="document-error"></span>
                             </div>
 
-                            <div>
-                                <x-input-label for="age" :value="__('Idade')" />
-                                <x-text-input id="age" class="block mt-1 w-full" type="number" name="age" :value="old('age')" required autofocus autocomplete="age" />
+                            <div class="form-row">
+                                <x-input-label for="age" :value="__('Idade')" class="dark:text-slate-800"/>
+                                <x-text-input id="age" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" placeholder="Idade" type="number" name="age" :value="old('age')" required autofocus autocomplete="age" />
                                 <x-input-error :messages="$errors->get('age')" class="mt-2" />
                             </div> 
 
