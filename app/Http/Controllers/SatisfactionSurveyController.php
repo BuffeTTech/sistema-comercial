@@ -95,7 +95,7 @@ class SatisfactionSurveyController extends Controller
             return redirect()->route('survey.index', $buffet_slug)->withErrors(['id' => 'question not found'])->withInput();
         }
 
-        $this->authorize('view', [$survey, $buffet]);  
+        $this->authorize('view', [$survey, $buffet]);
 
         return view('survey.show', ['buffet'=>$buffet, 'survey'=>$survey]);
     }

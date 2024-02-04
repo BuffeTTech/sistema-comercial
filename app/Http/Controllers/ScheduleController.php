@@ -22,6 +22,49 @@ class ScheduleController extends Controller
         $this->hashids = new Hashids(config('app.name'));
     }
 
+    private function verify_conflict(Request $request, Schedule $schedule){
+        $buffet_slug = $request->buffet; 
+        $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
+        $schedules = $this->schedule->where('buffet_id', $buffet->id)->where('status',ScheduleStatus::ACTIVE->name)->get();
+
+        $isConflicted = false;
+
+        $startDateTime = \Carbon\Carbon::parse($schedule->start_time);
+        $endDateTime = $startDateTime->copy()->addMinutes($schedule->duration);
+
+        foreach($schedules as $key => $value){
+            $startValueTime = \Carbon\Carbon::parse($value->start_time);
+            $endValueTime = $startDateTime->copy()->addMinutes($value->duration);
+
+            if(((($startDateTime >= $startValueTime) && ($startDateTime <= $endValueTime)) && (($endDateTime <= $endValueTime) && ($endDateTime >= $startValueTime))) && ($schedule->day_week == $value->day_week)){
+                $isConflicted = true;
+            }
+
+        }
+        return $isConflicted;
+    }
+    
+    private function verify_conflict_without_param(Request $request){
+        $buffet_slug = $request->buffet; 
+        $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
+        $schedules = $this->schedule->where('buffet_id', $buffet->id)->where('status',ScheduleStatus::ACTIVE->name)->get();
+
+        $isConflicted = false;
+
+        $startDateTime = \Carbon\Carbon::parse($request->start_time);
+        $endDateTime = $startDateTime->copy()->addMinutes($request->duration);
+
+        foreach($schedules as $key => $value){
+            $startValueTime = \Carbon\Carbon::parse($value->start_time);
+            $endValueTime = $startDateTime->copy()->addMinutes($value->duration);
+
+            if(((($startDateTime >= $startValueTime) && ($startDateTime <= $endValueTime)) && (($endDateTime <= $endValueTime) && ($endDateTime >= $startValueTime))) && ($request->day_week == $value->day_week)){
+                $isConflicted = true;
+            }
+
+        }
+        return $isConflicted;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -73,26 +116,9 @@ class ScheduleController extends Controller
         }
         $this->authorize('create', [Schedule::class, $buffet]);
 
-        $startDateTime = \Carbon\Carbon::parse($request->start_time);
-        $endDateTime = $startDateTime->copy()->addMinutes($request->duration);
-
-        // Verifica conflitos de horário e dia da semana
-        $conflictingSchedules = $this->schedule
-            ->where('buffet_id', $buffet->id)
-            ->where('day_week', $request->day_week)
-            ->where(function ($query) use ($startDateTime, $endDateTime) {
-                $query->where(function ($q) use ($startDateTime, $endDateTime) {
-                    $q->where('start_time', '>=', $startDateTime)
-                        ->where('start_time', '<', $endDateTime);
-                })
-                ->orWhere(function ($q) use ($startDateTime, $endDateTime) {
-                    $q->where('start_time', '<', $startDateTime)
-                        ->where('start_time', '>', $endDateTime);
-                });
-            })
-            ->get();
-
-        if (count($conflictingSchedules) !== 0) {
+        $
+        $isConflicted = $this->verify_conflict_without_param($request);
+        if($isConflicted){
             return redirect()->back()->withErrors(['start_time' => 'Schedule conflicts with existing schedules for the selected day of the week'])->withInput();
         }
 
@@ -104,7 +130,8 @@ class ScheduleController extends Controller
             'end_block' => $request->end_block, 
             'status' => $request->status ?? ScheduleStatus::ACTIVE->name, 
             'buffet_id'=> $buffet->id, 
-        ]); 
+        ]);
+
 
         return redirect()->route('schedule.show', ['buffet'=>$buffet_slug, 'schedule' =>$schedule->hashed_id]);
     }
@@ -122,6 +149,7 @@ class ScheduleController extends Controller
         if(!$schedule = $this->schedule->where('id', $schedule_id)->where('buffet_id', $buffet->id)->first()){
             return redirect()->route('schedule.index', ['buffet'=>$buffet_slug])->withErrors(['schedule'=>'schedule not found'])->withInput();
         }
+
         $this->authorize('view', [Schedule::class, $schedule, $buffet]);
 
         
@@ -163,31 +191,8 @@ class ScheduleController extends Controller
         }
         $this->authorize('update', [Schedule::class, $schedule, $buffet]);
 
-        $schedule_exists = $this->schedule->where('id', $request->schedule)->where('buffet_id', $buffet->id)->get()->first();
-        // if($schedule_exists && $schedule_exists->id !== $schedule->id) {
-        //     return redirect()->back()->withErrors(['slug' => 'schedule already exists.'])->withInput();
-        // }
-
-        $startDateTime = \Carbon\Carbon::parse($request->start_time);
-        $endDateTime = $startDateTime->copy()->addMinutes($request->duration);
-
-        // Verifica conflitos de horário e dia da semana
-        $conflictingSchedules = $this->schedule
-            ->where('buffet_id', $buffet->id)
-            ->where('day_week', $request->day_week)
-            ->where(function ($query) use ($startDateTime, $endDateTime) {
-                $query->where(function ($q) use ($startDateTime, $endDateTime) {
-                    $q->where('start_time', '>=', $startDateTime)
-                        ->where('start_time', '<', $endDateTime);
-                })
-                ->orWhere(function ($q) use ($startDateTime, $endDateTime) {
-                    $q->where('start_time', '<', $startDateTime)
-                        ->where('start_time', '>', $endDateTime);
-                });
-            })
-            ->get();
-
-        if (count($conflictingSchedules) > 1 || ($schedule_exists->id !== $schedule->id && count($conflictingSchedules) === 1)) {
+        $isConflicted = $this->verify_conflict($request, $schedule);
+        if($isConflicted){
             return redirect()->back()->withErrors(['start_time' => 'Schedule conflicts with existing schedules for the selected day of the week'])->withInput();
         }
 
@@ -200,6 +205,7 @@ class ScheduleController extends Controller
             'status' => $request->status ?? ScheduleStatus::ACTIVE->name, 
             'buffet_id'=> $buffet->id, 
         ]); 
+
 
         return redirect()->route('schedule.show', ['buffet'=>$buffet_slug, 'schedule'=>$schedule->id]);
     }
@@ -222,6 +228,7 @@ class ScheduleController extends Controller
 
         $schedule->update(['status'=> ScheduleStatus::UNACTIVE->name]);
 
+
         return redirect()->route('schedule.index', ['buffet'=>$buffet_slug]);
     }
 
@@ -235,6 +242,11 @@ class ScheduleController extends Controller
             return redirect()->back()->withErrors(['schedule' => 'schedule not found'])->withInput();
         }
         $this->authorize('change_status', [Schedule::class, $schedule, $buffet]);
+
+        $isConflicted = $this->verify_conflict($request,$schedule);
+        if($isConflicted){
+            return redirect()->back()->withErrors(['start_time' => 'Schedule conflicts with existing schedules for the selected day of the week'])->withInput();
+        }
         
         $schedule->update(['status'=>$request->status]); 
 

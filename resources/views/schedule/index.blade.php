@@ -1,9 +1,15 @@
 <x-app-layout>
 
     <div class="py-12">
+
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+                    @if ($errors->any())
+                        @foreach ($errors->all() as $error)
+                            {{ $error }}
+                        @endforeach
+                    @endif
                     <div class="overflow-auto">
                         <div>
                             <h1 class="inline-flex items-center border border-transparent text-lg leading-4 font-semi-bold">Listagem dos horários de festas</h1>
@@ -65,7 +71,7 @@
                                                 @csrf
                                                 @method('patch')
                                                 <input type="hidden" name="status" value="{{App\Enums\ScheduleStatus::ACTIVE->name }}">
-                                                <button type="submit" title="Deletar '{{ $value['main_theme'] }}'">✅</button>
+                                                <button type="submit" title="Ativar '{{ $value['start_time'] }}'">✅</button>
                                             </form>
                                         @endif                                        
                                     </td>
