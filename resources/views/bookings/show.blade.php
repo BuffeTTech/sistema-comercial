@@ -9,7 +9,8 @@
                         <p><strong>Número de Convidados:</strong>{{ $booking->num_guests }}</p><br>
                         <p><strong>Dia da Festa:</strong> {{ $booking->party_day }}</p><br>
                         <p><strong>Horário da festa:</strong> {{ $booking->schedule['start_time'] }}</p><br>
-                   {{-- <p><strong>Valor do Horário:</strong> {{ $booking->price_scheduçe }}</p><br> --}}
+                        <p><strong>Preço final:</strong> R$ {{ $booking->price_food * $booking->num_guests + $booking->price_decoration * $booking->num_guests + $booking->price_schedule  * $booking->num_guests}}</p><br>
+                        {{-- <p><strong>Valor do Horário:</strong> {{ $booking->price_scheduçe }}</p><br> --}}
                         <p><strong>Status:</strong><x-status.booking_status :status="$booking->status" /></p>
                             <form action="{{ route('booking.change_status', ['buffet' => $buffet->slug, 'booking' => $booking->hashed_id]) }}" method="post" class="inline">
                                 @csrf
@@ -23,15 +24,22 @@
                                 </select>
                             </form>
                         <p><strong>Pacote de Comida:</strong> {{ $booking->food->name_food }}</p><br>
-                   {{-- <p><strong>Preço do Pacote:</strong> {{ $booking->price_food }}</p><br> --}}
+                   <p><strong>Preço do Pacote:</strong> R$ {{ $booking->price_food }}</p><br>
                         <p><strong>Pacote de Decoração:</strong> {{ $booking->decoration->main_theme }}</p><br>
-                   {{-- <p><strong>Preço da Decoração:</strong> {{ $booking->price_decoration }}</p><br> --}}
-                        <p><strong>Preço:</strong> {{ $booking->price_food + $booking->price_decoration + $booking->price_schedule}}</p><br>
+                   <p><strong>Preço da Decoração:</strong> R${{ $booking->price_decoration }}</p><br>
                         <p><strong>Recomendações:</strong>
                             @foreach ($recommendations as $value)
                             <ul>{{$value['content']}}</ul>
                             @endforeach
                         </p><br>
+
+                        @if($booking->status == App\Enums\BookingStatus::FINISHED->name || $booking->status == App\Enums\BookingStatus::CLOSED->name)
+                        @php
+                            $total_guests_present = $guest_counter['present'] + $guest_counter['extras'];
+                            $total_guests_stipulated = $guest_counter['unblocked'] - $guest_counter['extras'];
+                        @endphp
+                        <p><strong>Convidados presentes/estipulados:</strong>{{$total_guests_present}}/{{$total_guests_stipulated}}</p><br>
+                        @endif
                         
                    {{-- <p><strong>Valor do desconto:</strong> {{ $booking->discount}}</p><br> --}}
 
@@ -42,6 +50,7 @@
                             </div>
                         </a>
                     </div>
+
                     <form action="{{ route('booking.change_status', ['buffet' => $buffet->slug, 'booking' => $booking->hashed_id]) }}" method="post" class="inline">
                         @csrf
                         @method('patch')
@@ -52,7 +61,8 @@
 
 
 
-                    <div><table class="w-full">
+                    <div>
+                        <table class="w-full">
                         <thead class="bg-gray-50 border-b-2 border-gray-200">
                             <tr>
                                 <!-- w-24 p-3 text-sm font-semibold tracking-wide text-left -->
@@ -61,6 +71,7 @@
                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">CPF</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">Idade</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">Status</th>
+                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Ações</th>
 
                             </tr>
                         </thead>
@@ -75,19 +86,28 @@
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $guest->name }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $guest->document }}</td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $guest->age}}</td>
+                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.guest_status :status="$guest['status']" /></td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                        <form action="{{ route('guest.change_status', ['buffet' => $buffet->slug, 'guest' => $guest->hashed_id, 'booking' => $booking->hashed_id]) }}" method="post" class="inline">
-                                            @csrf
-                                            @method('patch')
-                        
-                                            <label for="status" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"></label>
-                                            <select name="status" id="status" required onchange="this.form.submit()">
-                                                @foreach( App\Enums\GuestStatus::array() as $key=>$status )
-                                                    <option value="{{$status}}" {{ $guest['status'] == $status ? 'selected' : ""}}>{{$key}}</option>
-                                                @endforeach
-                                                <!-- <option value="invalid2"  disabled>Nenhum horario disponivel neste dia, tente novamente!</option> -->
-                                            </select>
-                                        </form>
+                                        @if($booking->status == App\Enums\BookingStatus::APPROVED->name)
+                                            @if($guest->status == App\Enums\GuestStatus::PENDENT->name)
+                                                <form action="{{ route('guest.change_status', ['buffet' => $buffet->slug, 'guest' => $guest['hashed_id'], 'booking' => $booking->hashed_id]) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('PATCH')
+
+                                                    <input type="hidden" name="status" value="{{App\Enums\GuestStatus::CONFIRMED->name}}">
+                                                    <button type="submit" title="Confirmar '{{$guest->name}}'">✅</button>
+                                                </form>
+                                                <form action="{{ route('guest.change_status', ['buffet' => $buffet->slug, 'guest' => $guest['hashed_id'], 'booking' => $booking->hashed_id]) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('PATCH')
+
+                                                    <input type="hidden" name="status" value="{{App\Enums\GuestStatus::BLOCKED->name}}">
+                                                    <button type="submit" title="Bloquear '{{$guest->name}}'">❌</button>
+                                                </form>
+                                            @endif
+                                        @else
+                                            <x-status.guest_status :status="$guest['status']" />
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach
