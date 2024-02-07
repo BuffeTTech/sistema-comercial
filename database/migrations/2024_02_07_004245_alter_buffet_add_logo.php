@@ -12,11 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('buffets', function (Blueprint $table) {
-            $table->foreignId('owner_id')->nullable()->constrained(
-                table: 'users', indexName: 'buffets_owner_id'     
+            $table->foreignId('logo_id')->nullable()->constrained(
+                table: 'buffet_photos', indexName: 'buffets_logo_id'     
             );
         });
-
     }
 
     /**
@@ -26,8 +25,7 @@ return new class extends Migration
     {
         Schema::table('buffets', function (Blueprint $table) {
             // Reverta as alterações feitas no método up
-            $table->dropColumn('owner_id');
+            $table->dropColumn('logo_id');
         });
-
     }
 };

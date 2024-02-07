@@ -34,6 +34,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     Route::get('{buffet}/dashboard', [BuffetController::class, 'dashboard'])->name('buffet.dashboard');
     Route::get('{buffet}', [BuffetController::class, 'dashboard']);
+    Route::get('{buffet}/edit', [BuffetController::class, 'edit'])->name('buffet.edit');
+    Route::put('{buffet}', [BuffetController::class, 'update'])->name('buffet.update');
+    Route::put('{buffet}/logo', [BuffetController::class, 'update_logo'])->name('buffet.update_logo');
     
     Route::get('{buffet}/booking/{booking}/guest/invite/',[GuestController::class, 'create'])->name('guest.invite');
     Route::patch('{buffet}/booking/{booking}/guest/{guest}/change_status',[GuestController::class,'change_status'])->name('guest.change_status');
