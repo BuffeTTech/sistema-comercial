@@ -66,25 +66,25 @@
                                     @csrf
 
                                     {{-- <input type="hidden" name="booking_id" value="{{ $booking->hashed_id }}"> --}}
-                                    <input type="hidden" name="status" id= 'status' value={{App\Enums\GuestStatus::EXTRA->name}}>
+                                    <input type="hidden" name="rows[0][status]" id= 'status' value={{App\Enums\GuestStatus::EXTRA->name}}>
             
                                     <div id="form-rows">
                                             <div class="form-row mb-4">
                                                 <x-input-label for="name" :value="__('Nome')" class="dark:text-slate-800" />
-                                                <x-text-input id="name" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" placeholder="Nome" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+                                                <x-text-input id="name" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" placeholder="Nome" type="text" name="rows[0][name]" :value="old('name')" required autofocus autocomplete="name" />
                                                 <x-input-error :messages="$errors->get('name')" class="mt-2" />
                                             </div>
                 
                                             <div class="form-row mb-4">
                                                 <x-input-label for="document" :value="__('CPF')" class="dark:text-slate-800"/>
-                                                <x-text-input id="document" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" placeholder="CPF" type="text" name="document" :value="old('document')" required autofocus autocomplete="document" />
+                                                <x-text-input id="document" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" placeholder="CPF" type="text" name="rows[0][document]" :value="old('document')" required autofocus autocomplete="document" />
                                                 <x-input-error :messages="$errors->get('document')" class="mt-2" />
                                                 <span class="text-sm text-red-600 dark:text-red-400 space-y-1" id="document-error"></span>
                                             </div>
                 
                                             <div class="form-row mb-4">
                                                 <x-input-label for="age" :value="__('Idade')" class="dark:text-slate-800"/>
-                                                <x-text-input id="age" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" placeholder="Idade" type="number" name="age" :value="old('age')" required autofocus autocomplete="age" />
+                                                <x-text-input id="age" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" placeholder="Idade" type="number" name="rows[0][age]" :value="old('age')" required autofocus autocomplete="age" />
                                                 <x-input-error :messages="$errors->get('age')" class="mt-2" />
                                             </div> 
                                     </div>

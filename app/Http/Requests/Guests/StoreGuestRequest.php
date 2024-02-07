@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Guests;
 
+use App\Enums\GuestStatus;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreGuestRequest extends FormRequest
 {
@@ -21,10 +23,15 @@ class StoreGuestRequest extends FormRequest
      */
     public function rules(): array
     {
+        return [];
         return [
-            'name'=>['required','max:255'],
-            'document'=>['required','max:255','cpf'],
-            'age'=>['required', 'integer']
-                ];
+            'rows' => 'required|array',
+            'rows.*.name' => 'required|string|max:255',
+            'rows.*.document' => 'required|string|cpf',
+            'rows.*.age' => 'required|integer',
+            'rows.*.status' => [
+                'string', Rule::in(array_column(GuestStatus::cases(), 'name'))
+            ]
+            ];
     }
 }
