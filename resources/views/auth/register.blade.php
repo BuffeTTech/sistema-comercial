@@ -1,5 +1,8 @@
 <x-guest-layout>
     <h1 class="text-white text-xl font-bold mb-4 ">Buffet {{ $buffet->trading_name }}</h1>
+        @if($buffet->logo_id)
+            <img src="{{ asset('storage/buffets'.$buffet->logo->file_path) }}" alt="">
+        @endif
     <form method="POST" action="{{ route('register', ['buffet'=>$buffet->slug]) }}" id="form">
         @csrf
 

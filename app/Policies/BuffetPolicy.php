@@ -22,7 +22,21 @@ class BuffetPolicy
      */
     public function update(User $user, Buffet $buffet): bool
     {
-        //
+        if($user == null) {
+            return false;
+        }
+
+        // Verifica se o usuário é cadastrado no buffet
+        if($user->buffet_id == $buffet->id) {
+            return $user->can('update buffet');
+        }
+
+        // Verifica se usuário é o dono do buffet
+        if($user->id == $buffet->owner_id) {
+            return $user->can('update buffet');
+        }
+
+        return false;
     }
 
     /**

@@ -10,8 +10,10 @@ use App\Enums\QuestionType;
 use App\Enums\SatisfactionQuestionStatus;
 use App\Enums\SubscriptionStatus;
 use App\Enums\UserStatus;
+use App\Models\Address;
 use App\Models\Booking;
 use App\Models\Buffet;
+use App\Models\BuffetPhoto;
 use App\Models\BuffetSubscription;
 use App\Models\Decoration;
 use App\Models\DecorationPhotos;
@@ -101,7 +103,22 @@ class TestsSeeder extends Seeder
             'buffet_id' => null,
         ]);
         $user->assignRole($administrative_role->name);
-        $user->assignRole($administrative);
+        $user->assignRole($administrative->name);
+
+        $buffet_address = Address::create([
+            "zipcode"=>fake()->postcode(),
+            "street"=>fake()->streetName(),
+            "number"=>fake()->buildingNumber(),
+            "neighborhood"=>fake()->secondaryAddress(),
+            "state"=>fake()->state(),
+            "city"=>fake()->city(),
+            "country"=>fake()->country(),
+            "complement"=>""
+        ]);
+
+        $buffet_phone1 = Phone::create([
+            'number'=>'(19) 99999-9999'
+        ]);
 
         $buffet = Buffet::create([
             'trading_name' => 'Buffet Alegria',
@@ -110,7 +127,20 @@ class TestsSeeder extends Seeder
             'document' => "47.592.257/0001-43",
             'owner_id' => $user->id,
             'status' => BuffetStatus::ACTIVE->name,
+            'phone1'=>$buffet_phone1->id,
+            'address'=>$buffet_address->id
         ]);
+
+        $logo = BuffetPhoto::create([
+            'file_name'=>'169998221749.jpg',
+            'file_path'=>'/169998221749.170554800088-.jpg',
+            'file_extension'=>'jpg',
+            'mime_type'=>'image/jpeg',
+            'file_size'=>'31904',
+            'buffet_id'=>$buffet->id
+        ]);
+
+        $buffet->update(['logo_id'=>$logo->id]);
 
         $buffet_subscription = BuffetSubscription::create([
             'buffet_id'=>$buffet->id,

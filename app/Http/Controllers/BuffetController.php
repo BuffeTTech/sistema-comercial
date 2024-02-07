@@ -7,6 +7,7 @@ use App\Http\Requests\StoreBuffetRequest;
 use App\Http\Requests\UpdateBuffetRequest;
 use App\Models\Address;
 use App\Models\Buffet;
+use App\Models\BuffetPhoto;
 use App\Models\BuffetSubscription;
 use App\Models\Phone;
 use App\Models\Subscription;
@@ -16,13 +17,15 @@ use Illuminate\Http\Request;
 
 class BuffetController extends Controller
 {
+    public static string $image_repository = '/app/public/buffets';
     public function __construct(
         protected User $user,
         protected Buffet $buffet,
         protected Address $address,
         protected Phone $phone,
         protected Subscription $subscription,
-        protected BuffetSubscription $buffet_subscription
+        protected BuffetSubscription $buffet_subscription,
+        protected BuffetPhoto $buffet_photo,
     )
     {
         
@@ -246,17 +249,24 @@ class BuffetController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Buffet $buffet)
+    public function edit(Request $request)
     {
-        //
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->with(['buffet_phone1','buffet_phone2', 'buffet_address'])->where('slug', $buffet_slug)->get()->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
+        }
+
+        return view('buffet.update',['buffet'=>$buffet]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateBuffetRequest $request, Buffet $buffet)
+    public function update(UpdateBuffetRequest $request)
     {
-        //
+        dd('aa', $request);
     }
 
     /**
@@ -265,5 +275,93 @@ class BuffetController extends Controller
     public function destroy(Buffet $buffet)
     {
         //
+    }
+
+    public function update_logo(Request $request) {
+        $buffet_slug = $request->buffet;
+        $buffet = Buffet::where('slug', $buffet_slug)->with('logo')->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+
+        $this->authorize('update', [Buffet::class, $buffet]);
+
+        // dd(storage_path(self::$image_repository).$foods_photo->file_path,
+        //     Storage::exists(self::$image_repository).$foods_photo->file_path,
+        //     Storage::allFiles(self::$image_repository));
+
+        $logo = $this->buffet_photo->where('id', $buffet->logo_id)->get()->first();
+
+        $previousFilePath = "";
+        if($logo) {
+            $previousFilePath = storage_path(self::$image_repository).$logo->file_path;
+        }
+
+         $photo = $request->buffet_logo;
+         if ($request->has('buffet_logo')) {
+            if ($photo->isValid()) { 
+               
+                if($upload = $this->upload_image(photo: $photo))  {
+                    // excluir foto anterior aqui
+                    if (file_exists($previousFilePath)) {
+                        // dd(Storage::delete($previousFilePath));
+                        unlink($previousFilePath);
+                    }
+
+                    if($logo) {
+                        $logo->update([
+                            'file_name'=>$upload['file_name'],
+                            'file_path'=>$upload['file_path'],
+                            'file_extension'=>$upload['file_extension'],
+                            'mime_type'=>$upload['mime_type'],
+                            'file_size'=>$upload['file_size'],
+                            'buffet_id'=>$buffet->id,
+                        ]);
+                    } else {
+                        $photo_created = $this->buffet_photo->create([
+                            'file_name'=>$upload['file_name'],
+                            'file_path'=>$upload['file_path'],
+                            'file_extension'=>$upload['file_extension'],
+                            'mime_type'=>$upload['mime_type'],
+                            'file_size'=>$upload['file_size'],
+                            'buffet_id'=>$buffet->id,
+                        ]);
+                        $buffet->update(['logo_id'=>$photo_created->id]);
+                    }
+
+                } else {
+                    return redirect()->back()->withErrors(['photo'=>"error photo not valid"])->withInput();
+                }
+            }
+        }
+
+        return redirect()->back()->withInput();
+    }
+
+    private function upload_image($photo) {
+        if ($photo->isValid()) {
+            $file_name = $photo->getClientOriginalName();
+            $file_extension = $photo->getClientOriginalExtension();
+            $file_size = $photo->getSize();
+            $mime_type = $photo->getMimeType();
+            
+            $imageName = sanitize_string(explode($file_extension, $file_name)[0]).time() . rand(1, 99) . '-.' . $file_extension;
+            $file_path = "/".$imageName;
+
+            // $foto->move(public_path('uploads'), $file_path);
+            $photo->move(storage_path(self::$image_repository), $imageName);
+
+            //$file_path = "/foods/".$imageName;
+
+            return [
+                "file_name"=>$file_name,
+                "file_extension"=>$file_extension,
+                "file_size"=>$file_size,
+                "mime_type"=>$mime_type,
+                "file_path"=>$file_path,
+            ];
+        }
+        return null;
     }
 }

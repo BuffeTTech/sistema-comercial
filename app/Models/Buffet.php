@@ -21,14 +21,17 @@ class Buffet extends Model
         return $this->hasMany(BuffetSubscription::class, 'buffet_id');
     }
 
-    public function phone1() {
+    public function buffet_phone1() {
         return $this->belongsTo(Phone::class, 'phone1');
     }
-    public function phone2() {
+    public function buffet_phone2() {
         return $this->belongsTo(Phone::class, 'phone2');
     }
-    public function address() {
+    public function buffet_address() {
         return $this->belongsTo(Address::class, 'address');
+    }
+    public function logo() {
+        return $this->belongsTo(BuffetPhoto::class, 'logo_id');
     }
 
     public function bookings()

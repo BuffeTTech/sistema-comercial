@@ -3,6 +3,9 @@
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <h1 class="text-white text-xl font-bold mb-4 ">Buffet {{ $buffet->trading_name }}</h1>
+        @if($buffet->logo_id)
+            <img src="{{ asset('storage/buffets'.$buffet->logo->file_path) }}" alt="">
+        @endif
 
     <form method="POST" action="{{ route('login', ['buffet'=>$buffet->slug]) }}">
         @csrf
