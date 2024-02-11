@@ -36,7 +36,7 @@
                     </div>
                     <br><br>
 
-                    @if($value['status'] === App\Enums\DecorationStatus::ACTIVE->name)
+                    @if($value['status'] === App\Enums\ScheduleStatus::ACTIVE->name)
                         <div class="flex items-center ml-auto float-down">
                             <a href="{{ route('schedule.edit', ['schedule'=>$schedule->hashed_id, 'buffet'=>$buffet]) }}" class="bg-amber-300 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded">
                                 <div class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4">
