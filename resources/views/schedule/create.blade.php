@@ -4,6 +4,7 @@
 
     <h1>Criar Horário</h1>
     <div>
+
         <form method="POST" action="{{ route('schedule.store', ['buffet'=>$buffet->slug]) }}">
             @csrf
 

@@ -51,15 +51,19 @@
                                         <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
                                             <a href="{{ route('survey.show',  ['survey'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" title="Visualizar pergunta {{$value['hashed_id']}}">👁️</a>
                                             <a href="{{ route('survey.edit',  ['survey'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" title="Editar pergunta {{$value['hashed_id']}}">✏️</a>
-                                            {{--<form action="{{ route('survey.change_question_status', $value['id']) }}" method="post" class="inline">
+                                            @if ($value['status'] == true)
+                                            <form action="{{ route('survey.destroy',['survey'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="post" class="inline">
+                                                @csrf
+                                                @method('delete')
+                                                    <button type="submit" title="Deletar pergunta {{$value['id']}}">❌</button>
+                                            </form>
+                                            @else
+                                            <form action="{{ route('survey.change_status',['survey'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="post" class="inline">
                                                 @csrf
                                                 @method('patch')
-                                                @if($value['status'] == true)
-                                                    <button type="submit" title="Deletar pergunta {{$value['id']}}">❌</button>
-                                                @else
                                                     <button type="submit" title="Ativar pergunta {{$value['id']}}">✅</button>
-                                                @endif
-                                            </form>--}}
+                                            </form>
+                                            @endif
                                         </td>
                                     </tr>
                                     @endforeach

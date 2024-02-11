@@ -7,7 +7,7 @@
 
                 <div class="p-6 text-gray-900">
                     <div>
-                        <p><strong><a href="{{route('recommendation.create',['buffet'=>$buffet])}}">Criar nova Recomendação</a></strong></p>
+                        <p><strong><a href="{{route('recommendation.create',['buffet'=>$buffet->slug])}}">Criar nova Recomendação</a></strong></p>
                     </div>
                     <div class="overflow-auto">
                     <table class="w-full">
@@ -35,18 +35,26 @@
                                 @foreach($recommendations as $value)
                                 <tr class="bg-white">
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                        <a href="{{ route('recommendation.show', ['buffet'=>$buffet,'recommendation'=>$value->hashed_id]) }}" class="font-bold text-blue-500 hover:underline">{{ $value['content'] }}</a>
+                                        <a href="{{ route('recommendation.show', ['buffet'=>$buffet->slug,'recommendation'=>$value->hashed_id]) }}" class="font-bold text-blue-500 hover:underline">{{ $value['content'] }}</a>
                                     </td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.decoration_status :status="$value['status']" /></td>
+                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.recommendation_status :status="$value['status']" /></td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                        <a href="{{ route('recommendation.show', ['buffet'=>$buffet,'recommendation'=>$value->hashed_id]) }}" title="Visualizar recomendação">👁️</a>
-                                        <a href="{{ route('recommendation.edit', ['buffet'=>$buffet, 'recommendation'=>$value->hashed_id]) }}" title="Editar recomendação">✏️</a>
-
-                                        <form action="{{ route('recommendation.destroy', ['buffet'=>$buffet, 'recommendation'=>$value->hashed_id]) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('delete')
-                                            <button type="submit">❌</button>                                        
-                                        </form>
+                                        <a href="{{ route('recommendation.show', ['buffet'=>$buffet->slug,'recommendation'=>$value->hashed_id]) }}" title="Visualizar recomendação">👁️</a>
+                                        <a href="{{ route('recommendation.edit', ['buffet'=>$buffet->slug, 'recommendation'=>$value->hashed_id]) }}" title="Editar recomendação">✏️</a>
+                                        @if($value['status'] !== App\Enums\RecommendationStatus::UNACTIVE->name)
+                                            <form action="{{ route('recommendation.destroy', ['buffet'=>$buffet->slug, 'recommendation'=>$value->hashed_id]) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('delete')
+                                                <button type="submit">❌</button>                                        
+                                            </form>
+                                        @else
+                                            <form action="{{ route('recommendation.change_status', ['recommendation'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="post" class="inline">
+                                                @csrf
+                                                @method('patch')
+                                                <input type="hidden" name="status" value="{{App\Enums\RecommendationStatus::ACTIVE->name }}">
+                                                <button type="submit" title="Ativar '{{ $value['start_time'] }}'">✅</button>
+                                            </form>
+                                        @endif    
 
                                         <!-- Se a pessoa está vendo esta página, ela por padrão ja é ADM ou comercial, logo nao preciso validar aqui! -->
 
