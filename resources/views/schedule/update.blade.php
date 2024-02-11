@@ -16,9 +16,9 @@
             @endif
             <div>
                 <label for="day_week" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Dia da semana</label>
-                    <select name="day_week" id="day_week" :value="old('start_time')" required>
+                    <select name="day_week" id="day_week" required>
                         @foreach( App\Enums\DayWeek::array() as $key=>$day_week )
-                            <option value="{{$day_week}}">{{$key}}</option>
+                            <option value="{{$day_week}}" {{ $day_week == $schedule->day_week ? 'selected' : ''}}>{{$key}}</option>
                         @endforeach
                         <!-- <option value="invalid2"  disabled>Nenhum horario disponivel neste dia, tente novamente!</option> -->
                     </select>
@@ -27,18 +27,13 @@
             @php
                 $date = DateTime::createFromFormat('H:i:s', $schedule->start_time);
                 $date = $date->format('H:i');
-
-                $oldTime = old('time', date('H:i', strtotime($schedule->start_time)));
-                // $oldTime = old('time') ? date('H:i', old('time')) : false;
             @endphp
 
             <div>
                 <x-input-label for="start_time" :value="__('Início da festa')" />
-                <x-text-input id="start_time" class="block mt-1 w-full" type="time" name="start_time" :value="$oldTime ?? $schedule->time" required autofocus autocomplete="start_time" />
+                <x-text-input id="start_time" class="block mt-1 w-full" type="time" name="start_time" :value="$date" required autofocus autocomplete="start_time" />
                 <x-input-error :messages="$errors->get('start_time')" class="mt-2" />
             </div>
-
-            
 
             <div>
                 <x-input-label for="duration" :value="__('Duração da festa')" />

@@ -9,5 +9,4 @@ enum SubscriptionStatus: string {
 
     case ACTIVE = "Ativo";
     case UNACTIVE = "Inativo";
-    case PENDENT = "Pendente";
 }

@@ -59,7 +59,9 @@
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.schedule_status :status="$value['status']" /></td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
                                         <a href="{{ route('schedule.show', ['schedule'=>$value['hashed_id'], 'buffet'=>$buffet]) }}" title="Visualizar '{{ App\Enums\DayWeek::getEnumByName($value['day_week']) }}'">👁️</a>
-                                        <a href="{{ route('schedule.edit', ['schedule'=>$value['hashed_id'], 'buffet'=>$buffet]) }}" title="Editar '{{ App\Enums\DayWeek::getEnumByName($value['day_week']) }}'">✏️</a>
+                                        @if($value['status'] === App\Enums\DecorationStatus::ACTIVE->name)
+                                            <a href="{{ route('schedule.edit', ['schedule'=>$value['hashed_id'], 'buffet'=>$buffet]) }}" title="Editar '{{ App\Enums\DayWeek::getEnumByName($value['day_week']) }}'">✏️</a>
+                                        @endif
                                         @if($value['status'] !== App\Enums\DecorationStatus::UNACTIVE->name)
                                             <form action="{{ route('schedule.destroy', ['schedule'=>$value['hashed_id'], 'buffet'=>$buffet]) }}" method="post" class="inline">
                                                 @csrf
