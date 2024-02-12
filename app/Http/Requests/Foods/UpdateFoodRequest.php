@@ -29,8 +29,6 @@ class UpdateFoodRequest extends FormRequest
             'food_description' => 'required|string',
             'beverages_description' => 'required|string',
             'status'=>['in:' . implode(',', FoodStatus::array())],
-            'foods_photo' => 'required|array',
-            'foods_photo.*' => 'required|image|mimes:png,jpg,jpeg',
             'price' => 'required|numeric'
         ];
         return $rules;

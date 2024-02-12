@@ -31,7 +31,6 @@ class StoreEmployeeRequest extends FormRequest
                 'required',
                 'string',
                 'cpf_ou_cnpj',
-                'unique:'.User::class
             ],
             'document_type' => [
                 'required',
