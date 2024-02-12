@@ -23,7 +23,6 @@ class StoreSatisfactionAnswerRequest extends FormRequest
     {
         $rules = [
             'answer' => 'required|max:255',
-            
         ];
 
         return $rules;
