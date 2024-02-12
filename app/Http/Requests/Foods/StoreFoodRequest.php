@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Foods;
 
+use App\Enums\FoodStatus;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreFoodRequest extends FormRequest
@@ -22,22 +23,16 @@ class StoreFoodRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'name_food' => 'required|max:255',
-            'slug' => 'required|max:255',
-            'food_description' => 'required',
-            'beverages_description' => 'required',
-            //'images' => 'required',
-            //'images.*' => 'required|image|mimes:png,jpg,jpeg|max:2048',
+            'name_food' => 'required|max:255|string',
+            'slug' => 'required|max:255|string',
+            'food_description' => 'required|string',
+            'beverages_description' => 'required|string',
+            'status'=>['in:' . implode(',', FoodStatus::array())],
+            'foods_photo' => 'required|array',
+            'foods_photo.*' => 'required|image|mimes:png,jpg,jpeg',
             'price' => 'required|numeric'
-            // 'photo_1' =>'required|max:255',
-            // 'photo_2' =>'required|max:255',
-            // 'photo_3' =>'required|max:255'
         ];
 
-        // if ($this->method() === 'PUT') {
-        //     unset($rules['ímages']);
-        //     unset($rules['images.*']);
-        // }
         return $rules;
     }
 }

@@ -57,13 +57,13 @@ class RecommendationController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
+        $this->authorize('create', [User::class, $buffet]);
+        
         $recommendation = $this->recommendation->create([
             'content' => $request->content,
             'status' => RecommendationStatus::ACTIVE->name,
             'buffet_id' => $buffet->id,
         ]);
-
-        $this->authorize('create', [User::class, $buffet]);
 
         return redirect()->route('recommendation.show',['buffet'=>$buffet->slug, 'recommendation'=>$recommendation->hashed_id]);
 
@@ -114,12 +114,11 @@ class RecommendationController extends Controller
         if(!$recommendation){
             return redirect()->back()->withErrors(['message'=>'Recomendação não encontrada'])->withInput();
         }
+        $this->authorize('update', [User::class, $recommendation, $buffet]);
 
         $recommendation->update([
             'content' => $request->content
         ]);
-
-        $this->authorize('update', [User::class, $recommendation, $buffet]);
 
         return redirect()->route('recommendation.index',['buffet'=>$buffet->slug]);
 
@@ -170,11 +169,11 @@ class RecommendationController extends Controller
             return redirect()->back()->withErrors(['message'=>'Recommendation não validada'])->withInput();
         }
         
+        $this->authorize('delete', [User::class,$recommendation, $buffet]);
+
         $recommendation->update([
             'status'=>RecommendationStatus::UNACTIVE->name
         ]);
-
-        $this->authorize('delete', [User::class,$recommendation, $buffet]);
 
         return redirect()->route('recommendation.index',['buffet'=>$buffet->slug]);
 
@@ -200,11 +199,11 @@ class RecommendationController extends Controller
             return redirect()->back()->withErrors(['message'=>'Recommendation não validada'])->withInput();
         }
         
+        $this->authorize('change_status', [User::class,$recommendation, $buffet]);
+
         $recommendation->update([
             'status'=>$request->status
         ]);
-
-        $this->authorize('delete', [User::class,$recommendation, $buffet]);
 
         return redirect()->route('recommendation.index',['buffet'=>$buffet->slug]);
     }

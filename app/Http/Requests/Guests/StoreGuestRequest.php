@@ -25,6 +25,6 @@ class StoreGuestRequest extends FormRequest
             'name'=>['required','max:255'],
             'document'=>['required','max:255','cpf'],
             'age'=>['required', 'integer']
-                ];
+            ];
     }
 }
