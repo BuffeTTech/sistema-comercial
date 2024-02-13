@@ -51,7 +51,7 @@ class AuthenticatedSessionController extends Controller
         }
         // Caso seja um buffet
         $buffet = Buffet::find($user->buffet_id);
-        return redirect()->route('dashboard_buffet', $buffet->slug);
+        return redirect()->route('buffet.dashboard', $buffet->slug);
 
     }
 

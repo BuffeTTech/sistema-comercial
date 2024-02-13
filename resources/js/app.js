@@ -165,3 +165,9 @@ window.replacePhone = function(value) {
         .replace(/(\d{5})(\d)/, '$1-$2') // captura 2 grupos de numero o primeiro de 5 e o segundo de 1, apos capturar o primeiro grupo ele adiciona um traço antes do segundo grupo de numero
         .replace(/(-\d{4})\d+?$/, '$1'); // captura 4 numeros seguidos de um traço e não deixa ser digitado mais nada
 }
+
+window.replaceCEP = function(cep){
+    cep = cep.replace(/\D/g, '');
+    cep = cep.slice(0, 8);
+    return cep.replace(/(\d{5})(\d{3}).*$/, '$1-$2');
+}
