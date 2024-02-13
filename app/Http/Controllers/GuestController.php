@@ -65,7 +65,7 @@ class GuestController extends Controller
             // abort(404);
             return redirect()->back()->withErrors(['message'=>'Buffet não encontrado'])->withInput();
         }
-        
+
         $booking_id = $this->hashids->decode($request->booking);
         if(!$booking_id) {
             // abort(404);
@@ -87,26 +87,38 @@ class GuestController extends Controller
             return redirect()->back()->withErrors(['message'=>'Esta festa não está aceitando convidados'])->withInput();
         }
 
-        $guest_exists = $this->guest
-                             ->where('document',$request->document)
+        $rows = $request->rows;
+        $rows_to_insert = [];
+
+        foreach ($rows as $guest) {
+            $guest_exists = $this->guest
+                             ->where('document',$guest['document'])
                              ->where('buffet_id', $buffet->id)
                              ->where('booking_id', $booking->id)
                              ->get()
                              ->first();
-        if($guest_exists) {
-            return redirect()->back()->withErrors(['document'=>'Este convidado já está na festa com o status '.GuestStatus::getEnumByName($guest_exists->status)->value])->withInput();
+
+            if($guest_exists) {
+                return redirect()->back()->withErrors(['error'=>'O convidado '.$guest['name'].' já está na festa com o status '.GuestStatus::getEnumByName($guest_exists->status)->value])->withInput();
+            }
+
+            $data = [
+                "name" => $guest['name'],
+                "document" => $guest['document'],
+                "age" => $guest['age'],
+                "status" => $guest->status ?? GuestStatus::PENDENT->name,
+                "booking_id" => $booking->id,
+                'buffet_id'=>$buffet->id
+            ];
+
+            array_push($rows_to_insert, $data);
         }
 
-        $guest = $this->guest->create([
-            'name'=>$request->name,
-            'document'=>$request->document,
-            'age'=>$request->age,
-            'booking_id'=>$booking->id,
-            'buffet_id'=>$buffet->id,
-            'status'=> $request->status ?? GuestStatus::PENDENT->name
-        ]);
+        foreach ($rows_to_insert as $guest) {
+            $this->guest->create($guest);
+        }
 
-        if($request->status == GuestStatus::EXTRA->name) {
+        if(isset($rows[0]['status']) && $rows[0]['status'] == GuestStatus::EXTRA->name) {
             return redirect()->back()->with(['message'=>"Convidado adicionado com sucesso"]);
         } else {
             return view('guest.guest_invited', ['buffet'=>$buffet, 'booking'=>$booking, 'guest'=>$guest]);
