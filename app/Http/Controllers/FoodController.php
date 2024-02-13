@@ -6,8 +6,11 @@ use App\Enums\FoodStatus;
 use App\Http\Requests\Foods\StoreFoodRequest;
 use App\Http\Requests\Foods\UpdateFoodRequest;
 use App\Models\Buffet;
+use App\Models\BuffetSubscription;
 use App\Models\Food;
-use App\Models\FoodPhoto; 
+use App\Models\FoodPhoto;
+use App\Models\SubscriptionConfiguration;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -60,11 +63,16 @@ class FoodController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
         
-        $this->authorize('create', [Food::class, $buffet]);
+        // $this->authorize('create', [Food::class, $buffet]);
 
         // buffet exists
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
+        }
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
 
-        return view('foods.create', ['buffet'=>$buffet]);
+        return view('foods.create', ['buffet'=>$buffet, 'configurations'=>$configurations]);
     }
 
     /**
@@ -85,9 +93,14 @@ class FoodController extends Controller
         }
         $this->authorize('create', [Food::class, $buffet]);
 
-        // if(!isset($request->images) || count($request->images) != 3) {
-        //     return redirect()->back()->with('errors', 'Não existem 3 fotos na requisição');
-        // }
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
+        }
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+        if(!isset($request->images) || count($request->foods_photo) != $configurations['max_food_photos']) {
+            return redirect()->back()->withErrors(['foods_photo_generic'=> 'Não existem '.$configurations['max_food_photos'].' fotos na requisição'])->withInput();
+        }
         
         $food = $this->food->create([
             "name_food"=>$request->name_food,

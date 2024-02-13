@@ -6,8 +6,11 @@ use App\Enums\DecorationStatus;
 use App\Http\Requests\Decorations\StoreDecorationRequest;
 use App\Http\Requests\Decorations\UpdateDecorationRequest;
 use App\Models\Buffet;
+use App\Models\BuffetSubscription;
 use App\Models\Decoration;
 use App\Models\DecorationPhotos;
+use App\Models\SubscriptionConfiguration;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class DecorationController extends Controller
@@ -80,7 +83,13 @@ class DecorationController extends Controller
         }
         $this->authorize('create', [Decoration::class, $buffet]);
 
-        return view('decoration.create', ['buffet'=>$buffet]);
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
+        }
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
+        return view('decoration.create', ['buffet'=>$buffet, 'configurations'=>$configurations]);
     }
 
     /**
@@ -97,6 +106,15 @@ class DecorationController extends Controller
         }
 
         $this->authorize('create', [Decoration::class, $buffet]);
+
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
+        }
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+        if(!isset($request->images) || count($request->foods_photo) != $configurations['max_decoration_photos']) {
+            return redirect()->back()->withErrors(['decorations_photo_generic'=> 'Não existem '.$configurations['max_decoration_photos'].' fotos na requisição'])->withInput();
+        }
 
         $decoration = $this->decoration->create([
             'main_theme'=>$request->main_theme,

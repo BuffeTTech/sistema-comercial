@@ -24,6 +24,7 @@ use App\Models\Phone;
 use App\Models\SatisfactionQuestion;
 use App\Models\Schedule;
 use App\Models\Subscription;
+use App\Models\SubscriptionConfiguration;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -46,6 +47,13 @@ class TestsSeeder extends Seeder
             "price"=>159.99,
             "discount"=>0,
             "status"=>SubscriptionStatus::ACTIVE->name,
+        ]);
+        $pacote_alegria_configs = SubscriptionConfiguration::create([
+            "max_employees"=>6,
+            "max_food_photos"=>3,
+            "max_decoration_photos"=>3,
+            "max_recommendations"=>3,
+            "subscription_id"=>$pacote_alegria->id,
         ]);
         $user_role = Role::create(['name' => $pacote_alegria->slug.'.user']);
         $commercial_role = Role::create(['name' => $pacote_alegria->slug.'.commercial']);

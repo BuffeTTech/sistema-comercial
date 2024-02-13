@@ -28,12 +28,12 @@ class BuffetPolicy
 
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {
-            return $user->can('update buffet');
+            return $user->can('update buffet commercial');
         }
 
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('update buffet');
+            return $user->can('update buffet commercial');
         }
 
         return false;

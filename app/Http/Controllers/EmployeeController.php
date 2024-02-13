@@ -10,6 +10,7 @@ use App\Models\Address;
 use App\Models\Buffet;
 use App\Models\BuffetSubscription;
 use App\Models\Phone;
+use App\Models\SubscriptionConfiguration;
 use App\Models\User;
 use Carbon\Carbon;
 use Hashids\Hashids;
@@ -51,6 +52,8 @@ class EmployeeController extends Controller
             return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
         }
 
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
         $employees = $this->user
             ->with(['user_phone2', 'user_phone1', 'user_address'])
             ->where('buffet_id', $buffet->id)
@@ -59,21 +62,30 @@ class EmployeeController extends Controller
 
         $this->authorize('viewAny', [User::class, $buffet]);
 
-        return view('employee.index', ['buffet'=>$buffet, 'employees'=>$employees]); 
+        return view('employee.index', ['buffet'=>$buffet, 'employees'=>$employees, 'configurations'=>$configurations]); 
     }
     
     public function create(Request $request){
-
         $buffet_slug = $request->buffet;
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
 
         if(!$buffet || !$buffet_slug) {
-            return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
+            return redirect()->back()->withErrors(['generic_error'=>'Buffet not found'])->withInput();
         }
 
         $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
         if($buffet_subscription->expires_in < Carbon::now()) {
-            return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
+            return redirect()->back()->withErrors(['generic_error'=> "Buffet is not active"])->withInput();
+        }
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
+        $employees = $this->user
+            ->where('buffet_id', $buffet->id)
+            ->withoutRole($buffet_subscription->subscription->slug.'.user')
+            ->get();
+        
+        if(count($employees) >= $configurations['max_employees']) {
+            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais funcionarios neste plano.'])->withInput();
         }
 
         $roles = $this->role->where('name', 'like', $buffet_subscription->subscription->slug.'.%')->get();
@@ -88,7 +100,7 @@ class EmployeeController extends Controller
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
 
         if(!$buffet || !$buffet_slug) {
-            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado.'])->withInput();
+            return redirect()->back()->withErrors(['generic_error'=>'Buffet não encontrado.'])->withInput();
         }
 
         $this->authorize('create', [User::class, $buffet]);
@@ -96,6 +108,17 @@ class EmployeeController extends Controller
         $buffet_subscription = $this->buffet_subscription->where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
         if($buffet_subscription->expires_in < Carbon::now()) {
             return redirect()->back()->withErrors(['buffet'=> "Este buffet não está mais ativo."])->withInput();
+        }
+
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
+        $employees = $this->user
+            ->where('buffet_id', $buffet->id)
+            ->withoutRole($buffet_subscription->subscription->slug.'.user')
+            ->get();
+        
+        if(count($employees) >= $configurations['max_employees']) {
+            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais funcionarios neste plano.'])->withInput();
         }
         
         $mail_exists = $this->user->where('buffet_id', $buffet->id)->where('email', $request->email)->first();
@@ -223,7 +246,7 @@ class EmployeeController extends Controller
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
 
         if(!$buffet || !$buffet_slug) {
-            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado.'])->withInput();
+            return redirect()->back()->withErrors(['generic_error'=>'Buffet não encontrado.'])->withInput();
         }
 
         $user_id = $this->hashids->decode($request->employee)[0];

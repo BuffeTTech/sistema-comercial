@@ -137,4 +137,22 @@ class SurveyQuestionPolicy
 
         return $user->can('delete survey question');
     }
+
+    public function answer(User $user, SatisfactionQuestion $satisfactionQuestion, Buffet $buffet): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+        // Verifica se o usuário é cadastrado no buffet
+        if($user->buffet_id == $buffet->id) {
+            return $user->can('answer survey question');
+        }
+
+        // Verifica se usuário é o dono do buffet
+        if($user->id == $buffet->owner_id) {
+            return $user->can('answer survey question');
+        }
+
+        return $user->can('answer survey question');
+    }
 }

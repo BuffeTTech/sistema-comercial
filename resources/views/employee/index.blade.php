@@ -12,7 +12,9 @@
                     <div class="overflow-auto">
                         <div>
                             <h1 class="inline-flex items-center border border-transparent text-lg leading-4 font-semi-bold">Listagem dos Funcionários</h1>
-                            <h2><a href="{{ route('employee.create', ['buffet'=>$buffet->slug]) }}">Criar funcionário</a></h2>
+                            @if(count($employees) < $configurations['max_employees'])
+                                <h2><a href="{{ route('employee.create', ['buffet'=>$buffet->slug]) }}">Criar funcionário</a></h2>
+                            @endif
                         </div>
                         @if (session('success'))
                             <div class="alert alert-success">
