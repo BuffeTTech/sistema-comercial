@@ -156,6 +156,9 @@ class BuffetController extends Controller
             'subscription_id'=>$subscription->id,
             'expires_in'=>$expires_in->format('Y-m-d H:i:s')
         ]);
+
+        $owner->assignRole($buffet_subscription->subscription->slug.'.administrative');
+
         return response()->json(['data'=>[$request->buffet_subscription]], 201);
         return response()->json(['data'=>[$buffet, $buffet_subscription, $owner]], 201);
 

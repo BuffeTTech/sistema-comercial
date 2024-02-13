@@ -118,7 +118,6 @@ class SubscriptionController extends Controller
     public function create_many_permission(Request $request) {
         $data = $request->data; // array de permissoes laravel permission
         $response = [];
-        return response(status: 201)->json($data);
         foreach ($data as $permission) {
             $permission_exists = $this->permission->where('name', $permission['permission']['name'])->get()->first();
             $permi = $permission['permission']['name'];
@@ -127,15 +126,17 @@ class SubscriptionController extends Controller
                     'name'=>$permi,
                 ]);
             }
+            $roles = [];
             foreach($permission['roles'] as $role) {
                 $role_eloquent = $this->role->where('name', $role['name'])->get()->first();
                 if($role_eloquent) {
                     $role_eloquent->givePermissionTo($permission_exists['name']);
+                    array_push($roles, $role_eloquent);
                 }
             }
-            array_push($response, $permission);
+            array_push($response, ['permission'=>$permi, 'roles'=>$role]);
         }
-        return response(status: 201)->json($response);
+        return response()->json($response, 201);
     }
 
 
