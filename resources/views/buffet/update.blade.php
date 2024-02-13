@@ -15,7 +15,7 @@
                             {{ session('success') }}
                         </div>
                     @endif
-                    <form method="POST" action="{{ route('buffet.update', ['buffet'=>$buffet->slug]) }}">
+                    <form method="POST" action="{{ route('buffet.update', ['buffet'=>$buffet->slug]) }}" id="main-form">
                         @csrf
                         @method('put')
 
@@ -134,4 +134,96 @@
             </div>
         </div>
     </div>
+    <script>
+        const zipcode = document.querySelector('#zipcode');
+        const street = document.querySelector('#street');
+        const neighborhood = document.querySelector('#neighborhood');
+        const state = document.querySelector('#state');
+        const city = document.querySelector('#city');
+        const number = document.querySelector('#number');
+        const complement = document.querySelector('#complement');
+        const zipcode_error = document.querySelector("#zipcode-error")
+        const document_buffet = document.querySelector("#document_buffet")
+        const doc_buffet_error = document.querySelector("#document_buffet-error")
+        const form = document.querySelector("#main-form")
+        
+        document_buffet.addEventListener('input', (e)=>{
+            e.target.value = replaceCNPJ(e.target.value);
+            return;
+        })
+
+        document_buffet.addEventListener('focusout', (e)=>{
+            const cnpj_valid = validarCNPJ(e.target.value)
+            if(!cnpj_valid) {
+                doc_buffet_error.innerHTML = "Documento inválido"
+                return
+            }
+            doc_buffet_error.innerHTML = ""
+            return;
+        })
+
+        zipcode.addEventListener('input', async (e) => {
+            e.target.value = replaceCEP(e.target.value)
+        })
+
+        zipcode.addEventListener('focusout', async (e) => {
+            try {
+                // const onlyNumbers = /^[0-9]+$/;
+                // const cepValid = /^[0-9]{8}$/;
+
+                // if(!onlyNumbers.test(e.target.value) || !cepValid.test(e.target.value)) {
+                //     console.log(onlyNumbers.test(e.target.value), cepValid.test(e.target.value))
+                //     throw {cep_error: 'CEP inválido'}
+                // }
+                const cep = e.target.value.replace(/\D/g, '');
+
+                const response = await fetch(`http://viacep.com.br/ws/${cep}/json`)
+
+                const responseCep = await response.json()
+                console.log(responseCep)
+
+                if(responseCep?.erro) {
+                    throw {cep_error: 'CEP inválido'}
+                }
+                zipcode_error.innerHTML = ""
+                street.value = responseCep.logradouro
+                neighborhood.value = responseCep.bairro
+                state.value = responseCep.uf
+                city.value = responseCep.localidade
+                number.value = ""
+                complement.value = ""
+
+                // number.innerHTML = response
+                // complement.innerHTML = response
+                // country.innerHTML = response
+
+            } catch(error) {
+                street.value = ""
+                neighborhood.value = ""
+                state.value = ""
+                city.value = ""
+                complement.value = ""
+                number.value = ""
+                zipcode_error.innerHTML = "CEP Inválido"
+                console.log(error)
+            }
+        });
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const cnpj_valid = validarCNPJ(document_buffet.value);
+            if (!cnpj_valid) {
+                error('Documento inválido');
+                return;
+            }
+
+            const userConfirmed = await confirm(`Deseja cadastrar este funcionário?`);
+
+            if (userConfirmed) {
+                // Envie o formulário manualmente
+                form.submit();
+            }
+        });
+    </script>
 </x-app-layout>

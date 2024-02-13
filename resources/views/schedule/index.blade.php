@@ -1,9 +1,15 @@
 <x-app-layout>
 
     <div class="py-12">
+
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+                    @if ($errors->any())
+                        @foreach ($errors->all() as $error)
+                            {{ $error }}
+                        @endforeach
+                    @endif
                     <div class="overflow-auto">
                         <div>
                             <h1 class="inline-flex items-center border border-transparent text-lg leading-4 font-semi-bold">Listagem dos horários de festas</h1>
@@ -53,8 +59,10 @@
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.schedule_status :status="$value['status']" /></td>
                                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
                                         <a href="{{ route('schedule.show', ['schedule'=>$value['hashed_id'], 'buffet'=>$buffet]) }}" title="Visualizar '{{ App\Enums\DayWeek::getEnumByName($value['day_week']) }}'">👁️</a>
-                                        <a href="{{ route('schedule.edit', ['schedule'=>$value['hashed_id'], 'buffet'=>$buffet]) }}" title="Editar '{{ App\Enums\DayWeek::getEnumByName($value['day_week']) }}'">✏️</a>
-                                        @if($value['status'] !== App\Enums\DecorationStatus::UNACTIVE->name)
+                                        @if($value['status'] === App\Enums\ScheduleStatus::ACTIVE->name)
+                                            <a href="{{ route('schedule.edit', ['schedule'=>$value['hashed_id'], 'buffet'=>$buffet]) }}" title="Editar '{{ App\Enums\DayWeek::getEnumByName($value['day_week']) }}'">✏️</a>
+                                        @endif
+                                        @if($value['status'] !== App\Enums\ScheduleStatus::UNACTIVE->name)
                                             <form action="{{ route('schedule.destroy', ['schedule'=>$value['hashed_id'], 'buffet'=>$buffet]) }}" method="post" class="inline">
                                                 @csrf
                                                 @method('delete')
@@ -65,7 +73,7 @@
                                                 @csrf
                                                 @method('patch')
                                                 <input type="hidden" name="status" value="{{App\Enums\ScheduleStatus::ACTIVE->name }}">
-                                                <button type="submit" title="Deletar '{{ $value['main_theme'] }}'">✅</button>
+                                                <button type="submit" title="Ativar '{{ $value['start_time'] }}'">✅</button>
                                             </form>
                                         @endif                                        
                                     </td>

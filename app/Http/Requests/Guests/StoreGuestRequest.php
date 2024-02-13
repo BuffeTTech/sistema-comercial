@@ -31,7 +31,7 @@ class StoreGuestRequest extends FormRequest
             'rows.*.age' => 'required|integer',
             'rows.*.status' => [
                 'string', Rule::in(array_column(GuestStatus::cases(), 'name'))
-            ]
+              ]
             ];
     }
 }

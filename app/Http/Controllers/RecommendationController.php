@@ -33,7 +33,7 @@ class RecommendationController extends Controller
         $this->authorize('viewAny', [User::class, $buffet]);
 
 
-        return view('recommendation.index',['buffet'=>$buffet_slug,'recommendations'=>$recommendations]);
+        return view('recommendation.index',['buffet'=>$buffet,'recommendations'=>$recommendations]);
     }
 
     public function create(Request $request){
@@ -57,13 +57,13 @@ class RecommendationController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
+        $this->authorize('create', [User::class, $buffet]);
+        
         $recommendation = $this->recommendation->create([
             'content' => $request->content,
             'status' => RecommendationStatus::ACTIVE->name,
             'buffet_id' => $buffet->id,
         ]);
-
-        $this->authorize('create', [User::class, $buffet]);
 
         return redirect()->route('recommendation.show',['buffet'=>$buffet->slug, 'recommendation'=>$recommendation->hashed_id]);
 
@@ -114,12 +114,11 @@ class RecommendationController extends Controller
         if(!$recommendation){
             return redirect()->back()->withErrors(['message'=>'Recomendação não encontrada'])->withInput();
         }
+        $this->authorize('update', [User::class, $recommendation, $buffet]);
 
         $recommendation->update([
             'content' => $request->content
         ]);
-
-        $this->authorize('update', [User::class, $recommendation, $buffet]);
 
         return redirect()->route('recommendation.index',['buffet'=>$buffet->slug]);
 
@@ -170,13 +169,42 @@ class RecommendationController extends Controller
             return redirect()->back()->withErrors(['message'=>'Recommendation não validada'])->withInput();
         }
         
+        $this->authorize('delete', [User::class,$recommendation, $buffet]);
+
         $recommendation->update([
             'status'=>RecommendationStatus::UNACTIVE->name
         ]);
 
-        $this->authorize('delete', [User::class,$recommendation, $buffet]);
-
         return redirect()->route('recommendation.index',['buffet'=>$buffet->slug]);
 
+    }
+
+    public function change_status(Request $request){
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug',$buffet_slug)->get()->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+
+        $recommendation_id = $this->hashids->decode($request->recommendation);
+        if(!$recommendation_id) {
+            return redirect()->back()->withErrors(['message'=>'Recomendação não encontrada'])->withInput();
+        }
+        
+        $recommendation_id = $recommendation_id[0];
+        $recommendation = $this->recommendation->where('id',$recommendation_id)->where('buffet_id', $buffet->id)->get()->first();
+        
+        if(!$recommendation){
+            return redirect()->back()->withErrors(['message'=>'Recommendation não validada'])->withInput();
+        }
+        
+        $this->authorize('change_status', [User::class,$recommendation, $buffet]);
+
+        $recommendation->update([
+            'status'=>$request->status
+        ]);
+
+        return redirect()->route('recommendation.index',['buffet'=>$buffet->slug]);
     }
 }

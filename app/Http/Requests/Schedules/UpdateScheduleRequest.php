@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Schedules;
 
+use App\Enums\DayWeek;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateScheduleRequest extends FormRequest
@@ -22,7 +23,11 @@ class UpdateScheduleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'day_week' => ['required', 'in:' . implode(',', DayWeek::array())],
+            'start_time'=>'required|date_format:H:i', // esse formato é Hora:minuto
+            'duration'=>'required|numeric|min:60', //minimo de uma hora em minutos 
+            'start_block' => 'nullable|date_format:Y-m-d',
+            'end_block' => 'nullable|date_format:Y-m-d|after_or_equal:start_block',
         ];
     }
 }

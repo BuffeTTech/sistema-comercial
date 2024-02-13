@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\BuffetStatus;
+use App\Events\EditBuffetEvent;
 use App\Http\Requests\StoreBuffetRequest;
 use App\Http\Requests\UpdateBuffetRequest;
 use App\Models\Address;
@@ -266,7 +267,53 @@ class BuffetController extends Controller
      */
     public function update(UpdateBuffetRequest $request)
     {
-        dd('aa', $request);
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->with(['buffet_phone1','buffet_phone2', 'buffet_address'])->where('slug', $buffet_slug)->get()->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['generic_error'=>'Buffet not found'])->withInput();
+        }
+
+        $old_slug = $buffet->slug;
+
+        if($request->phone1) {
+            if($buffet->phone1) {
+                $this->phone->find($buffet->phone1)->update(['number'=>$request->phone1]);
+            } else {
+                $buffet->update(['phone1'=>$this->phone->create(['number'=>$request->phone1])->id]);
+            }
+        }
+        if($request->phone2) {
+            if($buffet->phone2) {
+                $this->phone->find($buffet->phone2)->update(['number'=>$request->phone2]);
+            } else {
+                $buffet->update(['phone2'=>$this->phone->create(['number'=>$request->phone2])->id]);
+            }
+        }
+        $address = $this->address->find($buffet->address)->update([
+            'zipcode' => $request->zipcode, 
+            'street' => $request->street, 
+            'number' => $request->number, 
+            'complement' => $request->complement ?? null, 
+            'neighborhood' => $request->neighborhood, 
+            'state' => $request->state, 
+            'city' => $request->city, 
+            'country' => $request->country
+        ]);
+
+        $buffet->update([
+            'trading_name' => $request->trading_name,
+            'email' => $request->email_buffet,
+            'slug' => $request->slug,
+            'document'=>$request->document_buffet,
+            'status'=>$request->status ?? BuffetStatus::ACTIVE->name
+        ]); 
+
+        $buffet = $this->buffet->where('slug', $request->slug)->get()->first();
+        
+        event(new EditBuffetEvent(buffet: $buffet, old_slug: $old_slug));
+
+        return back()->with('success', "Update successfully");
     }
 
     /**

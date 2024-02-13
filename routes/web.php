@@ -70,6 +70,8 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
 
     //Route::post('/survey/answer', [SatisfactionSurveyController::class, 'answer'])->name('survey.answer');
     Route::resource('{buffet}/recommendation',RecommendationController::class);
+    Route::patch('/{buffet}/recommendation/{recommendation}/change_status', [RecommendationController::class,'change_status'])->name('recommendation.change_status');
+
 
 });
 
