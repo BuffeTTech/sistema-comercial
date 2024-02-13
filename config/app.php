@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 
 return [
+    'administrative_url' => env('ADMINISTRATIVE_URL', 'http://sistema-administrativo-laravel.test-1'),
 
     /*
     |--------------------------------------------------------------------------
