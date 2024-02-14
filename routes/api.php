@@ -24,6 +24,7 @@ Route::delete('/buffet/{slug}', [BuffetController::class, 'delete_buffet_api'])-
 
 Route::post('/subscription', [SubscriptionController::class, 'create_subscription'])->name('buffet.subscription.store');
 Route::post('/subscription/permission', [SubscriptionController::class, 'create_permission'])->name('buffet.permission.store');
+Route::post('/subscription/permission/many', [SubscriptionController::class, 'create_many_permission'])->name('buffet.permission.store_many');
 Route::post('/subscription/role', [SubscriptionController::class, 'create_role'])->name('buffet.role.store');
 // Route::post('/subscription/permission/{permission}', [SubscriptionController::class, 'create_permission'])->name('buffet.permission.store');
 Route::post('/subscription/permission/{permission}', [SubscriptionController::class, 'insert_role_in_permission'])->name('buffet.permission.insert_role');

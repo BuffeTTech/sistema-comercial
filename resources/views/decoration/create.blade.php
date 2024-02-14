@@ -45,19 +45,14 @@
                                 <x-text-input id="price" class="block mt-1 w-full" type="number" name="price" :value="old('price')" required autofocus autocomplete="price" />
                                 <x-input-error :messages="$errors->get('price')" class="mt-2" />
                             </div>
-
-                            <div>
-                                <x-input-label for="decoration_photos1" :value="__('Inserir Imagem')" />
-                                <x-text-input id="decoration_photos1" class="block mt-1 w-full" accept="image/png, image/gif, image/jpeg" type="file" name="decoration_photos[]" :value="old('decoration_photos1')" required autofocus autocomplete="decoration_photos1" />
-                                <x-input-error :messages="$errors->get('decoration_photos[0]')" class="mt-2" />
-                            </div> 
-
-                            <div>
-                                <x-input-label for="decoration_photos2" :value="__('Inserir Imagem')" />
-                                <x-text-input id="decoration_photos2" class="block mt-1 w-full" accept="image/png, image/gif, image/jpeg" type="file" name="decoration_photos[]" :value="old('')" required autofocus autocomplete="" />
-                                <x-input-error :messages="$errors->get('decoration_photos[1]')" class="mt-2" />
-                            </div> 
-
+                            <x-input-error :messages="$errors->get('decorations_photos_generic')" class="mt-2" />
+                            @for($i=0; $i<$configurations->max_decoration_photos; $i++)
+                                <div>
+                                    <x-input-label for="decoration_photos{{ $i+1 }}" :value="__('Inserir Imagem')" />
+                                    <x-text-input id="decoration_photos{{ $i+1 }}" class="block mt-1 w-full" accept="image/png, image/gif, image/jpeg" type="file" name="decoration_photos[]" :value="old('decoration_photos{{ $i+1 }}')" required autofocus />
+                                    <x-input-error :messages="$errors->get('decoration_photos[{{ $i }}]')" class="mt-2" />
+                                </div> 
+                            @endfor
 
                             <div class="flex items-center justify-end mt-4">
                                 <x-primary-button class="ms-4">

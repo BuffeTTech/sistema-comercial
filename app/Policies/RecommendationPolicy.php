@@ -29,7 +29,7 @@ class RecommendationPolicy
         if($user->buffet_id == $buffet->id) {
             return $user->can('list recommendation');
         }
-
+        
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
             return $user->can('list recommendation');

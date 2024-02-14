@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Events\BookingCreatedEvent;
 use App\Events\ChangeBookingStatusEvent;
+use App\Events\EditBuffetEvent;
+use App\Listeners\EditBuffetInAdministrativeListener;
 use App\Listeners\SendMailBookingCreatedListener;
 use App\Listeners\SendMailBookingStatusListener;
 use Illuminate\Auth\Events\Registered;
@@ -28,6 +30,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         ChangeBookingStatusEvent::class => [
             SendMailBookingStatusListener::class
+        ],
+        EditBuffetEvent::class => [
+            EditBuffetInAdministrativeListener::class
         ]
     ];
 

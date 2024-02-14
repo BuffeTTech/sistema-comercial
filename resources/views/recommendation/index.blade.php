@@ -7,7 +7,9 @@
 
                 <div class="p-6 text-gray-900">
                     <div>
-                        <p><strong><a href="{{route('recommendation.create',['buffet'=>$buffet->slug])}}">Criar nova Recomendação</a></strong></p>
+                        @if(count($recommendations) < $configurations['max_recommendations'])
+                            <p><strong><a href="{{ route('recommendation.create', ['buffet'=>$buffet->slug]) }}">Criar recomendação</a></strong></p>
+                        @endif
                     </div>
                     <div class="overflow-auto">
                     <table class="w-full">

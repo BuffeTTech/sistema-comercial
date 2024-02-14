@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Enums\RecommendationStatus;
 use App\Models\Buffet;
+use App\Models\BuffetSubscription;
 use App\Models\Recommendation;
+use App\Models\SubscriptionConfiguration;
 use App\Models\User;
+use Carbon\Carbon;
 use Hashids\Hashids;
 use Illuminate\Http\Request;
 
@@ -30,10 +33,16 @@ class RecommendationController extends Controller
 
         $recommendations = $this->recommendation->where('buffet_id',$buffet->id)->get();
 
-        $this->authorize('viewAny', [User::class, $buffet]);
+        $this->authorize('viewAny', [Recommendation::class, $buffet]);
 
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
+        }
 
-        return view('recommendation.index',['buffet'=>$buffet,'recommendations'=>$recommendations]);
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
+        return view('recommendation.index',['buffet'=>$buffet,'recommendations'=>$recommendations, 'configurations'=>$configurations]);
     }
 
     public function create(Request $request){
@@ -44,7 +53,19 @@ class RecommendationController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
-        $this->authorize('create', [User::class, $buffet]);
+        $this->authorize('create', [Recommendation::class, $buffet]);
+
+        $recommendations = $this->recommendation->where('buffet_id',$buffet->id)->get();
+
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['generic_error'=> "Buffet is not active"])->withInput();
+        }
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
+        if(count($recommendations) >= $configurations['max_recommendations']) {
+            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais recomendações neste plano.'])->withInput();
+        }
 
         return view('recommendation.create',['buffet'=>$buffet]);
     }
@@ -57,7 +78,19 @@ class RecommendationController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
-        $this->authorize('create', [User::class, $buffet]);
+        $this->authorize('create', [Recommendation::class, $buffet]);
+
+        $recommendations = $this->recommendation->where('buffet_id',$buffet->id)->get();
+
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['generic_error'=> "Buffet is not active"])->withInput();
+        }
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
+        if(count($recommendations) >= $configurations['max_recommendations']) {
+            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais recomendações neste plano.'])->withInput();
+        }
         
         $recommendation = $this->recommendation->create([
             'content' => $request->content,
@@ -89,7 +122,7 @@ class RecommendationController extends Controller
             return redirect()->back()->withErrors(['message'=>'Recomendação não encontrada'])->withInput();
         }
 
-        $this->authorize('view', [User::class,$recommendation, $buffet]);
+        $this->authorize('view', [Recommendation::class,$recommendation, $buffet]);
 
         return view('recommendation.show',['buffet'=>$buffet,'recommendation'=>$recommendation]);
 
@@ -114,7 +147,7 @@ class RecommendationController extends Controller
         if(!$recommendation){
             return redirect()->back()->withErrors(['message'=>'Recomendação não encontrada'])->withInput();
         }
-        $this->authorize('update', [User::class, $recommendation, $buffet]);
+        $this->authorize('update', [Recommendation::class, $recommendation, $buffet]);
 
         $recommendation->update([
             'content' => $request->content
@@ -144,7 +177,7 @@ class RecommendationController extends Controller
             return redirect()->back()->withErrors(['message'=>'Recomendação não encontrada'])->withInput();
         }
 
-        $this->authorize('update', [User::class,$recommendation, $buffet]);
+        $this->authorize('update', [Recommendation::class,$recommendation, $buffet]);
 
         return view('recommendation.update',['buffet'=>$buffet,'recommendation'=>$recommendation]);
     }
@@ -169,7 +202,7 @@ class RecommendationController extends Controller
             return redirect()->back()->withErrors(['message'=>'Recommendation não validada'])->withInput();
         }
         
-        $this->authorize('delete', [User::class,$recommendation, $buffet]);
+        $this->authorize('delete', [Recommendation::class,$recommendation, $buffet]);
 
         $recommendation->update([
             'status'=>RecommendationStatus::UNACTIVE->name
@@ -199,7 +232,7 @@ class RecommendationController extends Controller
             return redirect()->back()->withErrors(['message'=>'Recommendation não validada'])->withInput();
         }
         
-        $this->authorize('change_status', [User::class,$recommendation, $buffet]);
+        $this->authorize('change_status', [Recommendation::class,$recommendation, $buffet]);
 
         $recommendation->update([
             'status'=>$request->status

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Subscription;
+use App\Models\SubscriptionConfiguration;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,7 +15,8 @@ class SubscriptionController extends Controller
     public function __construct(
         protected Subscription $subscription,
         protected Permission $permission,
-        protected Role $role
+        protected Role $role,
+        protected SubscriptionConfiguration $configuration,
     )
     {
     }
@@ -46,7 +48,15 @@ class SubscriptionController extends Controller
             'status'=>$request->subscription['status'],
         ]);
 
-        return response(status: 201)->json($subscription);
+        $configuration = $this->configuration->create([
+            "max_employees"=>$request->configuration['max_employees'],
+            "max_food_photos"=>$request->configuration['max_food_photos'],
+            "max_decoration_photos"=>$request->configuration['max_decoration_photos'],
+            "max_recommendations"=>$request->configuration['max_recommendations'],
+            "subscription_id"=>$subscription->id,
+        ]);
+
+        return response(status: 201)->json([$subscription, $configuration]);
     }
     public function insert_role_in_permission(Request $request){
         $permission = $request->permission;
@@ -103,6 +113,30 @@ class SubscriptionController extends Controller
         ]);
 
         return response(status: 201)->json($permission);
+    }
+
+    public function create_many_permission(Request $request) {
+        $data = $request->data; // array de permissoes laravel permission
+        $response = [];
+        foreach ($data as $permission) {
+            $permission_exists = $this->permission->where('name', $permission['permission']['name'])->get()->first();
+            $permi = $permission['permission']['name'];
+            if(!$permission_exists) {
+                $permission_exists = $this->permission->create([
+                    'name'=>$permi,
+                ]);
+            }
+            $roles = [];
+            foreach($permission['roles'] as $role) {
+                $role_eloquent = $this->role->where('name', $role['name'])->get()->first();
+                if($role_eloquent) {
+                    $role_eloquent->givePermissionTo($permission_exists['name']);
+                    array_push($roles, $role_eloquent);
+                }
+            }
+            array_push($response, ['permission'=>$permi, 'roles'=>$role]);
+        }
+        return response()->json($response, 201);
     }
 
 
