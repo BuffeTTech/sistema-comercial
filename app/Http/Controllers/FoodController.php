@@ -44,7 +44,7 @@ class FoodController extends Controller
         $this->authorize('viewAny', [Food::class, $buffet]);
 
         $foods = $this->food->where('buffet_id', $buffet->id)->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
-        return view('foods.index', ['foods'=>$foods, 'buffet'=>$buffet_slug]);
+        return view('foods.index', ['foods'=>$foods, 'buffet'=>$buffet]);
     }
 
     public function not_found() {
@@ -133,7 +133,7 @@ class FoodController extends Controller
             }
         }
 
-        return redirect()->route('food.show', ['food'=>$food, 'buffet'=>$buffet_slug]); 
+        return redirect()->route('food.show', ['food'=>$food, 'buffet'=>$buffet]); 
     }
 
     /**
@@ -158,7 +158,7 @@ class FoodController extends Controller
 
         // $food = $this->food->where('buffet', $buffet->id);
 
-        return view('foods.show', ['food'=>$food, 'buffet'=>$buffet_slug, 'foods_photo'=> $foods_photo]);
+        return view('foods.show', ['food'=>$food, 'buffet'=>$buffet, 'foods_photo'=> $foods_photo]);
     }
 
     /**
@@ -310,7 +310,7 @@ class FoodController extends Controller
 
         $pk = $this->food->find($food->id);
         
-        return redirect()->route('food.edit', ['buffet'=>$buffet->slug, 'food'=>$pk->slug]);
+        return redirect()->route('food.edit', ['buffet'=>$buffet, 'food'=>$pk->slug]);
     }
 
     /**
@@ -373,7 +373,7 @@ class FoodController extends Controller
 
         $food->update(['status'=>$request->status]);
 
-        return redirect()->route('food.index', ['buffet'=>$buffet_slug]);
+        return redirect()->route('food.index', ['buffet'=>$buffet]);
      }
 
      // API

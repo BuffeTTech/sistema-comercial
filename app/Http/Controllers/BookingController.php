@@ -525,6 +525,17 @@ class BookingController extends Controller
         return view('bookings.calendar', ['buffet'=>$buffet]);
     }
 
+    public function buffet_calendar(Request $request) {
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+
+        return view('bookings.calendar-page', ['buffet'=>$buffet]);
+    }
+
     public function reschedule_party() {
         
     }

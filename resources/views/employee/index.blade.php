@@ -1,79 +1,101 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Funcionários') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <div class="overflow-auto">
-                        <div>
-                            <h1 class="inline-flex items-center border border-transparent text-lg leading-4 font-semi-bold">Listagem dos Funcionários</h1>
-                            @if(count($employees) < $configurations['max_employees'])
-                                <h2><a href="{{ route('employee.create', ['buffet'=>$buffet->slug]) }}">Criar funcionário</a></h2>
-                            @endif
-                        </div>
-                        @if (session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
-                        @endif
-                        <table class="w-full">
-                            <thead class="bg-gray-50 border-b-2 border-gray-200">
-                                <tr>
-                                    <th class="p-3 text-sm font-semibold tracking-wide text-center">Nome</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide text-center">Email</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide text-center">Cargo</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide text-center">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100">
-                                @if($employees->total() === 0)
-                                <tr>
-                                    <td colspan="7" class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">Nenhum funcionário encontrado</td>
-                                </tr>
-                                @else   
-                                    @foreach($employees->items() as $employee)
-                                    <tr>
-                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                            <a href="{{ route('employee.show', ['buffet'=>$buffet->slug, 'employee'=>$employee->hashed_id]) }}" class="font-bold text-blue-500 hover:underline">
-                                                {{ $employee->name }}
-                                            </a>
-                                        </td>
-                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $employee->email }}</td>
-                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $employee->roles[0]->name ?? ""}}</td>
-                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.user_status :status="$employee->status" /></td>
-
-                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                             @can('show employee')
-                                            <a href="{{ route('employee.show', ['buffet'=>$buffet->slug, 'employee'=>$employee->hashed_id]) }}" title="Visualizar '{{$employee->name}}'">👁️</a>
-                                            @endcan
-                                            @if($employee->status !== \App\Enums\UserStatus::UNACTIVE->name)
-                                                @can('update employee')
-                                                    <a href="{{ route('employee.edit', ['buffet'=>$buffet->slug, 'employee'=>$employee->hashed_id]) }}" title="Editar '{{$employee->name}}'">✏️</a>
-                                                @endcan
-                                                @can('delete employee')
-                                                    <form action="{{ route('employee.destroy', ['buffet'=>$buffet->slug, 'employee'=>$employee->hashed_id]) }}" method="post" class="inline">
-                                                        @csrf
-                                                        @method('delete')
-                                                        <button type="submit" title="Deletar '{{ $employee->name }}'">❌</button>
-                                                    </form>
-                                                @endcan
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                @endif
-                            </tbody>
-                        </table>
-                        {{ $employees->links('components.pagination') }}
+@section('content')
+    @include('layouts.navbars.auth.topnav', ['title' => 'Funcionários'])
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header pb-0">
+                        <h6>Listagem dos Funcionários</h6>
+                        <a href="{{ route('employee.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Adicionar Funcionário">Adicionar Funcionário</a>                                        
                     </div>
-
+                    <div id="alert">
+                        @include('components.alert')
+                    </div>
+                    <div class="card-body px-0 pt-0 pb-2">
+                        <div class="table-responsive p-0">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Nome</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Email</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Cargo</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Status</th>
+                                        <th class="text-secondary opacity-7"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if(count($employees) === 0)
+                                    <tr>
+                                        <td colspan="3" class="p-3 text-sm text-center">Nenhum funcionário encontrado</td>
+                                    </tr>
+                                    @else
+                                        @foreach($employees as $value)
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex px-2 py-1">
+                                                        <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                            <h6 class="text-sm mb-0">{{$value['name']}}</h6>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex px-2 py-1">
+                                                        <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                            <p class="text-sm mb-0">{{$value['email']}}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex px-2 py-1">
+                                                        <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                            <p class="text-sm mb-0">{{$value->roles[0]->name ?? ""}}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <x-status.user_status :status="$value['status']" />
+                                                </td>
+                                                <td class="align-middle">
+                                                    @can('view employee')
+                                                        <a href="{{ route('employee.show', ['employee'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" title="Visualizar '{{$value->name}}'" class="btn btn-outline-primary btn-sm fs-6">👁️</a>
+                                                    @endcan
+                                                    @can('update employee')
+                                                        @if($value['status'] === App\Enums\UserStatus::ACTIVE->name)
+                                                            <a href="{{ route('employee.edit', ['employee'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" title="Editar '{{$value->name}}'" class="btn btn-outline-primary btn-sm fs-6">✏️</a>
+                                                        @endif
+                                                    @endcan
+                                                    @can('change employee status')
+                                                        @if($value['status'] !== App\Enums\UserStatus::UNACTIVE->name)
+                                                            <form action="{{ route('employee.destroy', ['employee'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="POST" class="d-inline">
+                                                                @csrf
+                                                                @method('delete')
+                                                                <button type="submit" class="btn btn-outline-primary btn-sm fs-6" title="Desativar Funcionário" >❌</button>                                        
+                                                            </form>
+                                                        @else
+                                                            <form action="{{ route('employee.change_status', ['employee'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="post" class="d-inline">
+                                                                @csrf
+                                                                @method('patch')
+                                                                <input type="hidden" name="status" value="{{ App\Enums\UserStatus::ACTIVE->name }}">
+                                                                <button type="submit" title="Ativar Funcionário" class="btn btn-outline-primary btn-sm fs-6">✅</button>
+                                                            </form>
+                                                        @endif    
+                                                    @endcan
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @endif
+                                </tbody>
+                            </table>
+                            <div class="px-2">
+                                {{ $employees->links('components.pagination') }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        @include('layouts.footers.auth.footer')
     </div>
-</x-app-layout>
+@endsection

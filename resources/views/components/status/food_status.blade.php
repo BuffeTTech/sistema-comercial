@@ -1,20 +1,21 @@
 @props(['status'])
-
 @if ($status)
     @php
         $class = "";
         switch($status) {
             case 'ACTIVE':
-                $class = "p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50";
+                $class = "badge badge-md bg-success";
+                $name = \App\Enums\FoodStatus::getEnumByName($status)->value;
                 break;
             case 'UNACTIVE':
-                $class = "p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50";
-            break;
+                $class = "badge badge-md bg-danger";
+                $name = \App\Enums\FoodStatus::getEnumByName($status)->value;
+                break;
             default:
-                $class = "p-1.5 text-xs font-medium uppercase tracking-wider text-gray-800 bg-gray-400 rounded-lg bg-opacity-50";
+                $class = "badge badge-md bg-secondary";
+                $name = "Desconhecido";
                 break;
         }
     @endphp
-
-    <span class="{{$class}}">{{ \App\Enums\FoodStatus::getEnumByName($status) }}</span>
+    <span class="{{$class}}">{{ $name }}</span>
 @endif

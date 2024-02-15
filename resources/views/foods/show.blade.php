@@ -1,62 +1,87 @@
-<x-app-layout>
+@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 float-left" style="width: 50%; border-right: 3px solid #000000;">
-                    <div class="bg-gray-50 border-b-2 border-gray-200">
-                        <p><strong>Nome do pacote:</strong> {{ $food->name_food }}</p><br>
-                        <p><strong>Slug:</strong> {{ $food->slug }}</p><br>
-                        <p><strong>Preço:</strong> {{ $food->price }}</p><br>
-                        @php
-                        $class_active = "p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50";
-                        $class_unactive = 'p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50';
-                        @endphp
-                        <p><strong>Status:</strong>
-                            <form action="{{ route('food.change_status', ['buffet' => $buffet, 'food' => $food['slug']]) }}" method="post" class="inline">
-                                @csrf
-                                @method('patch')
-
-                                <label for="status" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"></label>
-                                <select name="status" id="status" required onchange="this.form.submit()">
-                                    @foreach( App\Enums\FoodStatus::array() as $key=>$status )
-                                        <option value="{{$status}}" {{ $food['status'] == $status ? 'selected' : ""}}>{{$key}}</option>
-                                    @endforeach
-                                    <!-- <option value="invalid2"  disabled>Nenhum horario disponivel neste dia, tente novamente!</option> -->
-                                </select>
-                            </form>
-                        </p><br>
-                        <p><strong>Descricao das comidas:</strong></p>
-                        {!! $food->food_description !!}
-                        <br>
-                        <br>
-                        <p><strong>Descricao das bebidas:</strong></p>
-                        {!! $food->beverages_description !!}
+@section('content')
+    @include('layouts.navbars.auth.topnav', ['title' => 'Comidas', 'subtitle'=>"Visualizar comida"])
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header pb-0">
+                        <h6>Pacotes de comida</h6>
                     </div>
-                    <br><br>
+                    <div id="alert">
+                        @include('components.alert')
+                    </div>
+                    <div class="card-body px-0 pt-0 pb-2">
+                        <div class="px-4">
+                            <h3>{{ $food->name_food }}</h3>
+                            <p class="text-md mb-0"><strong>Slug:</strong> {{ $food->slug }}</p>
+                            <p class="text-lg mb-0"><strong>Status:</strong> <x-status.food_status :status="$food['status']" /></p>
+                            <p class="text-lg mb-0"><span class="badge bg-gradient-primary"><strong>Preço:</strong> R$ {{ $food->price }}</span></p>
 
-                    <div class="flex items-center ml-auto float-down">
-                        <a href="{{ route('food.edit', ['food'=>$food->slug, 'buffet'=>$buffet]) }}" class="bg-amber-300 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded">
-                            <div class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4">
-                                Editar
+                            <div class="accordion-1">
+                                <div class="row">
+                                    <div class="accordion" id="accordionRental">
+                                        <div class="accordion-item mb-2">
+                                            <h5 class="accordion-header" id="headingOne">
+                                                <button class="accordion-button border-bottom font-weight-bold collapsed ps-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                                    Descrição das comidas
+                                                <i class="collapse-close fa fa-plus text-xs pt-1 position-absolute end-0 me-3" aria-hidden="true"></i>
+                                                <i class="collapse-open fa fa-minus text-xs pt-1 position-absolute end-0 me-3" aria-hidden="true"></i>
+                                                </button>
+                                            </h5>
+                                            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionRental" style="">
+                                                <div class="accordion-body text-sm opacity-8">
+                                                    {!! $food->food_description !!}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="accordion-item mb-2">
+                                            <h5 class="accordion-header" id="headingTwo">
+                                                <button class="accordion-button border-bottom font-weight-bold collapsed ps-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                    Descrição das bebidas
+                                                <i class="collapse-close fa fa-plus text-xs pt-1 position-absolute end-0 me-3" aria-hidden="true"></i>
+                                                <i class="collapse-open fa fa-minus text-xs pt-1 position-absolute end-0 me-3" aria-hidden="true"></i>
+                                                </button>
+                                            </h5>
+                                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionRental" style="">
+                                                <div class="accordion-body text-sm opacity-8">
+                                                    {!! $food->beverages_description !!}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </a>
+                            
+                        @foreach($foods_photo as $key=>$photo)
+                            <img {{ $key == 0 ? 'active' : ''}}" src="{{ asset('storage/foods'. $photo->file_path) }}" alt="{{ $photo->file_name }}"> 
+                        @endforeach
+                        <br>
+                        <br>
+                        @can('update food')
+                            <a href="{{ route('food.edit', ['buffet'=>$buffet->slug, 'food'=>$food->slug]) }}" title="Editar recomendação" class="btn btn-outline-primary btn-sm fs-6">Editar</a>
+                        @endcan
+                        @can('change food status')
+                            @if($food['status'] !== App\Enums\FoodStatus::UNACTIVE->name)
+                                <form action="{{ route('food.destroy', ['buffet'=>$buffet->slug, 'food'=>$food->slug]) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('delete')
+                                    <button type="submit" class="btn btn-outline-primary btn-sm fs-6" title="Desativar recomendação">❌ Desativar pacote de comida</button>                                        
+                                </form>
+                            @else
+                                <form action="{{ route('food.change_status', ['food'=>$food['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="post" class="d-inline">
+                                    @csrf
+                                    @method('patch')
+                                    <input type="hidden" name="status" food="{{App\Enums\FoodStatus::ACTIVE->name }}">
+                                    <button type="submit" title="Ativar recomendação" class="btn btn-outline-primary btn-sm fs-6">✅ Ativar pacote de comida</button>
+                                </form>
+                            @endif  
+                        @endcan
                     </div>
                 </div>
-
-                <div class="p-6 text-gray-900 float-right" style="width: 50%;">
-                    <!-- Imagens -->
-                    <img src="{{ asset('storage/foods'. $foods_photo[0]->file_path) }}" alt="{{ $foods_photo[0]->file_name }}"> 
-                    <img src="{{ asset('storage/foods'. $foods_photo[1]->file_path) }}" alt="{{ $foods_photo[1]->file_name }}">     
-                </div>
-
-                {{-- <div class="p-6 text-gray-900 float-right" style="width: 50%;">
-                    <!-- Imagens -->
-                    <img src="{{asset('storage/foods/'.$food->photo_1)}}" alt="foto1">
-                    <img src="{{asset('storage/foods/'.$food->photo_2)}}" alt="foto2">
-                    <img src="{{asset('storage/foods/'.$food->photo_3)}}" alt="foto3">
-                </div> --}}
             </div>
         </div>
+        @include('layouts.footers.auth.footer')
     </div>
-</x-app-layout>
+@endsection

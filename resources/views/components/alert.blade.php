@@ -4,9 +4,19 @@
             <p class="text-white mb-0">{{ session()->get('succes') }}</p>
         </div>
     @endif
-    @if ($message = session()->has('error'))
-        <div class="alert alert-danger" role="alert">
-            <p class="text-white mb-0">{{ session()->get('error') }}</p>
-        </div>
+    @if ($errors->any())
+        @foreach ($errors->all() as $error)
+            <div class="alert alert-danger alert-component" role="alert">
+                <p class="text-white mb-0">{{ $error }}</p>
+            </div>
+        @endforeach
     @endif
 </div>
+
+<script>
+    const alert_component = document.querySelector('#alert');
+    setTimeout(() => {
+        console.log(alert_component)
+        alert_component.innerHTML = ""
+    }, 6000);
+</script>

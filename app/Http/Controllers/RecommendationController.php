@@ -42,20 +42,21 @@ class RecommendationController extends Controller
 
         $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
 
-        return view('recommendation.index',['buffet'=>$buffet,'recommendations'=>$recommendations, 'configurations'=>$configurations]);
+        $total = $this->recommendation->where('buffet_id',$buffet->id)->where('status', RecommendationStatus::ACTIVE->name)->get();
+        return view('recommendation.index',['buffet'=>$buffet,'recommendations'=>$recommendations, 'configurations'=>$configurations, 'total'=>count($total)]);
     }
 
     public function create(Request $request){
         $buffet_slug = $request->buffet;
-        $buffet = $this->buffet->where('slug',$buffet_slug)->get()->first();
 
+        $buffet = $this->buffet->where('slug',$buffet_slug)->get()->first();
         if(!$buffet || !$buffet_slug) {
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
         $this->authorize('create', [Recommendation::class, $buffet]);
 
-        $recommendations = $this->recommendation->where('buffet_id',$buffet->id)->get();
+        $recommendations = $this->recommendation->where('buffet_id',$buffet->id)->where('status', RecommendationStatus::ACTIVE->name)->get();
 
         $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
         if($buffet_subscription->expires_in < Carbon::now()) {
@@ -80,7 +81,7 @@ class RecommendationController extends Controller
 
         $this->authorize('create', [Recommendation::class, $buffet]);
 
-        $recommendations = $this->recommendation->where('buffet_id',$buffet->id)->get();
+        $recommendations = $this->recommendation->where('buffet_id',$buffet->id)->where('status', RecommendationStatus::ACTIVE->name)->get();
 
         $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
         if($buffet_subscription->expires_in < Carbon::now()) {
@@ -233,6 +234,18 @@ class RecommendationController extends Controller
         }
         
         $this->authorize('change_status', [Recommendation::class,$recommendation, $buffet]);
+
+        $recommendations = $this->recommendation->where('buffet_id',$buffet->id)->where('status', RecommendationStatus::ACTIVE->name)->get();
+
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['generic_error'=> "Buffet is not active"])->withInput();
+        }
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
+        if(count($recommendations) >= $configurations['max_recommendations']) {
+            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido ativar mais recomendações neste plano.'])->withInput();
+        }
 
         $recommendation->update([
             'status'=>$request->status

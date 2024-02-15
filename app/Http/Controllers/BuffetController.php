@@ -31,6 +31,7 @@ class BuffetController extends Controller
     {
         
     }
+
     public function dashboard(Request $request) {
         $buffet_slug = $request->buffet;
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
@@ -39,7 +40,7 @@ class BuffetController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
-        return view('pages.dashboard', ['buffet'=>$buffet]);
+        return view('dashboard_buffet', ['buffet'=>$buffet]);
     }
 
     /**

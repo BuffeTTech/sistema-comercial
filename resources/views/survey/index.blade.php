@@ -1,80 +1,109 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Perguntas') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <div class="overflow-auto">
-                        <div>
-                            <h1 class="inline-flex items-center border border-transparent text-lg leading-4 font-semi-bold">Listagem dos Funcionários</h1>
-                            <h2><a href="{{ route('survey.create', ['buffet'=>$buffet->slug]) }}">Criar pergunta</a></h2>
-                        </div>
-                        @if (session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
+@section('content')
+    @include('layouts.navbars.auth.topnav', ['title' => 'Pesquisa de satisfação'])
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header pb-0 d-flex justify-content-between">
+                        <h6>Perguntas</h6>
+                        @if($total < $configurations['max_survey_questions'])
+                            <a href="{{ route('survey.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar recomendação">Criar Pesquisa</a>                                        
                         @endif
-                        <table class="w-full">
-                            <thead class="bg-gray-50 border-b-2 border-gray-200">
-                                <tr>
-                                    <th class="w-20 p-3 text-sm font-semibold tracking-wide text-center">ID</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide text-left">Pergunta</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide text-center">Respostas</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide text-center">Formato</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide text-center">Status</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide text-center">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100">
-                                @if($surveys->total() === 0)
-                                <tr>
-                                    <td colspan="7" class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">Nenhuma pergunta encontrada</td>
-                                </tr>
-                                @else   
-                                    @php
-                                    $limite_char = 50; // O número de caracteres que você deseja exibir
-                                    $class_active = "p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50";
-                                    $class_unactive = 'p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50';
-                                    @endphp
-                                    @foreach($surveys->items() as $value)
-                                    <tr class="bg-white">
-                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['id'] }}</td>
-                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-left">{!! mb_strimwidth($value['question'], 0, $limite_char, " ...") !!} <a href="{{route('survey.show', ['survey'=>$value['hashed_id'], 'buffet'=>$buffet->slug])}}" class="p-1 text-xs font-medium uppercase text-green-700 bg-green-400 rounded-lg bg-opacity-50">Ver mais</a></td>
-                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['answers'] }}</td>
-                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ App\Enums\QuestionType::fromValue($value['question_type']) }}</td>
-                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.survey_status :status="$value['status']" /></td>
-                                        <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                            <a href="{{ route('survey.show',  ['survey'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" title="Visualizar pergunta {{$value['hashed_id']}}">👁️</a>
-                                            <a href="{{ route('survey.edit',  ['survey'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" title="Editar pergunta {{$value['hashed_id']}}">✏️</a>
-                                            @if ($value['status'] == true)
-                                            <form action="{{ route('survey.destroy',['survey'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="post" class="inline">
-                                                @csrf
-                                                @method('delete')
-                                                    <button type="submit" title="Deletar pergunta {{$value['id']}}">❌</button>
-                                            </form>
-                                            @else
-                                            <form action="{{ route('survey.change_status',['survey'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="post" class="inline">
-                                                @csrf
-                                                @method('patch')
-                                                    <button type="submit" title="Ativar pergunta {{$value['id']}}">✅</button>
-                                            </form>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                @endif
-                            </tbody>
-                        </table>
-                        {{ $surveys->links('components.pagination') }}
                     </div>
-
+                    <div id="alert">
+                        @include('components.alert')
+                    </div>
+                    <div class="card-body px-0 pt-0 pb-2">
+                        <div class="table-responsive p-0">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Pergunta</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Respostas</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Formato</th>
+                                        <th
+                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Status</th>
+                                        <th class="text-secondary opacity-7"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if(count($surveys) === 0)
+                                    <tr>
+                                        <td colspan="3" class="p-3 text-sm text-center">Nenhuma pergunta encontrada</td>
+                                    </tr>
+                                    @else
+                                        @php
+                                            $limite_char = 70; // O número de caracteres que você deseja exibir
+                                        @endphp
+                                        @foreach($surveys as $value)
+                                        <tr>
+                                            <td class="text-center">
+                                                <div class="d-flex px-2 py-1">
+                                                    <div class="d-flex flex-column justify-content-center text-xxs w-100">
+                                                        <h6 class="mb-0 text-sm">{!! mb_strimwidth($value['question'], 0, $limite_char, " ...") !!}</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center"> 
+                                                <div>
+                                                    <div class="d-flex flex-column justify-content-center text-xxs w-100">
+                                                        <p class="text-sm mb-0">{{ $value['answers'] }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <div>
+                                                    <div class="d-flex flex-column justify-content-center text-xxs w-100">
+                                                        <p class="text-sm mb-0">{{ App\Enums\QuestionType::fromValue($value['question_type']) }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <x-status.survey_status :status="$value['status']" />
+                                            </td>
+                                            <td class="align-middle">
+                                                @can('view survey')
+                                                    <a href="{{ route('survey.show', ['buffet'=>$buffet->slug,'survey'=>$value->hashed_id]) }}" title="Visualizar pergunta" class="btn btn-outline-primary btn-sm fs-6">👁️</a>
+                                                @endcan
+                                                @can('update survey')
+                                                    <a href="{{ route('survey.edit', ['buffet'=>$buffet->slug, 'survey'=>$value->hashed_id]) }}" title="Editar pergunta" class="btn btn-outline-primary btn-sm fs-6">✏️</a>
+                                                @endcan
+                                                @can('change survey status')
+                                                    @if($value['status'] == true)
+                                                        <form action="{{ route('survey.destroy', ['buffet'=>$buffet->slug, 'survey'=>$value->hashed_id]) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            @method('delete')
+                                                            <button type="submit" class="btn btn-outline-primary btn-sm fs-6" title="Desativar pergunta" >❌</button>                                        
+                                                        </form>
+                                                    @else
+                                                        <form action="{{ route('survey.change_status', ['survey'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="post" class="d-inline">
+                                                            @csrf
+                                                            @method('patch')
+                                                            <input type="hidden" name="status" value="true">
+                                                            <button type="submit" title="Ativar pergunta" class="btn btn-outline-primary btn-sm fs-6">✅</button>
+                                                        </form>
+                                                    @endif    
+                                                @endcan
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    @endif
+                                </tbody>
+                            </table>
+                            <div class="px-2">
+                                {{ $surveys->links('components.pagination') }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        @include('layouts.footers.auth.footer')
     </div>
-</x-app-layout>
+@endsection

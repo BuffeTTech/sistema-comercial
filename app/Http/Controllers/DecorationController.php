@@ -63,7 +63,7 @@ class DecorationController extends Controller
         $this->authorize('viewAny', [Decoration::class, $buffet]);
 
         $decorations = $this->decoration->where('buffet_id',$buffet->id)->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
-        return view('decoration.index',['decorations'=>$decorations,'buffet'=>$buffet_slug],);
+        return view('decoration.index',['decorations'=>$decorations,'buffet'=>$buffet],);
     }
 
     public function not_found() {
@@ -142,7 +142,7 @@ class DecorationController extends Controller
                 }
             }
         }
-        return redirect()->route('decoration.show',['buffet'=>$buffet_slug, 'decoration'=>$decoration]);
+        return redirect()->route('decoration.show',['buffet'=>$buffet, 'decoration'=>$decoration]);
     }
 
     /**
@@ -164,7 +164,7 @@ class DecorationController extends Controller
         $decoration_photos = DecorationPhotos::where('decorations_id', $decoration->id)->get(); 
         
 
-        return view('decoration.show',['buffet'=>$buffet_slug, 'decoration'=>$decoration, 'decoration_photos'=>$decoration_photos]);
+        return view('decoration.show',['buffet'=>$buffet, 'decoration'=>$decoration, 'decoration_photos'=>$decoration_photos]);
     }
 
     /**
@@ -226,7 +226,7 @@ class DecorationController extends Controller
         
         $decoration_photos = $this->photos->where('id', $request->slug)->where('decorations_id', $decoration->id)->get(); 
 
-        return redirect()->route('decoration.edit', ['buffet'=>$buffet->slug, 'decoration'=>$dec->slug]);
+        return redirect()->route('decoration.edit', ['buffet'=>$buffet, 'decoration'=>$dec->slug]);
 
     }
 
@@ -332,7 +332,7 @@ class DecorationController extends Controller
         $this->authorize('change_status', [Decoration::class, $decoration, $buffet]);
         $decoration->update(['status'=>$request->status]);
 
-        return redirect()->route('decoration.index', ['buffet'=>$buffet_slug]);
+        return redirect()->route('decoration.index', ['buffet'=>$buffet]);
     }
 
     // API

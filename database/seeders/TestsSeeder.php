@@ -23,6 +23,7 @@ use App\Models\FoodPhoto;
 use App\Models\Guest;
 use App\Models\Phone;
 use App\Models\Recommendation;
+use App\Models\SatisfactionAnswer;
 use App\Models\SatisfactionQuestion;
 use App\Models\Schedule;
 use App\Models\Subscription;
@@ -54,7 +55,8 @@ class TestsSeeder extends Seeder
             "max_employees"=>6,
             "max_food_photos"=>3,
             "max_decoration_photos"=>3,
-            "max_recommendations"=>3,
+            "max_recommendations"=>7,
+            "max_survey_questions"=>6,
             "subscription_id"=>$pacote_alegria->id,
         ]);
         $user_role = Role::create(['name' => $pacote_alegria->slug.'.user']);
@@ -142,8 +144,8 @@ class TestsSeeder extends Seeder
         ]);
 
         $logo = BuffetPhoto::create([
-            'file_name'=>'169998221749.jpg',
-            'file_path'=>'/169998221749.170554800088-.jpg',
+            'file_name'=>'ddasdasdas.jpg',
+            'file_path'=>'/ddasdasdas-.jpg',
             'file_extension'=>'jpg',
             'mime_type'=>'image/jpeg',
             'file_size'=>'31904',
@@ -246,16 +248,16 @@ class TestsSeeder extends Seeder
         ]);
 
         FoodPhoto::create([
-            'file_name'=>'169998221766.jpg',
-            'file_path'=>'/169998221766.170554800078-.jpg',
+            'file_name'=>'dadsadasd.jpg',
+            'file_path'=>'/dadsadasd.jpg',
             'file_extension'=>'jpg',
             'mime_type'=>'image/jpeg',
             'file_size'=>'40847',
             'food_id'=>$food->id
         ]);
         FoodPhoto::create([
-            'file_name'=>'169998221749.jpg',
-            'file_path'=>'/169998221749.170554800088-.jpg',
+            'file_name'=>'ddasdasdas.jpg',
+            'file_path'=>'/ddasdasdas.jpg',
             'file_extension'=>'jpg',
             'mime_type'=>'image/jpeg',
             'file_size'=>'31904',
@@ -378,9 +380,20 @@ class TestsSeeder extends Seeder
         $question1 = SatisfactionQuestion::create([
             'question' => 'Qualidade da comida', 
             'status'  => true,
-            'answers'  => 0,
+            'answers'  => 2,
             'question_type' => QuestionType::M->name,
             'buffet_id' => $buffet->id,
+        ]);
+
+        SatisfactionAnswer::create([
+            "question_id"=>$question1->id,
+            "booking_id"=>$booking->id,
+            "answer"=>'25%-50%'
+        ]);
+        SatisfactionAnswer::create([
+            "question_id"=>$question1->id,
+            "booking_id"=>$booking2->id,
+            "answer"=>'25%-50%'
         ]);
 
         $question2 = SatisfactionQuestion::create([

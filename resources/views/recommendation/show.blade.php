@@ -9,6 +9,9 @@
                     <div class="card-header pb-0">
                         <h6>Recomendações de festas</h6>
                     </div>
+                    <div id="alert">
+                        @include('components.alert')
+                    </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="px-4">
                             <h5>Conteudo</h5>

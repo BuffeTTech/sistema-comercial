@@ -6,8 +6,14 @@
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4">
-                    <div class="card-header pb-0">
+                    <div class="card-header pb-0 d-flex justify-content-between">
                         <h6>Recomendações de festas</h6>
+                        @if($total < $configurations['max_recommendations'])
+                            <a href="{{ route('recommendation.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar recomendação">Criar Recomendação</a>                                        
+                        @endif
+                    </div>
+                    <div id="alert">
+                        @include('components.alert')
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive p-0">
@@ -36,7 +42,7 @@
                                             <td>
                                                 <div class="d-flex px-2 py-1">
                                                     <div class="d-flex flex-column justify-content-center text-xxs">
-                                                        {!! mb_strimwidth($value['content'], 0, $limite_char, " ...") !!}
+                                                        <p class="text-sm mb-0">{{ mb_strimwidth($value['content'], 0, $limite_char, " ...") }}</p>
                                                     </div>
                                                 </div>
                                             </td>

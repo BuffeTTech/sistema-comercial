@@ -79,7 +79,7 @@ class ScheduleController extends Controller
 
         // $this->authorize('viewAny', [Schedule::class, $buffet]);
         
-        return view('schedule.index', ['buffet'=>$buffet_slug, 'schedules'=>$schedules]); 
+        return view('schedule.index', ['buffet'=>$buffet, 'schedules'=>$schedules]); 
     }
 
     /**
@@ -133,30 +133,6 @@ class ScheduleController extends Controller
 
         return redirect()->route('schedule.show', ['buffet'=>$buffet_slug, 'schedule' =>$schedule->hashed_id]);
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Request $request)
-    {
-        $buffet_slug = $request->buffet; 
-        $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
-
-        $schedule_id = $this->hashids->decode($request->schedule);
-        if(!$schedule_id) {
-            return redirect()->back()->withErrors(['message'=>'Horário não encontrado'])->withInput();
-        }
-        $schedule_id = $schedule_id[0];
-
-        if(!$schedule = $this->schedule->where('id', $schedule_id)->where('buffet_id', $buffet->id)->first()){
-            return redirect()->route('schedule.index', ['buffet'=>$buffet_slug])->withErrors(['schedule'=>'Horário não encontrado'])->withInput();
-        }
-
-        $this->authorize('view', [Schedule::class, $schedule, $buffet]);
-    
-        return view('schedule.show',['buffet'=>$buffet_slug, 'schedule'=>$schedule]); 
-    }
-
     /**
      * Show the form for editing the specified resource.
      */
