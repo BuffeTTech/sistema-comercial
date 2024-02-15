@@ -72,7 +72,9 @@
                                     @endif
                                 </tbody>
                             </table>
-                            {{ $recommendations->links('components.pagination') }}
+                            <div class="px-2">
+                                {{ $recommendations->links('components.pagination') }}
+                            </div>
                         </div>
                     </div>
                 </div>

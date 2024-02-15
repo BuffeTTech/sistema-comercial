@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BuffetController;
 use App\Http\Controllers\FoodController;
@@ -22,13 +23,13 @@ Route::get('/', function () {
 Route::get('/{buffet}/booking/calendar', [BookingController::class,'calendar'])->name('booking.calendar');
 
 
-// Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
 //     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-//     Route::get('/dashboard', [SiteController::class, 'dashboard'])->name('dashboard');
-// });
+    Route::get('/dashboard', [SiteController::class, 'dashboard'])->name('dashboard');
+});
 
 
 Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
@@ -84,13 +85,10 @@ use App\Http\Controllers\ResetPassword;
 use App\Http\Controllers\ChangePassword;            
             
 
-// Route::get('/login', [LoginController::class, 'show'])->middleware('guest')->name('login');
-// Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login.perform');
 Route::get('/reset-password', [ResetPassword::class, 'show'])->middleware('guest')->name('reset-password');
 Route::post('/reset-password', [ResetPassword::class, 'send'])->middleware('guest')->name('reset.perform');
-Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('guest')->name('change-password');
-Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
-
+// Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('guest')->name('change-password');
+// Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
 Route::group(['middleware' => 'auth'], function () {
 	Route::get('/{buffet}/virtual-reality', [PageController::class, 'vr'])->name('virtual-reality');
 	Route::get('/{buffet}/rtl', [PageController::class, 'rtl'])->name('rtl');
@@ -99,7 +97,8 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/{buffet}/profile-static', [PageController::class, 'profile'])->name('profile-static'); 
 	Route::get('/{buffet}/sign-in-static', [PageController::class, 'signin'])->name('sign-in-static');
 	Route::get('/{buffet}/sign-up-static', [PageController::class, 'signup'])->name('sign-up-static'); 
-	Route::get('/{buffet}/{page}', [PageController::class, 'index'])->name('page');
+	// Route::get('/{buffet}/{page}', [PageController::class, 'index'])->name('page');
 	// Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 });
+
 require __DIR__.'/auth.php';

@@ -18,7 +18,7 @@ class AuthenticatedSessionController extends Controller
      * Display the login view.
      */
     public function create(Request $request)
-    {        
+    {   
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         if(!$buffet || !$buffet_slug || $buffet->status == BuffetStatus::UNACTIVE->name) {
