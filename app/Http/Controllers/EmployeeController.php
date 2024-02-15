@@ -62,7 +62,16 @@ class EmployeeController extends Controller
 
         $this->authorize('viewAny', [User::class, $buffet]);
 
-        return view('employee.index', ['buffet'=>$buffet, 'employees'=>$employees, 'configurations'=>$configurations]); 
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
+        }
+
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
+        $total = $this->user->where('buffet_id',$buffet->id)->where('status', UserStatus::ACTIVE->name)->get();
+
+        return view('employee.index', ['buffet'=>$buffet, 'employees'=>$employees, 'configurations'=>$configurations, 'total'=>count($total)]); 
     }
     
     public function create(Request $request){

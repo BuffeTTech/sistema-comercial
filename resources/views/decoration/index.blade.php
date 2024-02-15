@@ -18,15 +18,15 @@
                             <table class="table align-items-center mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                             Nome da Decoração</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                             Descrição</th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                             Slug</th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                             Preço</th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                             Status</th>
                                         <th class="text-secondary opacity-7"></th>
                                     </tr>
@@ -38,7 +38,7 @@
                                     </tr>
                                     @else
                                         @php
-                                            $limite_char = 90; // O número de caracteres que você deseja exibir
+                                            $limite_char = 40; // O número de caracteres que você deseja exibir
                                         @endphp
                                         @foreach($decorations as $value)
                                         <tr>
@@ -51,7 +51,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex px-2 py-1">
-                                                    <div class="d-flex flex-column justify-content-center text-xxs">
+                                                    <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
                                                         <p class="text-sm mb-0">{{ mb_strimwidth($value['description'], 0, $limite_char, " ...") }}</p>
                                                     </div>
                                                 </div>

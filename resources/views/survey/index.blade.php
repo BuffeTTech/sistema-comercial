@@ -22,9 +22,9 @@
                                     <tr>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Pergunta</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                             Respostas</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                             Formato</th>
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
@@ -45,7 +45,7 @@
                                         <tr>
                                             <td class="text-center">
                                                 <div class="d-flex px-2 py-1">
-                                                    <div class="d-flex flex-column justify-content-center text-xxs w-100">
+                                                    <div class="d-flex flex-column justify-content-center text-xxs">
                                                         <h6 class="mb-0 text-sm">{!! mb_strimwidth($value['question'], 0, $limite_char, " ...") !!}</h6>
                                                     </div>
                                                 </div>

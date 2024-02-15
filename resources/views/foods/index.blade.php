@@ -18,15 +18,15 @@
                             <table class="table align-items-center mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                             Nome do pacote</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                             Descrição das comidas</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                             Descriçao das bebidas</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                             Preço do pacote</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                             Slug</th>
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
@@ -47,35 +47,35 @@
                                         <tr>
                                             <td>
                                                 <div class="d-flex px-2 py-1">
-                                                    <div class="d-flex flex-column justify-content-center text-xxs w-100">
+                                                    <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
                                                         <h6 class="mb-0 text-sm">{{ $value['name_food'] }}</h6>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div>
-                                                    <div class="d-flex flex-column justify-content-center text-xxs w-100">
+                                                    <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
                                                         <p class="text-sm mb-0">{{ mb_strimwidth($value['food_description'], 0, $limite_char, " ...") }}</p>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div>
-                                                    <div class="d-flex flex-column justify-content-center text-xxs w-100">
+                                                    <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
                                                         <p class="text-sm mb-0">{{ mb_strimwidth($value['beverages_description'], 0, $limite_char, " ...") }}</p>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div>
-                                                    <div class="d-flex flex-column justify-content-center text-xxs w-100">
+                                                    <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
                                                         <p class="text-sm mb-0">{{ (float)$value['price'] }}</p>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div>
-                                                    <div class="d-flex flex-column justify-content-center text-xxs w-100">
+                                                    <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
                                                         <p class="text-sm mb-0">{{ $value['slug'] }}</p>
                                                     </div>
                                                 </div>
