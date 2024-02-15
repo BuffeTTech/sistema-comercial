@@ -18,7 +18,7 @@
                             <p class="text-md mb-0"><strong>Pergunta: </strong> {{ $survey->question }}</p>
                             <p class="text-lg mb-0"><strong>Status: </strong> </strong><x-status.survey_status :status="$survey->status" /></p>
                             <p class="text-lg mb-0"><strong>Formato: </strong>{{ App\Enums\QuestionType::fromValue($survey->question_type) }}</p>
-                            <p class="text-lg mb-0"><strong>Respostas: </strong>
+                            <p class="text-lg mb-0"><strong>Respostas: </strong> {{ $survey->answers }}</p>
                                 <div class="overflow-auto">
                                     <table class="table align-items-center mb-0">
                                         <thead>
@@ -57,7 +57,8 @@
                                             @endif
                 
                                         </tbody>
-                                    </table></p>
+                                    </table>
+                                </div>
 
                         @can('update survey question')
                             <a href="{{ route('survey.edit', ['buffet'=>$buffet->slug, 'survey'=>$survey->hashed_id]) }}" title="Editar recomendação" class="btn btn-outline-primary btn-sm fs-6">Editar</a>

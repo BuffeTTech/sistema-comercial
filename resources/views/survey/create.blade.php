@@ -9,25 +9,33 @@
                     <div class="card-header pb-0">
                         <h6>Pesquisa de satisfação</h6>
                     </div>
+                    <div id="alert">
+                        @include('components.alert')
+                    </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive px-4">
-                            <form method="POST" action="{{ route('survey.store', ['buffet'=>$buffet->slug]) }}">
+                            <form method="POST" action="{{ route('survey.store', ['buffet'=>$buffet->slug]) }}" id="form">
                                 @csrf
                                 <div class="form-group">
-                                    <label for="content">Pergunta</label>
-                                    <textarea class="form-control" id="content" rows="3" name="content"></textarea>
+                                    <label for="question" class="form-control-label">Pergunta</label>
+                                    <textarea class="form-control" id="question" rows="3" name="question" required>{{old('question')}}</textarea>
+                                    <x-input-error :messages="$errors->get('question')" class="mt-2" />
                                 </div>
-                                <div class="flex flex-wrap -mx-3 mb-6">
-                                    <div class="w-full  px-3 mb-6 md:mb-0">  
-                                        @foreach( App\Enums\QuestionType::array() as $key => $value )                          
-                                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="customRadio1">
-                                        <label class="custom-control-label" for="customRadio1">{{$key}}</label>
-        
-                                        @endforeach
+                                <div class="flex flex-wrap -mx-3 mb-6 form-group">
+                                    <label class="form-control-label">Tipo de pergunta</label>
+                                    <div class="w-full px-3 mb-6 md:mb-0">  
+                                        <div>
+                                            @foreach( App\Enums\QuestionType::array() as $key => $value )
+                                            <div class="form-check">
+                                                <input required class="form-check-input" type="radio" name="question_type" id="{{ $value }}" value="{{ $value }}" {{old('question') == $value ? 'checked' : ''}}>
+                                                <label class="custom-control-label" for="{{ $value }}">{{ $key }}</label>
+                                            </div>                  
+                                            @endforeach
+                                        </div>
                                     </div>
-                                </div>
-                                <x-input-error :messages="$errors->get('content')" class="mt-2" />
-                                <button class="btn btn-primary" type="submit">Cadastrar Recomendação</button>
+                                    <x-input-error :messages="$errors->get('question_type')" class="mt-2" />
+                                </div>                                
+                                <button class="btn btn-primary" type="submit">Cadastrar Pergunta</button>
                             </form>
                         </div>
                     </div>

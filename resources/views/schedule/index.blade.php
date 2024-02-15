@@ -21,6 +21,7 @@
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Dia da semana</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Hora de início</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Duração</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Fim</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Início de bloqueio</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Final de bloqueio</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Status</th>
@@ -54,6 +55,13 @@
                                                     <div class="d-flex px-2 py-1">
                                                         <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
                                                             <p class="text-sm mb-0">{{$value['duration']}} minutos</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="d-flex px-2 py-1">
+                                                        <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                            <p class="text-sm mb-0">{{ \Carbon\Carbon::parse($value->start_time)->addMinutes($value->duration)->format('H:i:s') }}</p>
                                                         </div>
                                                     </div>
                                                 </td>

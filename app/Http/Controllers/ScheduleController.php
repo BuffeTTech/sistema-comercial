@@ -131,7 +131,7 @@ class ScheduleController extends Controller
         $startDateTime = \Carbon\Carbon::parse($request->start_time);
         $endDateTime = $startDateTime->copy()->addMinutes($request->duration);
 
-        return redirect()->route('schedule.show', ['buffet'=>$buffet_slug, 'schedule' =>$schedule->hashed_id]);
+        return redirect()->route('schedule.index', ['buffet'=>$buffet_slug])->with(['updated', 'Horário atualizado com sucesso!']);
     }
     /**
      * Show the form for editing the specified resource.
@@ -157,7 +157,7 @@ class ScheduleController extends Controller
             return redirect()->back()->withErrors(['message'=>'Horário inativo. Altere seu status para ativo antes de tentar edita-lo'])->withInput();
         }
 
-        return view('schedule.update', ['buffet'=>$buffet_slug, 'schedule'=>$schedule]);
+        return view('schedule.update', ['buffet'=>$buffet, 'schedule'=>$schedule]);
     }
 
     /**
@@ -201,7 +201,7 @@ class ScheduleController extends Controller
         ]); 
 
 
-        return redirect()->route('schedule.show', ['buffet'=>$buffet_slug, 'schedule'=>$schedule->id]);
+        return redirect()->route('schedule.index', ['buffet'=>$buffet_slug])->with(['updated', 'Horário atualizado com sucesso!']);
     }
 
     /**
