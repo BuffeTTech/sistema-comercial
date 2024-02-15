@@ -22,13 +22,13 @@ Route::get('/', function () {
 Route::get('/{buffet}/booking/calendar', [BookingController::class,'calendar'])->name('booking.calendar');
 
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// Route::middleware(['auth', 'verified'])->group(function () {
+//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/dashboard', [SiteController::class, 'dashboard'])->name('dashboard');
-});
+//     Route::get('/dashboard', [SiteController::class, 'dashboard'])->name('dashboard');
+// });
 
 
 Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
@@ -38,42 +38,68 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     Route::put('{buffet}', [BuffetController::class, 'update'])->name('buffet.update');
     Route::put('{buffet}/logo', [BuffetController::class, 'update_logo'])->name('buffet.update_logo');
     
-    Route::get('{buffet}/booking/{booking}/guest/invite/',[GuestController::class, 'create'])->name('guest.invite');
-    Route::patch('{buffet}/booking/{booking}/guest/{guest}/change_status',[GuestController::class,'change_status'])->name('guest.change_status');
-    Route::post('{buffet}/booking/{booking}/guest',[GuestController::class, 'store'])->name('guest.store');
-    Route::get('{buffet}/booking/{booking}/guest/{guest}',[GuestController::class, 'show'])->name('guest.show');
+    // Route::get('{buffet}/booking/{booking}/guest/invite/',[GuestController::class, 'create'])->name('guest.invite');
+    // Route::patch('{buffet}/booking/{booking}/guest/{guest}/change_status',[GuestController::class,'change_status'])->name('guest.change_status');
+    // Route::post('{buffet}/booking/{booking}/guest',[GuestController::class, 'store'])->name('guest.store');
+    // Route::get('{buffet}/booking/{booking}/guest/{guest}',[GuestController::class, 'show'])->name('guest.show');
 
-    Route::patch('/{buffet}/food/{food}/change_status', [FoodController::class,'change_status'])->name('food.change_status');
-    Route::patch('/{buffet}/food/{food}/activate', [FoodController::class,'activate_food'])->name('food.activate_food');
-    Route::patch('/{buffet}/food/{food}/{foods_photo} ',[FoodController::class,'update_photo'])->name('food.update_photo');
+    // Route::patch('/{buffet}/food/{food}/change_status', [FoodController::class,'change_status'])->name('food.change_status');
+    // Route::patch('/{buffet}/food/{food}/activate', [FoodController::class,'activate_food'])->name('food.activate_food');
+    // Route::patch('/{buffet}/food/{food}/{foods_photo} ',[FoodController::class,'update_photo'])->name('food.update_photo');
     Route::resource('{buffet}/food', FoodController::class);
 
     Route::resource('{buffet}/decoration', DecorationController::class);
-    Route::patch('/{buffet}/decoration/{decoration}/activate', [DecorationController::class,'activate_decoration'])->name('decoration.activate_decoration');
-    Route::patch('/{buffet}/decoration/{decoration}/change_status', [DecorationController::class,'change_status'])->name('decoration.change_status');
-    Route::patch('/{buffet}/decoration/{decoration}/{decoration_photos} ',[DecorationController::class,'update_photo'])->name('decoration.update_photo');
+    // Route::patch('/{buffet}/decoration/{decoration}/activate', [DecorationController::class,'activate_decoration'])->name('decoration.activate_decoration');
+    // Route::patch('/{buffet}/decoration/{decoration}/change_status', [DecorationController::class,'change_status'])->name('decoration.change_status');
+    // Route::patch('/{buffet}/decoration/{decoration}/{decoration_photos} ',[DecorationController::class,'update_photo'])->name('decoration.update_photo');
 
     Route::resource('{buffet}/schedule', ScheduleController::class);
-    Route::patch('/{buffet}/schedule/{schedule}/change_status', [ScheduleController::class,'change_status'])->name('schedule.change_status');
+    // Route::patch('/{buffet}/schedule/{schedule}/change_status', [ScheduleController::class,'change_status'])->name('schedule.change_status');
 
     Route::resource('{buffet}/employee', EmployeeController::class);
     
-    Route::get('/{buffet}/booking/party_mode', [BookingController::class, 'party_mode'])->name('booking.party_mode');
-    Route::get('/{buffet}/booking/list', [BookingController::class, 'list'])->name('booking.list');
-    Route::patch('/{buffet}/booking/{booking}/change_status', [BookingController::class,'change_status'])->name('booking.change_status');
-    Route::patch('/{buffet}/booking/{booking}/reschedule', [BookingController::class,'reschedule_party'])->name('booking.reschedule');
+    // Route::get('/{buffet}/booking/party_mode', [BookingController::class, 'party_mode'])->name('booking.party_mode');
+    // Route::get('/{buffet}/booking/list', [BookingController::class, 'list'])->name('booking.list');
+    // Route::patch('/{buffet}/booking/{booking}/change_status', [BookingController::class,'change_status'])->name('booking.change_status');
+    // Route::patch('/{buffet}/booking/{booking}/reschedule', [BookingController::class,'reschedule_party'])->name('booking.reschedule');
     Route::resource('{buffet}/booking', BookingController::class);
 
-    Route::patch('/{buffet}/survey/{survey}/change_question_status', [SatisfactionSurveyController::class,'change_question_status'])->name('survey.change_status');
+    // Route::patch('/{buffet}/survey/{survey}/change_question_status', [SatisfactionSurveyController::class,'change_question_status'])->name('survey.change_status');
     Route::resource('{buffet}/survey', SatisfactionSurveyController::class);
-    Route::post('/{buffet}/survey/answer', [SatisfactionSurveyController::class, 'answer_question'])->name('survey.answer_question');
+    // Route::post('/{buffet}/survey/answer', [SatisfactionSurveyController::class, 'answer_question'])->name('survey.answer_question');
 
-    //Route::post('/survey/answer', [SatisfactionSurveyController::class, 'answer'])->name('survey.answer');
+    // //Route::post('/survey/answer', [SatisfactionSurveyController::class, 'answer'])->name('survey.answer');
     Route::resource('{buffet}/recommendation',RecommendationController::class);
     Route::patch('/{buffet}/recommendation/{recommendation}/change_status', [RecommendationController::class,'change_status'])->name('recommendation.change_status');
 
 
 });
 
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\ResetPassword;
+use App\Http\Controllers\ChangePassword;            
+            
 
+// Route::get('/login', [LoginController::class, 'show'])->middleware('guest')->name('login');
+// Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login.perform');
+Route::get('/reset-password', [ResetPassword::class, 'show'])->middleware('guest')->name('reset-password');
+Route::post('/reset-password', [ResetPassword::class, 'send'])->middleware('guest')->name('reset.perform');
+Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('guest')->name('change-password');
+Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
+
+Route::group(['middleware' => 'auth'], function () {
+	Route::get('/{buffet}/virtual-reality', [PageController::class, 'vr'])->name('virtual-reality');
+	Route::get('/{buffet}/rtl', [PageController::class, 'rtl'])->name('rtl');
+	Route::get('/{buffet}/profile', [UserProfileController::class, 'show'])->name('profile');
+	Route::post('/{buffet}/profile', [UserProfileController::class, 'update'])->name('profile.update');
+	Route::get('/{buffet}/profile-static', [PageController::class, 'profile'])->name('profile-static'); 
+	Route::get('/{buffet}/sign-in-static', [PageController::class, 'signin'])->name('sign-in-static');
+	Route::get('/{buffet}/sign-up-static', [PageController::class, 'signup'])->name('sign-up-static'); 
+	Route::get('/{buffet}/{page}', [PageController::class, 'index'])->name('page');
+	// Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+});
 require __DIR__.'/auth.php';

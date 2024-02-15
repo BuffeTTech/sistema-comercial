@@ -31,7 +31,7 @@ class RecommendationController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
-        $recommendations = $this->recommendation->where('buffet_id',$buffet->id)->get();
+        $recommendations = $this->recommendation->where('buffet_id',$buffet->id)->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));;
 
         $this->authorize('viewAny', [Recommendation::class, $buffet]);
 

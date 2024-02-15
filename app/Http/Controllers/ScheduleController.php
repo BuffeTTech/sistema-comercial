@@ -75,7 +75,7 @@ class ScheduleController extends Controller
         $schedules = $this->schedule->where('buffet_id', $buffet->id)
             ->orderByRaw("FIELD(day_week, '" . implode("', '", DayWeek::array()) . "')")
             ->orderBy('start_time', 'asc')
-            ->paginate($request->get('per page', 5), ['*'], 'page', $request->get('page', 1)); 
+            ->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1)); 
 
         // $this->authorize('viewAny', [Schedule::class, $buffet]);
         

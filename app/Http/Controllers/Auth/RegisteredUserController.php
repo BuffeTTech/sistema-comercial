@@ -53,10 +53,7 @@ class RegisteredUserController extends Controller
                 'cpf_ou_cnpj',
                 'unique:users,document'
             ],
-            // 'document_type' => [
-            //     'required',
-            //     Rule::in(array_column(DocumentType::cases(), 'name'))
-            // ],
+            'terms' => 'required',
             'phone1'=> ['required', 'string', 'celular_com_ddd']
         ]);
 

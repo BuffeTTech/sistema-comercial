@@ -7,6 +7,7 @@ use App\Enums\BuffetStatus;
 use App\Enums\DayWeek;
 use App\Enums\GuestStatus;
 use App\Enums\QuestionType;
+use App\Enums\RecommendationStatus;
 use App\Enums\SatisfactionQuestionStatus;
 use App\Enums\SubscriptionStatus;
 use App\Enums\UserStatus;
@@ -21,6 +22,7 @@ use App\Models\Food;
 use App\Models\FoodPhoto;
 use App\Models\Guest;
 use App\Models\Phone;
+use App\Models\Recommendation;
 use App\Models\SatisfactionQuestion;
 use App\Models\Schedule;
 use App\Models\Subscription;
@@ -407,6 +409,37 @@ class TestsSeeder extends Seeder
             'status'=>true,
             'question_type'=>QuestionType::M->name,
             'answers'=>0,
+            'buffet_id'=>$buffet->id
+        ]);
+
+        Recommendation::create([
+            'content'=>'<p>Esta é uma recomendação foda!</p>',
+            'status'=>RecommendationStatus::ACTIVE->name,
+            'buffet_id'=>$buffet->id
+        ]);
+        Recommendation::create([
+            'content'=>'<p>🎉 Prepare-se para a festa mais divertida do ano! Estamos animados para convidar todos os pequenos a se juntarem a nós em uma celebração cheia de cores, brincadeiras e sorrisos. Não perca essa festa incrível!</p>',
+            'status'=>RecommendationStatus::ACTIVE->name,
+            'buffet_id'=>$buffet->id
+        ]);
+        Recommendation::create([
+            'content'=>'<p>🎈 Seus amiguinhos estão convocados para uma festa cheia de magia e diversão! Teremos jogos, guloseimas deliciosas e, é claro, muita música para animar a pista de dança dos pequenos. Estamos ansiosos para compartilhar momentos mágicos juntos!</p>',
+            'status'=>RecommendationStatus::ACTIVE->name,
+            'buffet_id'=>$buffet->id
+        ]);
+        Recommendation::create([
+            'content'=>'<p>🌟 A aventura vai começar! Estamos preparando uma festa incrível para os pequenos aventureiros. Com decoração temática, atividades emocionantes e um bolo delicioso, garantimos sorrisos do início ao fim. Esperamos por vocês!</p>',
+            'status'=>RecommendationStatus::ACTIVE->name,
+            'buffet_id'=>$buffet->id
+        ]);
+        Recommendation::create([
+            'content'=>'<p>🚀 Embarque nesta jornada festiva conosco! A festa espacial mais esperada do ano está chegando, com alienígenas amigáveis, planetas coloridos e muita diversão intergaláctica. Não perca essa experiência única!</p>',
+            'status'=>RecommendationStatus::ACTIVE->name,
+            'buffet_id'=>$buffet->id
+        ]);
+        Recommendation::create([
+            'content'=>'<p>🎨 Preparem seus pincéis e aventuras criativas! Nossa festa terá uma explosão de cores, atividades artísticas e muita alegria. Convidamos todos os pequenos artistas para uma tarde cheia de diversão e descobertas!</p>',
+            'status'=>RecommendationStatus::ACTIVE->name,
             'buffet_id'=>$buffet->id
         ]);
 

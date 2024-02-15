@@ -39,7 +39,7 @@ class BuffetController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
-        return view('dashboard_buffet', ['buffet'=>$buffet]);
+        return view('pages.dashboard', ['buffet'=>$buffet]);
     }
 
     /**

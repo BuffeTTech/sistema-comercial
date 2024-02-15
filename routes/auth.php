@@ -15,24 +15,24 @@ Route::middleware('guest')->group(function () {
     Route::get('{buffet}/register', [RegisteredUserController::class, 'create'])
                 ->name('register');
 
-    Route::post('{buffet}/register', [RegisteredUserController::class, 'store']);
+    Route::post('{buffet}/register', [RegisteredUserController::class, 'store'])->name('register.perform');
 
     Route::get('{buffet}/login', [AuthenticatedSessionController::class, 'create'])
                 ->name('login');
 
     Route::post('{buffet}/login', [AuthenticatedSessionController::class, 'store']);
 
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
-                ->name('password.request');
+    // Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
+    //             ->name('password.request');
 
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
-                ->name('password.email');
+    // Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+    //             ->name('password.email');
 
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-                ->name('password.reset');
+    // Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
+    //             ->name('password.reset');
 
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-                ->name('password.store');
+    // Route::post('reset-password', [NewPasswordController::class, 'store'])
+    //             ->name('password.store');
 });
 
 Route::middleware('auth')->group(function () {

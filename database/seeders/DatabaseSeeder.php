@@ -2,29 +2,18 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-
-use App\Enums\BuffetStatus;
-use App\Enums\UserStatus;
-use App\Enums\FoodStatus;
-use App\Enums\SubscriptionStatus;
-use App\Models\Buffet;
-use App\Models\BuffetSubscription;
-use App\Models\User;
-use app\Models\Food;
-use App\Models\Subscription;
-use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\DB;
+
 
 class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
+     *
+     * @return void
      */
-    public function run(): void
+    public function run()
     {
         $this->call([
             PermissionSeeder::class,
@@ -32,7 +21,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             FoodSeeder::class, 
 
-            // TestsSeeder::class
+            TestsSeeder::class
         ]);
     }
 }

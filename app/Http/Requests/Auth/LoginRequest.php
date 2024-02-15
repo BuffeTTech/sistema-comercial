@@ -60,7 +60,7 @@ class LoginRequest extends FormRequest
                 'email' => trans('auth.failed'),
             ]);
         }
-        
+                
         // Caso o usuario seja um administrador, o buffet_id é nulo, logo preciso adaptar as credenciais enviadas
         $credentials['buffet_id'] = $user->buffet_id;
         

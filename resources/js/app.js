@@ -1,7 +1,10 @@
-import './bootstrap';
-
+import PerfectScrollbar from 'perfect-scrollbar';
+window.PerfectScrollbar = PerfectScrollbar;
 import Alpine from 'alpinejs';
 import Swal from 'sweetalert2'
+
+import './bootstrap'
+import './custom'
 
 window.Alpine = Alpine;
 
