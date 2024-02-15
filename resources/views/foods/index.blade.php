@@ -6,8 +6,9 @@
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4">
-                    <div class="card-header pb-0">
+                    <div class="card-header pb-0 d-flex justify-content-between">
                         <h6>Comidas de festa</h6>
+                        <a href="{{ route('food.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar Comida">Criar Comida</a>                                        
                     </div>
                     <div id="alert">
                         @include('components.alert')
