@@ -1,81 +1,74 @@
-<x-app-layout>
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h1 class="text-3xl font-bold mb-4">Criar Decoração</h1>
-                    <div>
-                        <form method="POST" action="{{ route('decoration.store', ['buffet'=>$buffet->slug]) }}" enctype="multipart/form-data">
-                            @csrf
+@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
-                            @if (session('success'))
-                                <div class="alert alert-success">
-                                    {{ session('success') }}
+@section('content')
+    @include('layouts.navbars.auth.topnav', ['title' => 'Decorações', 'subtitle'=>'Criar Decoração'])
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header pb-0">
+                        <h6>Decorações das festas</h6>
+                    </div>
+                    <div class="card-body px-0 pt-0 pb-2">
+                        <div class="table-responsive px-4">
+                            <form method="POST" action="{{ route('decoration.store', ['buffet'=>$buffet->slug]) }}" enctype="multipart/form-data">
+                                @csrf
+                                <div class="form-group">
+                                    <label for="main_theme" class="form-control-label">Tema</label>
+                                    <input class="form-control" type="text" placeholder="Insira o nome do tema" id="main_theme" name="main_theme" value="{{ old('main_theme') }}">
+                                    <x-input-error :messages="$errors->get('main_theme')" class="mt-2" />
                                 </div>
-                            @endif
 
+                                <div class="form-group">
+                                    <label for="slug" class="form-control-label">Slug</label>
+                                    <input class="form-control" type="slug" placeholder="pacote-ben-10" id="slug" name="slug" value="{{ old('slug') }}">
+                                    <x-input-error :messages="$errors->get('slug')" class="mt-2" />
+                                    <x-input-helper :value="'O nome unico relativo a URL do seu pacote de decoração.'" class="mt-2" />
+                                </div>
 
-                            <!-- Name -->
-                            <div>
-                                <x-input-label for="main_theme" :value="__('Tema Principal')" />
-                                <x-text-input id="main_theme" class="block mt-1 w-full" type="text" name="main_theme" :value="old('main_theme')" required autofocus autocomplete="main_theme" />
-                                <x-input-error :messages="$errors->get('main_theme')" class="mt-2" />
-                            </div>
+                                <div class="form-group">
+                                    <label for="description" class="form-control-label">Descrição</label>
+                                    <textarea class="form-control" id="description" rows="3" name="description" placeholder="Descrição do pacote">{{ old('description') }}</textarea>
+                                    <x-input-error :messages="$errors->get('description')" class="mt-2" />
+                                </div>
 
-                            <div>
-                                <x-input-label for="slug" :value="__('Slug')" />
-                                <x-text-input id="slug" class="block mt-1 w-full" type="text" name="slug" :value="old('slug')" required autofocus autocomplete="slug" />
-                                <x-input-error :messages="$errors->get('slug')" class="mt-2" />
-                            </div>
+                                <div class="form-group">
+                                    <label for="price" class="form-control-label">Preço</label>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text">R$</span>
+                                        <input class="form-control" type="number" step="0.1" id="price" name="price" required aria-label="Preço" placeholder="Preço" value="{{old('price')}}">
+                                    </div>
+                                    <x-input-error :messages="$errors->get('price')" class="mt-2" />
+                                </div>
+                                    
+                                <h6>Selecione as imagens</h6>
+                                <x-input-error :messages="$errors->get('photo')" class="mt-2" />
+                                @for($i=0; $i<$configurations->max_decoration_photos; $i++)
+                                    
+                                    <div class="form-group">
+                                        <input type="file" class="form-control" id="decoration_photos{{ $i+1 }}" name="decoration_photos[]" accept="image/*">
+                                    </div>
+                                @endfor
 
-                            <div>
-                                <x-input-label for="description" :value="__('Descrição da Decoração: ')" />
-                                <textarea name="description" id="description" cols="40" rows="10" class="height-500 width-500" placeholder="Descrição">{{ old('description')}}</textarea>
-                                <x-input-error :messages="$errors->get('description')" class="mt-2" />
-                            </div> 
+                                <button class="btn btn-primary" type="submit">Cadastrar Decoração</button>
 
-                            {{-- <div class="mt-4">
-                                <x-input-label for="" :value="__('Inserir imagem')" />
-                                <x-text-input id="" class="block mt-1 w-full" type="text" name="" :value="old('')" required autocomplete="" />
-                                <x-input-error :messages="$errors->get('')" class="mt-2" />
-                            </div> --}}
-
-                            <div>
-                                <x-input-label for="price" :value="__('Preço do Pacote')" />
-                                <x-text-input id="price" class="block mt-1 w-full" type="number" name="price" :value="old('price')" required autofocus autocomplete="price" />
-                                <x-input-error :messages="$errors->get('price')" class="mt-2" />
-                            </div>
-                            <x-input-error :messages="$errors->get('decorations_photos_generic')" class="mt-2" />
-                            @for($i=0; $i<$configurations->max_decoration_photos; $i++)
-                                <div>
-                                    <x-input-label for="decoration_photos{{ $i+1 }}" :value="__('Inserir Imagem')" />
-                                    <x-text-input id="decoration_photos{{ $i+1 }}" class="block mt-1 w-full" accept="image/png, image/gif, image/jpeg" type="file" name="decoration_photos[]" :value="old('decoration_photos{{ $i+1 }}')" required autofocus />
-                                    <x-input-error :messages="$errors->get('decoration_photos[{{ $i }}]')" class="mt-2" />
-                                </div> 
-                            @endfor
-
-                            <div class="flex items-center justify-end mt-4">
-                                <x-primary-button class="ms-4">
-                                    {{ __('Adcionar Decoração') }}
-                                </x-primary-button>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        @include('layouts.footers.auth.footer')
     </div>
-    <script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
+@endsection
+<script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
 
-
-    <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-        ClassicEditor
-            .create(document.querySelector('#description'))
-            .catch(error => {
-                console.error(error);
-            });
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+    ClassicEditor
+        .create(document.querySelector('#description'))
+        .catch(error => {
+            console.error(error);
         });
-    </script>
-
-</x-app-layout>
+    });
+</script>

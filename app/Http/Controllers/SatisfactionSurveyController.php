@@ -78,7 +78,7 @@ class SatisfactionSurveyController extends Controller
         $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
 
         if(count($surveys) >= $configurations['max_survey_questions']) {
-            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais recomendações neste plano.'])->withInput();
+            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais perguntas neste plano.'])->withInput();
         }
 
         return view('survey.create', ['buffet'=>$buffet]);
@@ -103,7 +103,7 @@ class SatisfactionSurveyController extends Controller
         $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
 
         if(count($surveys) >= $configurations['max_survey_questions']) {
-            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais recomendações neste plano.'])->withInput();
+            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais perguntas neste plano.'])->withInput();
         }
 
         $survey = $this->survey->create([
@@ -224,7 +224,7 @@ class SatisfactionSurveyController extends Controller
         $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
 
         if(count($surveys) >= $configurations['max_survey_questions']) {
-            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais recomendações neste plano.'])->withInput();
+            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais perguntas neste plano.'])->withInput();
         }
 
         $survey->update(['status'=> (bool)$request->status]);

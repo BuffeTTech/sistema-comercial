@@ -11,14 +11,15 @@
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive px-4">
-                            <form method="POST" action="{{ route('recommendation.store', ['buffet'=>$buffet->slug]) }}">
+                            <form method="POST" action="{{ route('recommendation.update', ['buffet'=>$buffet->slug, 'recommendation'=>$recommendation->hashed_id]) }}">
                                 @csrf
+                                @method('put')
                                 <div class="form-group">
                                     <label for="content">Conteúdo</label>
                                     <textarea class="form-control" id="content" rows="3" name="content">{{ $recommendation->content }}</textarea>
                                 </div>
                                 <x-input-error :messages="$errors->get('content')" class="mt-2" />
-                                <button class="btn btn-primary" type="submit">Cadastrar Recomendação</button>
+                                <button class="btn btn-primary" type="submit">Atualizar Recomendação</button>
                             </form>
                         </div>
                     </div>

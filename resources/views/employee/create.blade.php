@@ -26,7 +26,7 @@
                                 <div class="form-check mb-3">
                                     <input class="form-check-input" type="radio" name="document_type" id="cpf" value="CPF">
                                     <label class="custom-control-label" for="cpf">CPF</label>
-                                    </div>
+                                </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="document_type" id="cnpj" value="CNPJ">
                                     <label class="custom-control-label" for="cnpj">CNPJ</label>

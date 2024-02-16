@@ -24,7 +24,7 @@
                                         @endforeach
                                     </select>
                                     <x-input-error :messages="$errors->get('day_week')" class="mt-2" />
-                                    </div>
+                                </div>
                                 <div class="form-group">
                                     <label for="start_time" class="form-control-label">Horário de Inicio</label>
                                     <input class="form-control" type="time" id="start_time" name="start_time" required>

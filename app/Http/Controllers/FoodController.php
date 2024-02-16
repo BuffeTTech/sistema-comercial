@@ -98,8 +98,8 @@ class FoodController extends Controller
             return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
         }
         $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
-        if(!isset($request->images) || count($request->foods_photo) != $configurations['max_food_photos']) {
-            return redirect()->back()->withErrors(['foods_photo_generic'=> 'Não existem '.$configurations['max_food_photos'].' fotos na requisição'])->withInput();
+        if(!isset($request->foods_photo) || count($request->foods_photo) != $configurations['max_food_photos']) {
+            return redirect()->back()->withErrors(['photo'=> 'Não existem '.$configurations['max_food_photos'].' fotos na requisição'])->withInput();
         }
         
         $food = $this->food->create([
@@ -125,15 +125,12 @@ class FoodController extends Controller
                             'file_size'=>$upload['file_size'],
                             'food_id'=>$food->id,
                         ]);
-    
-                    } else {
-                        return redirect()->route('food.show', ['buffet' => $request->buffet, 'food' => $request->food])->withErrors(['photo'=>"error photo not valid"])->withInput();
                     }
                 }
             }
         }
 
-        return redirect()->route('food.show', ['food'=>$food, 'buffet'=>$buffet]); 
+        return redirect()->route('food.show', ['food'=>$food->slug, 'buffet'=>$buffet->slug]); 
     }
 
     /**
@@ -183,8 +180,14 @@ class FoodController extends Controller
 
         $foods_photo = $this->getFoodPhotos($food->id); 
 
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
+        }
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
         // dd($foods_photo);
-        return view('foods.update', ['food'=> $food, 'buffet'=>$buffet, 'foods_photo'=> $foods_photo]);
+        return view('foods.update', ['food'=> $food, 'buffet'=>$buffet, 'foods_photo'=> $foods_photo, 'configurations'=>$configurations]);
     }
 
     /**
@@ -195,7 +198,7 @@ class FoodController extends Controller
     {
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
-
+        
         if(!$buffet || !$buffet_slug) {
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
@@ -225,7 +228,7 @@ class FoodController extends Controller
 
          $photo = $request->photo;
          if ($request->has('photo')) {
-            if ($photo->isValid()) { 
+             if ($photo->isValid()) { 
                
                 if($upload = $this->upload_image(photo: $photo))  {
                     // excluir foto anterior aqui
@@ -241,13 +244,10 @@ class FoodController extends Controller
                         'file_size'=>$upload['file_size'],
                         'food_id'=>$food->id,
                     ]);
-
-                } else {
-                    return redirect()->back()->withErrors(['photo'=>"error photo not valid"])->withInput();
                 }
             }
         }
-        return redirect()->back()->withInput();
+        return redirect()->route('food.edit', ['buffet'=>$buffet->slug, 'food'=>$food->slug]);
     }
 
     private function upload_image($photo) {
@@ -280,7 +280,7 @@ class FoodController extends Controller
     {
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
-
+        
         if(!$buffet || !$buffet_slug) {
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
@@ -310,7 +310,7 @@ class FoodController extends Controller
 
         $pk = $this->food->find($food->id);
         
-        return redirect()->route('food.edit', ['buffet'=>$buffet, 'food'=>$pk->slug]);
+        return redirect()->route('food.edit', ['buffet'=>$buffet->slug, 'food'=>$pk->slug]);
     }
 
     /**
@@ -373,7 +373,7 @@ class FoodController extends Controller
 
         $food->update(['status'=>$request->status]);
 
-        return redirect()->route('food.index', ['buffet'=>$buffet]);
+        return redirect()->route('food.index', ['buffet'=>$buffet->slug]);
      }
 
      // API

@@ -98,7 +98,7 @@
                                                             <button type="submit" class="btn btn-outline-primary btn-sm fs-6" title="Desativar recomendação" >❌</button>                                        
                                                         </form>
                                                     @else
-                                                        <form action="{{ route('food.change_status', ['food'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="post" class="d-inline">
+                                                        <form action="{{ route('food.change_status', ['food'=>$value['slug'], 'buffet'=>$buffet->slug]) }}" method="post" class="d-inline">
                                                             @csrf
                                                             @method('patch')
                                                             <input type="hidden" name="status" value="{{App\Enums\FoodStatus::ACTIVE->name }}">
