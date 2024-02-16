@@ -77,7 +77,7 @@ class ScheduleController extends Controller
             ->orderBy('start_time', 'asc')
             ->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1)); 
 
-        // $this->authorize('viewAny', [Schedule::class, $buffet]);
+        $this->authorize('viewAny', [Schedule::class, $buffet]);
         
         return view('schedule.index', ['buffet'=>$buffet, 'schedules'=>$schedules]); 
     }

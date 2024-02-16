@@ -31,6 +31,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [SiteController::class, 'dashboard'])->name('dashboard');
 });
 
+Route::get('{buffet}/booking/{booking}/guest/',[GuestController::class, 'create'])->name('guest.invite');
+Route::post('{buffet}/booking/{booking}/guest',[GuestController::class, 'store'])->name('guest.store');
+
 
 Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     Route::get('/{buffet}/calendar', [BookingController::class,'buffet_calendar'])->name('calendar');
@@ -41,9 +44,9 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     Route::put('{buffet}', [BuffetController::class, 'update'])->name('buffet.update');
     Route::put('{buffet}/logo', [BuffetController::class, 'update_logo'])->name('buffet.update_logo');
     
-    Route::get('{buffet}/booking/{booking}/guest/invite/',[GuestController::class, 'create'])->name('guest.invite');
+    
     Route::patch('{buffet}/booking/{booking}/guest/{guest}/change_status',[GuestController::class,'change_status'])->name('guest.change_status');
-    Route::post('{buffet}/booking/{booking}/guest',[GuestController::class, 'store'])->name('guest.store');
+    
     Route::get('{buffet}/booking/{booking}/guest/{guest}',[GuestController::class, 'show'])->name('guest.show');
 
     Route::patch('/{buffet}/food/{food}/change_status', [FoodController::class,'change_status'])->name('food.change_status');

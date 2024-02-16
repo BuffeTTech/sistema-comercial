@@ -39,11 +39,12 @@
                     <span class="mask bg-primary opacity-6"></span>
                 </div>
             @endif
-            @include('layouts.navbars.auth.sidenav', ['buffet'=>$buffet])
-                <main class="main-content border-radius-lg">
-                    @yield('content')
-                </main>
-            @include('components.fixed-plugin')
+            @isset($buffet)
+                @include('layouts.navbars.auth.sidenav', ['buffet'=>$buffet])
+            @endisset
+            <main class="main-content border-radius-lg">
+                @yield('content')
+            </main>
         @endif
     @endauth
     <!--   Core JS Files   -->

@@ -34,7 +34,7 @@
                                         </div>
                                     </div>
                                     <x-input-error :messages="$errors->get('question_type')" class="mt-2" />
-                                </div>                                
+                                </div>                            
                                 <button class="btn btn-primary" type="submit">Cadastrar Pergunta</button>
                             </form>
                         </div>

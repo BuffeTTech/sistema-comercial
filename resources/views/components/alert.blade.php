@@ -9,7 +9,7 @@
     @if ($errors->any())
         @foreach ($errors->all() as $error)
             <div class="px-4 pt-4">
-                <div class="alert alert-danger alert-component" role="alert">
+                <div class="alert alert-danger alert-component alert-dismissible fade show" role="alert">
                     <p class="text-white mb-0">{{ $error }}</p>
                 </div>
             </div>
@@ -20,7 +20,6 @@
 <script>
     const alert_component = document.querySelector('#alert');
     setTimeout(() => {
-        console.log(alert_component)
         alert_component.innerHTML = ""
     }, 6000);
 </script>

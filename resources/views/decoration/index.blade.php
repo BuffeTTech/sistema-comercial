@@ -19,7 +19,7 @@
                                 <thead>
                                     <tr>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
-                                            Tema</th>
+                                            Nome da Decoração</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                             Descrição</th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">

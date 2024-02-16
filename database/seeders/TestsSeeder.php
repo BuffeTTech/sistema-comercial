@@ -90,6 +90,8 @@ class TestsSeeder extends Seeder
         $administrative_role->givePermissionTo($p10->name);
         $administrative_role->givePermissionTo($p11->name);
         $administrative_role->givePermissionTo($p12->name);
+        $user_role->givePermissionTo($p6->name);
+        $user_role->givePermissionTo($p2->name);
       
         $create_survey = Permission::create(['name'=>'create survey question']);
         $show_survey = Permission::create(['name'=>'show survey question']);
@@ -174,7 +176,7 @@ class TestsSeeder extends Seeder
             'buffet_id' => $buffet->id,
             'phone1'=>$user1_phone->id
         ]);
-        $user1->assignRole($operational_role->name);
+        $user1->assignRole($user_role->name);
 
         $schedule1 = Schedule::create([
             'day_week'=>DayWeek::SUNDAY->name,
@@ -232,7 +234,7 @@ class TestsSeeder extends Seeder
         ]);
         $schedule10 = Schedule::create([
             'day_week'=>DayWeek::THURSDAY->name,
-            'start_time'=>'19:00',
+            'start_time'=>'22:00',
             'duration'=>150,
             'buffet_id'=>$buffet->id
         ]);
@@ -293,23 +295,23 @@ class TestsSeeder extends Seeder
             'name_birthdayperson'=>'Aniversario top',
             'years_birthdayperson'=>15,
             'num_guests'=>15,
-            'party_day'=>'2024-01-31',
+            'party_day'=>'2024-02-15',
             'buffet_id'=>$buffet->id,
             'food_id'=>$food->id,
             'price_food'=>$food->price,
             'decoration_id'=>$decoration->id,
             'price_decoration'=>$decoration->price,
-            'schedule_id'=>$schedule1->id,
+            'schedule_id'=>$schedule10->id,
             'price_schedule'=>0,
             'discount'=>0,
-            'status'=>BookingStatus::FINISHED->name,
+            'status'=>BookingStatus::APPROVED->name,
             'user_id'=>$user1->id
         ]);
         $booking2 = Booking::create([
             'name_birthdayperson'=>'Aniversario top 2',
             'years_birthdayperson'=>15,
             'num_guests'=>15,
-            'party_day'=>'2024-02-04',
+            'party_day'=>'2024-02-17',
             'buffet_id'=>$buffet->id,
             'food_id'=>$food->id,
             'price_food'=>$food->price,
@@ -318,7 +320,7 @@ class TestsSeeder extends Seeder
             'schedule_id'=>$schedule1->id,
             'price_schedule'=>0,
             'discount'=>0,
-            'status'=>BookingStatus::APPROVED->name,
+            'status'=>BookingStatus::PENDENT->name,
             'user_id'=>$user1->id
         ]);
 

@@ -39,7 +39,7 @@
 
                                 <div class="form-group">
                                     <label for="phone1" class="form-control-label">Telefone</label>
-                                    <input class="form-control" type="text" placeholder="(XX) XXXXX-XXXX" id="phone1" name="phone1" value="{{ old('phone1') }}">
+                                    <input class="form-control phone" type="text" placeholder="(XX) XXXXX-XXXX" id="phone1" name="phone1" value="{{ old('phone1') }}">
                                 </div>
                                     
                                 <div class="form-group">
@@ -67,4 +67,33 @@
         </div>
         @include('layouts.footers.auth.footer')
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            console.log('azaa')
+            const doc = document.querySelector("#document")
+            doc.addEventListener('input', (e)=>{
+                e.target.value = replaceCPF(e.target.value);
+                return;
+            })
+    
+            doc.addEventListener('focusout', (e)=>{
+                const cpf_valid = validarCPF(doc.value)
+                if(!cpf_valid) {
+                    //button.disabled = true;
+                    doc_error.innerHTML = "Documento inválido"
+                    return
+                }
+                doc_error.innerHTML = ""
+                //button.disabled = false;
+                return;
+            })
+            const phones = document.querySelectorAll(".phone")
+            phones.forEach(phone => {
+                phone.addEventListener('input', (e)=>{
+                    e.target.value = replacePhone(e.target.value);
+                    return;
+                })
+            });
+        })
+    </script>
 @endsection

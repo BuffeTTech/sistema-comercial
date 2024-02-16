@@ -1,14 +1,22 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
 @section('content')
-    @include('layouts.navbars.auth.topnav', ['title' => 'Recomendações'])
+    @include('layouts.navbars.auth.topnav', ['title' => 'Reservas'])
     <div class="container-fluid py-4">
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4">
                     <div class="card-header pb-0 d-flex justify-content-between">
-                        <h6>Reservas Confirmadas</h6>
-                        <a href="{{ route('booking.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Adicionar Reserva">Adicionar reserva</a>                                        
+                        <h6>Listagem de todas as reservas {{$format == 'pendent' ? 'pendentes' : ''}}</h6>
+                        @if($format == "pendent")
+                            @can('list booking')
+                                <a href="?format=all" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar decoração">Ver todas as reservas</a> 
+                            @endcan
+                        @else
+                            @can('view pendent bookings')
+                                <a href="?format=pendent" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar decoração">Ver reservas pendentes</a> 
+                            @endcan
+                        @endif
                     </div>
                     <div id="alert">
                         @include('components.alert')
@@ -32,37 +40,37 @@
                                 <tbody>
                                     @if(count($bookings) === 0)
                                     <tr>
-                                        <td colspan="3" class="p-3 text-sm text-center">Nenhuma reserva encontrada</td>
+                                        <td colspan="8" class="p-3 text-sm text-center">Nenhuma reserva encontrada</td>
                                     </tr>
                                     @else
-                                        @foreach($bookings as $value)
+                                        @foreach($bookings as $booking)
                                     
                                             <tr>
                                                 <td class="text-center">
                                                     <div class="d-flex px-2 py-1">
                                                         <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
-                                                            <h6 class="mb-0 text-sm">{{$value['name_birthdayperson'] }}</h6>
+                                                            <h6 class="mb-0 text-sm">{{$booking['name_birthdayperson'] }}</h6>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td class="text-center">
                                                     <div class="d-flex px-2 py-1">
                                                         <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
-                                                            <p class="text-sm mb-0">{{$value['num_guests']}}</p>
+                                                            <p class="text-sm mb-0">{{$booking['num_guests']}}</p>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td class="text-center">
                                                     <div class="d-flex px-2 py-1">
                                                         <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
-                                                            <p class="text-sm mb-0">{{$value->food['slug']}}</p>
+                                                            <p class="text-sm mb-0">{{$booking->food['slug']}}</p>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td class="text-center">
                                                     <div class="d-flex px-2 py-1">
                                                         <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
-                                                            <p class="text-sm mb-0">{{$value->decoration['slug']}}</p>
+                                                            <p class="text-sm mb-0">{{$booking->decoration['slug']}}</p>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -88,29 +96,30 @@
                                                     </div>
                                                 </td>
                                                 <td class="text-center">
-                                                    <x-status.booking_status :status="$value['status']" />
+                                                    <x-status.booking_status :status="$booking['status']" />
                                                 </td>
-                                                <td class="align-middle">
-                                                    @can('update schedule')
-                                                        @if($value['status'] === App\Enums\Bookingtatus::ACTIVE->name)
-                                                            <a href="{{ route('schedule.edit', ['schedule'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" title="Editar '{{ App\Enums\DayWeek::getEnumByName($value['day_week']) }}" class="btn btn-outline-primary btn-sm fs-6">✏️</a>
-                                                        @endif
-                                                    @endcan
-                                                    @can('change schedule status')
-                                                        @if($value['status'] !== App\Enums\Bookingtatus::UNACTIVE->name)
-                                                            <form action="{{ route('schedule.destroy', ['schedule'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="POST" class="d-inline">
-                                                                @csrf
-                                                                @method('delete')
-                                                                <button type="submit" class="btn btn-outline-primary btn-sm fs-6" title="Desativar horário" >❌</button>                                        
-                                                            </form>
-                                                        @else
-                                                            <form action="{{ route('schedule.change_status', ['schedule'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="post" class="d-inline">
+                                                <td class="text-center">
+                                                    @can('change booking status')
+                                                        @if($booking->status === App\Enums\BookingStatus::PENDENT->name && $format == 'pendent')
+                                                            <form action="{{ route('booking.change_status', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id]) }}" method="post" class="d-inline">
                                                                 @csrf
                                                                 @method('patch')
-                                                                <input type="hidden" name="status" value="{{App\Enums\Bookingtatus::ACTIVE->name }}">
-                                                                <button type="submit" title="Ativar horário" class="btn btn-outline-primary btn-sm fs-6">✅</button>
+                                                                <input type="hidden" name="status" value="{{App\Enums\BookingStatus::APPROVED->name}}">
+                                                                <button type="submit" title="Aprovar festa '{{$booking->name_birthdayperson}}'" class="btn btn-outline-primary btn-sm fs-6">✅</button>
                                                             </form>
-                                                        @endif    
+                                                            <form action="{{ route('booking.change_status', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id]) }}"  method="post" class="d-inline">
+                                                                @csrf
+                                                                @method('patch')
+                                                                <input type="hidden" name="status" value="{{App\Enums\BookingStatus::REJECTED->name}}">
+                                                                <button type="submit" title="Negar festa '{{$booking->name_birthdayperson}}'" class="btn btn-outline-primary btn-sm fs-6">❌</button>
+                                                            </form>
+                                                        @endif
+                                                    @endcan
+                                                    @can('view booking')
+                                                        <a href="{{ route('booking.show', ['booking'=>$booking->hashed_id, 'buffet'=>$buffet->slug]) }}" title="Visualizar '{{$booking->name_birthdayperson}}'" class="btn btn-outline-primary btn-sm fs-6">👁️</a>
+                                                    @endcan
+                                                    @can('edit booking')
+                                                        <a href="{{ route('booking.edit', ['booking'=>$booking->hashed_id, 'buffet'=>$buffet->slug]) }}" title="Editar '{{$booking->name_birthdayperson}}'" class="btn btn-outline-primary btn-sm fs-6">✏️</a>
                                                     @endcan
                                                 </td>
                                             </tr>
@@ -119,7 +128,7 @@
                                 </tbody>
                             </table>
                             <div class="px-2">
-                                {{ $booking->links('components.pagination') }}
+                                {{ $bookings->links('components.pagination') }}
                             </div>
                         </div>
                     </div>

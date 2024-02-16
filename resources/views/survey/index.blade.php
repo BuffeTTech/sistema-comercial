@@ -8,9 +8,11 @@
                 <div class="card mb-4">
                     <div class="card-header pb-0 d-flex justify-content-between">
                         <h6>Perguntas</h6>
-                        @if($total < $configurations['max_survey_questions'])
-                            <a href="{{ route('survey.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar recomendação">Criar Pesquisa</a>                                        
-                        @endif
+                        @can('create survey question')
+                            @if($total < $configurations['max_survey_questions'])
+                                <a href="{{ route('survey.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar recomendação">Criar Pesquisa</a>                                        
+                            @endif
+                        @endcan
                     </div>
                     <div id="alert">
                         @include('components.alert')
