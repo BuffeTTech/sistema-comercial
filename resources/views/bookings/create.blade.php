@@ -80,7 +80,7 @@
         </div>
         @include('layouts.footers.auth.footer')
     </div>
-@endsection
+    
 <script>
     // variaveis
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -142,3 +142,4 @@
     })
 
 </script>
+@endsection

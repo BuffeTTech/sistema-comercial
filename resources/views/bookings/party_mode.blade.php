@@ -1,242 +1,280 @@
-<x-app-layout>
+@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                @if($booking)
-                <div class="p-6 text-gray-900">
-                    <div class="flex justify-between">
-                        
-                        <div style="width: 47%">
-                            
-                            <div class="border-b-2 border-gray-200">
-                                <h1>
-                                    <strong>Nome do aniversariante:</strong>
-                                </h1>
-                                <h2>{{$booking->name_birthdayperson}}</h2>
-                                <br>
-                                
-                                    @php
-                                    $total_guests_present = $guest_counter['present'] + $guest_counter['extras'];
-                                    $total_guests_stipulated = $guest_counter['unblocked'] - $guest_counter['extras'];
-                                    @endphp
-                                <h1><strong>Quantidade de convidados que chegaram:</strong></h1>
-                                <h2>{{$total_guests_present}} de {{$total_guests_stipulated}} (convidados pagos {{ $booking->num_guests}})</h2>
-                                {{-- <h2><strong>Quantidade de convidados que chegaram:</strong> {{$total_guests_present}}</h2>
-                                <h2><strong>Quantidade de convidados estipulados:</strong> {{$total_guests_stipulated}}</h2>
-                                <h2><strong>Quantidade de convidados pagos:</strong> {{ $booking->num_guests}}</h2> --}}
-                            </div>
+@section('content')
+    @include('layouts.navbars.auth.topnav', ['title' => 'Reserva', 'subtitle'=>'Modo Festa'])
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header pb-0">
+                        <h6>Modo Festa</h6>
+                    </div>
+                    <div class="card-body px-4 pt-0 pb-2">
+                        @if($booking)
+                            <h4>{{ $booking->name_birthdayperson }}</h4>
+                            @php
+                                $total_guests_present = $guest_counter['present'] + $guest_counter['extras'];
+                                $total_guests_stipulated = $guest_counter['unblocked'] - $guest_counter['extras'];
+                            @endphp
+                            <div class="card-group">
+                                <div class="card">
+                                    <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
+                                        <h5>Informações da festa</h5>
+                                        <ul class="list-group list-group-flush mt-2">
+                                            <li class="list-group-item">Nome do aniversariante: {{ $booking->name_birthdayperson }}</li>
+                                            <li class="list-group-item">Idade:  {{$booking->years_birthdayperson}}</li>
+                                            <li class="list-group-item">Buffet: {{$booking->buffet->trading_name}}</li>
+                                            <li class="list-group-item">Organizador: {{$booking->user->name}}</li>
+                                            <li class="list-group-item">Data: {{$booking->party_day}}</li>
+                                            <li class="list-group-item">Preço: R$ {{ $booking->price_food * $booking->num_guests + $booking->price_decoration * $booking->num_guests + $booking->price_schedule  * $booking->num_guests }}</li>
+                                            <li class="list-group-item">{{$total_guests_present}} de {{$total_guests_stipulated}} (convidados pagos {{ $booking->num_guests}})</li>
+                                            <li class="list-group-item">
+                                                <div class="accordion-2">
+                                                    <div class="row">
+                                                        <div class="accordion" id="accordionRental">
+                                                            <div class="accordion-item mb-2">
+                                                                <h5 class="accordion-header" id="headingOne"><strong>
+                                                                    <button class="accordion-button border-bottom collapsed ps-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                                                        Pacote de comida: {{ $booking->food->name_food }}
+                                                                    <i class="collapse-close fa fa-plus text-xs pt-1 position-absolute end-0 me-3" aria-hidden="true"></i>
+                                                                    <i class="collapse-open fa fa-minus text-xs pt-1 position-absolute end-0 me-3" aria-hidden="true"></i>
+                                                                    </button>
+                                                                </strong></h5>
+                                                                <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionRental" style="">
+                                                                    <ul>
+                                                                        <li>Slug: {{ $booking->food->slug }}</li>
+                                                                        <li>Status: <x-status.food_status :status="$booking->food['status']" /></li>
+                                                                        <li><span class="badge bg-gradient-primary"><strong>Preço:</strong> R$ {{ $booking->food->price }}</span></li>
+                                                                        <li>Descrição das comidas:<br>
+                                                                            {!! $booking->food->food_description !!}
+                                                                        </li>
+                                                                        <li>Descrição das bebidas:<br>
+                                                                            {!! $booking->food->beverages_description !!}
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <div class="accordion-item mb-2">
+                                                                <h5 class="accordion-header" id="headingTwo"><strong>
+                                                                    <button class="accordion-button border-bottom collapsed ps-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                                        Pacote de decoração: {{ $booking->decoration->main_theme }}
+                                                                    <i class="collapse-close fa fa-plus text-xs pt-1 position-absolute end-0 me-3" aria-hidden="true"></i>
+                                                                    <i class="collapse-open fa fa-minus text-xs pt-1 position-absolute end-0 me-3" aria-hidden="true"></i>
+                                                                    </button>
+                                                                </strong></h5>
+                                                                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionRental" style="">
+                                                                    <ul>
+                                                                        <li>Slug: {{ $booking->decoration->slug }}</li>
+                                                                        <li>Status: <x-status.decoration_status :status="$booking->decoration['status']" /></li>
+                                                                        <li><span class="badge bg-gradient-primary"><strong>Preço:</strong> R$ {{ $booking->decoration->price }}</span></li>
+                                                                        <li>Descrição das comidas:<br>
+                                                                            {!! $booking->decoration->description !!}
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                   <!-- Card body -->
+                                   <div class="card-body">
+                                   </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
+                                        <h5>Convidados Extras</h5>
+                                    </div>
+                                  
+                                    <div class="card-body pt-2">
+                                        <form method="POST" action="{{ route('guest.store', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id]) }}" enctype="multipart/form-data" id="form">
+                                            @csrf
+                                            <x-input-error :messages="$errors->get('error')" class="mt-2" />
+                                            <div id="form-rows">
+                                                <input type="hidden" name="rows[0][status]" id= 'status' value={{App\Enums\GuestStatus::EXTRA->name}}>
+                                                <div class="form-group">
+                                                    <label for="name0" class="form-control-label">Nome</label>
+                                                    <input class="form-control" type="text" placeholder="Nome" id="name0" name="rows[0][name]" value="{{ old('rows[0][name]') }}">
+                                                    <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                                                </div>
 
-                            <div>
-                                <div class="border-gray-200">
-                                    <p><strong>{{ $booking->food['name_food'] }}</strong></p>
-                                    <br>
-                                    <p><strong>Slug:</strong> {{ $booking->food['slug'] }}</p>
-                                    <p><strong>Preço p/pessoa:</strong> R${{ $booking->food['price'] }}</p>
-                                    <br>
-                                    <p><strong>Descricao das comidas:</strong></p>
-                                    {!! $booking->food['food_description'] !!}
-                                    <br>
-                                    <br>
-                                    <p><strong>Descricao das bebidas:</strong></p>
-                                    {!! $booking->food['beverages_description'] !!}
-                                    <p><strong>Decoração:</strong></p>
-                                    {!! $booking->decoration['main_theme'] !!}
-                                    <p><strong>Preço p/pessoa:</strong> R${{ $booking->decoration['price'] }}</p>
-                                    <br>
-                                    <p><strong>Preço final:</strong> {{ $booking->price_food * $booking->num_guests + $booking->price_decoration * $booking->num_guests + $booking->price_schedule  * $booking->num_guests}}</p><br>
+                                                <div class="form-group">
+                                                    <label for="document0" class="form-control-label">CPF</label>
+                                                    <input class="form-control document" type="text" placeholder="CPF" id="document0" name="rows[0][document]" value="{{ old('rows[0][document]') }}">
+                                                    <span class="text-sm text-red-600 dark:text-red-400 space-y-1 document-error" id="document-error0"></span>
+                                                    <x-input-error :messages="$errors->get('document')" class="mt-2" />
+                                                </div>
+        
+                                                <div class="form-group">
+                                                    <label for="age0" class="form-control-label">Idade</label>
+                                                    <input class="form-control" type="number" value="{{old('rows[0][age]')}}" id="age0" placeholder="Idade" name="rows[0][age]">
+                                                    <x-input-error :messages="$errors->get('age')" class="mt-2" />
+                                                </div>
+                                            </div>
+                                            <button class="btn btn-primary" type="submit">Cadastrar Convidados</button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-
-                        </div>
-
-                        <div style="width: 50%">
-                            <div class="border-gray-200">
-                                @if ($errors->any())
-                                    @foreach ($errors->all() as $error)
-                                        {{ $error }}
-                                    @endforeach
-                                @endif
-            
-                                <h1><strong>Convidados Extras:</strong></h1>
-            
-                                <form class="w-full max-w-lg" method="POST" action="{{ route('guest.store', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id]) }}" enctype="multipart/form-data" id="form">
-                                    <x-input-error :messages="$errors->get('message')" class="mt-2" />
-            
-                                    @csrf
-
-                                    {{-- <input type="hidden" name="booking_id" value="{{ $booking->hashed_id }}"> --}}
-                                    <input type="hidden" name="rows[0][status]" id= 'status' value={{App\Enums\GuestStatus::EXTRA->name}}>
-            
-                                    <div id="form-rows">
-                                            <div class="form-row mb-4">
-                                                <x-input-label for="name" :value="__('Nome')" class="dark:text-slate-800" />
-                                                <x-text-input id="name" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" placeholder="Nome" type="text" name="rows[0][name]" :value="old('name')" required autofocus autocomplete="name" />
-                                                <x-input-error :messages="$errors->get('name')" class="mt-2" />
-                                            </div>
-                
-                                            <div class="form-row mb-4">
-                                                <x-input-label for="document" :value="__('CPF')" class="dark:text-slate-800"/>
-                                                <x-text-input id="document" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" placeholder="CPF" type="text" name="rows[0][document]" :value="old('document')" required autofocus autocomplete="document" />
-                                                <x-input-error :messages="$errors->get('document')" class="mt-2" />
-                                                <span class="text-sm text-red-600 dark:text-red-400 space-y-1" id="document-error"></span>
-                                            </div>
-                
-                                            <div class="form-row mb-4">
-                                                <x-input-label for="age" :value="__('Idade')" class="dark:text-slate-800"/>
-                                                <x-text-input id="age" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" placeholder="Idade" type="number" name="rows[0][age]" :value="old('age')" required autofocus autocomplete="age" />
-                                                <x-input-error :messages="$errors->get('age')" class="mt-2" />
-                                            </div> 
-                                    </div>
+                            <div class="card">
+                                <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
+                                    <h5>Convidados Confirmados</h5>
+                                </div>
+                              
+                                <div class="card-body pt-2">
+                                    @if($guest_counter === 0 || count($guests) == 0)
+                                        <h5>Esta festa não possui convidados!</h5>
+                                    @else
+                                    <div class="table-responsive p-0">
+                                        <table class="table align-items-center mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Nome do Convidado</th>
+                                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">CPF</th>
+                                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Idade</th>
+                                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Status</th>
+                                                    <th class="text-secondary opacity-7"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if(count($guests) === 0)
+                                                <tr>
+                                                    <td colspan="7" class="p-3 text-sm text-center">Nenhum convidado confirmado</td>
+                                                </tr>
+                                                @else
+                                                    @foreach($guests as $guest)
+                                                        <tr>
+                                                            <td class="text-center">
+                                                                <div class="d-flex px-2 py-1">
+                                                                    <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                                        <h6 class="mb-0 text-sm">{{ $guest->name }}</h6>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="d-flex px-2 py-1">
+                                                                    <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                                        <p class="text-sm mb-0">{{$guest->document}}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="d-flex px-2 py-1">
+                                                                    <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                                        <p class="text-sm mb-0">{{$guest->age}}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="d-flex px-2 py-1">
+                                                                    <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                                        <p class="text-sm mb-0"><x-status.guest_status :status="$guest['status']" /></p>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="d-flex px-2 py-1">
+                                                                    <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                                        <div class="text-sm mb-0">
+                                                                            @if($booking->status == App\Enums\BookingStatus::APPROVED->name)
+                                                                                @if($guest->status == App\Enums\GuestStatus::PENDENT->name)
+                                                                                    <form action="{{ route('guest.change_status', ['buffet' => $buffet->slug, 'guest' => $guest['hashed_id'], 'booking' => $booking->hashed_id]) }}" method="POST" class="d-inline">
+                                                                                        @csrf
+                                                                                        @method('PATCH')
                                     
-                                    <div class="flex items-center justify-end mt-4">
-                                        <x-primary-button class="ms-4">
-                                            {{ __('Adcionar Convidado') }}
-                                        </x-primary-button>
+                                                                                        <input type="hidden" name="status" value="{{App\Enums\GuestStatus::CONFIRMED->name}}">
+                                                                                        <button type="submit" class="btn btn-success" title="Confirmar '{{$guest->name}}'">✅</button>
+                                                                                    </form>
+                                                                                    <form action="{{ route('guest.change_status', ['buffet' => $buffet->slug, 'guest' => $guest['hashed_id'], 'booking' => $booking->hashed_id]) }}" method="POST" class="d-inline">
+                                                                                        @csrf
+                                                                                        @method('PATCH')
+                                    
+                                                                                        <input type="hidden" name="status" value="{{App\Enums\GuestStatus::BLOCKED->name}}">
+                                                                                        <button type="submit" class="btn" title="Bloquear '{{$guest->name}}'">❌</button>
+                                                                                    </form>
+                                                                                @elseif($guest->status == App\Enums\GuestStatus::CONFIRMED->name)
+                                                                                    <form action="{{ route('guest.change_status', ['buffet' => $buffet->slug, 'guest' => $guest['hashed_id'], 'booking' => $booking->hashed_id]) }}" method="POST" class="d-inline">
+                                                                                        @csrf
+                                                                                        @method('PATCH')
+                                    
+                                                                                        @if($total_guests_present >= $booking->num_guests)
+                                                                                            <input type="hidden" name="status" value="{{App\Enums\GuestStatus::EXTRA->name}}">
+                                                                                        @else
+                                                                                            <input type="hidden" name="status" value="{{App\Enums\GuestStatus::PRESENT->name}}">
+                                                                                        @endif
+                                                                                        <button type="submit" class="btn" title="Confirmar Presença '{{$guest->name}}'">✅</button>
+                                                                                    </form>  
+                                                                                    <form action="{{ route('guest.change_status', ['buffet' => $buffet->slug, 'guest' => $guest['hashed_id'], 'booking' => $booking->hashed_id]) }}" method="POST" class="d-inline">
+                                                                                        @csrf
+                                                                                        @method('PATCH')
+                                    
+                                                                                        <input type="hidden" name="status" value="{{App\Enums\GuestStatus::ABSENT->name}}">
+                                                                                        <button type="submit" class="btn" title="Confirmar Ausência '{{$guest->name}}'">❌</button>
+                                                                                    </form>  
+                                                                                @endif
+                                                                            @endif
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                @endif
+                                            </tbody>
+                                        </table>
+                                        {{ $guests->links('components.pagination') }}
                                     </div>
-                                </form>
+                                    @endif
+                                </div>
                             </div>
-                        </div>
-
-                    </div>
-                </div>
-
-
-                <div class="text-gray-900">
-                    <div>
-                        @if($guest_counter === 0)
-                            <h1><strong>ESSA FESTA NÃO TEM CONVIDADOS CONFIRMADOS!</strong></h1>
-                        
                         @else
-                            <div class="p-6 text-gray-900">
-                                <h1><strong>Lista de convidados</strong></h1>
-                                <table class="w-full">
-                                    <thead class="bg-gray-50 border-b-2 border-gray-200">
-                                        <tr>
-                                            <!-- w-24 p-3 text-sm font-semibold tracking-wide text-left -->
-                                            
-                                            <th class="p-3 text-sm font-semibold tracking-wide text-left">Nome</th>
-                                            <th class="p-3 text-sm font-semibold tracking-wide text-center">CPF</th>
-                                            <th class="p-3 text-sm font-semibold tracking-wide text-center">Idade</th>
-                                            <th class="p-3 text-sm font-semibold tracking-wide text-center">Status</th>
-                                            <th class="p-3 text-sm font-semibold tracking-wide text-center">Ações</th>
-
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-gray-100">
-                                        @if(count($guests) === 0)
-                                        <tr>
-                                            <td colspan="8" class="p-3 text-sm text-gray-700 whitespace-nowrap text-left">Nenhum convidado encontrado</td>
-                                        </tr>
-                                        @else
-                                            @php
-                                                $limite_char = 30; // O número de caracteres que você deseja exibir
-                                            @endphp
-                                            @foreach($guests as $key=>$value)
-                                            <tr class="bg-white">
-                                                <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-left">{{ $value['name'] }}</td>
-                                                <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ mb_strimwidth($value['document'], 0, $limite_char, " ...") }}</td>
-                                                <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ (int)$value['age'] }}</td>
-                                                <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.guest_status :status="$value['status']" /></td>
-                                                <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                                    @if($booking->status == App\Enums\BookingStatus::APPROVED->name)
-
-                                                        @if($value->status == App\Enums\GuestStatus::PENDENT->name)
-                                                            <form action="{{ route('guest.change_status', ['buffet' => $buffet->slug, 'guest' => $value['hashed_id'], 'booking' => $booking->hashed_id]) }}" method="POST" class="inline">
-                                                                @csrf
-                                                                @method('PATCH')
-
-                                                                <input type="hidden" name="status" value="{{App\Enums\GuestStatus::CONFIRMED->name}}">
-                                                                <button type="submit" title="Confirmar '{{$value->name}}'">✅</button>
-                                                            </form>
-                                                            <form action="{{ route('guest.change_status', ['buffet' => $buffet->slug, 'guest' => $value['hashed_id'], 'booking' => $booking->hashed_id]) }}" method="POST" class="inline">
-                                                                @csrf
-                                                                @method('PATCH')
-
-                                                                <input type="hidden" name="status" value="{{App\Enums\GuestStatus::BLOCKED->name}}">
-                                                                <button type="submit" title="Bloquear '{{$value->name}}'">❌</button>
-                                                            </form>
-                                                        @elseif($value->status == App\Enums\GuestStatus::CONFIRMED->name)
-                                                            <form action="{{ route('guest.change_status', ['buffet' => $buffet->slug, 'guest' => $value['hashed_id'], 'booking' => $booking->hashed_id]) }}" method="POST" class="inline">
-                                                                @csrf
-                                                                @method('PATCH')
-
-                                                                @if($total_guests_present >= $booking->num_guests)
-                                                                    <input type="hidden" name="status" value="{{App\Enums\GuestStatus::EXTRA->name}}">
-                                                                @else
-                                                                    <input type="hidden" name="status" value="{{App\Enums\GuestStatus::PRESENT->name}}">
-                                                                @endif
-                                                                <button type="submit" title="Confirmar Presença '{{$value->name}}'">✅</button>
-                                                            </form>
-                                                            <form action="{{ route('guest.change_status', ['buffet' => $buffet->slug, 'guest' => $value['hashed_id'], 'booking' => $booking->hashed_id]) }}" method="POST" class="inline">
-                                                                @csrf
-                                                                @method('PATCH')
-
-                                                                <input type="hidden" name="status" value="{{App\Enums\GuestStatus::ABSENT->name}}">
-                                                                <button type="submit" title="Confirmar Ausência '{{$value->name}}'">❌</button>
-                                                            </form>
-                                                        @endif
-                                                    @else
-                                                        <x-status.guest_status :status="$guest['status']" />
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                            @endforeach
-                                        @endif
-
-                                    </tbody>
-                                </table>
-                            </div>
+                            <h3>Não existe festa em andamento!</h3>
                         @endif
                     </div>
                 </div>
-
-                <script>
-                    const doc = document.querySelector("#document")
-                    const doc_error = document.querySelector("#document-error")
-                    const form = document.querySelector("#form")
-                    //const button = document.querySelector("#button");
-            
-                    form.addEventListener('submit', async function (e) {
-                        e.preventDefault()
-                        const cpf_valid = validarCPF(doc.value)
-                        if(!cpf_valid) {
-                            error('Documento inválido')
-                            return
-                        }
-            
-                        const userConfirmed = await confirm(`Deseja cadastrar este convidado?`)
-            
-                        if (userConfirmed) {
-                            this.submit();
-                        } else {
-                            error("Ocorreu um erro!")
-                            return;
-                        }
-                    })
-            
-                    doc.addEventListener('input', (e)=>{
-                        e.target.value = replaceCPF(e.target.value);
-                        return;
-                    })
-            
-                    doc.addEventListener('focusout', (e)=>{
-                        const cpf_valid = validarCPF(doc.value)
-                        if(!cpf_valid) {
-                            //button.disabled = true;
-                            doc_error.innerHTML = "Documento inválido"
-                            return
-                        }
-                        doc_error.innerHTML = ""
-                        //button.disabled = false;
-                        return;
-                    })
-                </script>
-
-                @else
-                    <h1>Nao existe festa em andamento</h1>
-                @endif
             </div>
         </div>
+        @include('layouts.footers.auth.footer')
     </div>
-</x-app-layout>
+    <script>
+        const doc = document.querySelector("#document0")
+        const doc_error = document.querySelector("#document-error0")
+        const form = document.querySelector("#form")
+
+        form.addEventListener('submit', async function (e) {
+            // e.preventDefault()
+            // const cpfs = document.querySelectorAll('.document')
+
+            // let erro = false
+            // cpfs.forEach(cpf => {
+            //     const cpf_valid = validarCPF(cpf.value)
+            //     if(!cpf_valid) {
+            //         error("O CPF é invalido")
+            //         erro = true
+            //         return;
+            //     }
+            // });
+            // if(erro) return
+            // this.submit();
+        })
+
+        doc.addEventListener('input', (e)=>{
+            e.target.value = replaceCPF(e.target.value);
+            return;
+        })
+
+        doc.addEventListener('focusout', (e)=>{
+            const cpf_valid = validarCPF(doc.value)
+            if(!cpf_valid) {
+                //button.disabled = true;
+                doc_error.innerHTML = "Documento inválido"
+                return
+            }
+            doc_error.innerHTML = ""
+            //button.disabled = false;
+            return;
+        })
+</script>   
+@endsection

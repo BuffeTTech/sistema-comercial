@@ -74,7 +74,7 @@ class TestsSeeder extends Seeder
         $p7 = Permission::create(['name'=>'update booking']);
         $p8 = Permission::create(['name'=>'cancel booking']);
         $p9 = Permission::create(['name'=>'change booking status']);
-        $p10 = Permission::create(['name'=>'create guest']);
+        // $p10 = Permission::create(['name'=>'create guest']);
         $p11 = Permission::create(['name'=>'change guest status']);
         $p12 = Permission::create(['name'=>'show guest']);
         $user_role->givePermissionTo($p3->name);
@@ -87,7 +87,7 @@ class TestsSeeder extends Seeder
         $administrative_role->givePermissionTo($p7->name);
         $administrative_role->givePermissionTo($p8->name);
         $administrative_role->givePermissionTo($p9->name);
-        $administrative_role->givePermissionTo($p10->name);
+        // $administrative_role->givePermissionTo($p10->name);
         $administrative_role->givePermissionTo($p11->name);
         $administrative_role->givePermissionTo($p12->name);
         $user_role->givePermissionTo($p6->name);
@@ -180,7 +180,7 @@ class TestsSeeder extends Seeder
 
         $schedule1 = Schedule::create([
             'day_week'=>DayWeek::SUNDAY->name,
-            'start_time'=>'12:00',
+            'start_time'=>'21:00',
             'duration'=>120,
             'buffet_id'=>$buffet->id
         ]);
@@ -295,13 +295,13 @@ class TestsSeeder extends Seeder
             'name_birthdayperson'=>'Aniversario top',
             'years_birthdayperson'=>15,
             'num_guests'=>15,
-            'party_day'=>'2024-02-16',
+            'party_day'=>'2024-02-18',
             'buffet_id'=>$buffet->id,
             'food_id'=>$food->id,
             'price_food'=>$food->price,
             'decoration_id'=>$decoration->id,
             'price_decoration'=>$decoration->price,
-            'schedule_id'=>$schedule4->id,
+            'schedule_id'=>$schedule1->id,
             'price_schedule'=>0,
             'discount'=>0,
             'status'=>BookingStatus::APPROVED->name,

@@ -15,6 +15,8 @@ class GuestPolicy
         if($user == null) {
             return false;
         }
+
+        dd('a');
         
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {

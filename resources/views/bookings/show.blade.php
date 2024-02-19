@@ -22,7 +22,7 @@
                                 <div class="card">
                                   <div class="card-body pt-2">
                                     <a href="javascript:;" class="card-title h5 d-block text-darker">
-                                      Info Aniversário 
+                                      Informações Aniversário 
                                     </a>
                                     <p class="card-description mb-4">
                                         <p class="text-md mb-0"><strong>Idade:</strong> {{ $booking->years_birthdayperson }}</p>
@@ -35,7 +35,7 @@
                                 <div class="card">
                                   <div class="card-body pt-2">
                                     <a href="javascript:;" class="card-title h5 d-block text-darker">
-                                      Info Pacotes 
+                                      Informações Pacotes 
                                     </a>
                                     <p class="card-description mb-4">
                                         <p class="text-md mb-0"><strong>Pacote de Comida:</strong> {{ $booking->food->name_food}}</p>
@@ -55,7 +55,7 @@
                                     $total_guests_present = $guest_counter['present'] + $guest_counter['extras'];
                                     $total_guests_stipulated = $guest_counter['unblocked'] - $guest_counter['extras'];
                                 @endphp
-                                <p><strong>Convidados presentes/estipulados:</strong>{{$total_guests_present}}/{{$total_guests_stipulated}}</p><br>
+                                <h4><strong>Convidados presentes/estipulados:</strong>{{$total_guests_present}}/{{$total_guests_stipulated}}</h4><br>
                             
                             @endif
 
@@ -74,13 +74,16 @@
                                             </strong></h5>
                                             <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionRental" style="">
                                                 <div class="card-body px-0 pt-0 pb-2">
-                                                    <div>
-                                                        <div class="input-group mb-3">
-                                                            <input type="text" readonly class="form-control" id="copy-input" value="{{ route('guest.invite', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id]) }}">
-                                                            <button class="btn btn-outline-primary mb-0" type="button" id="button-copy-input"><i class="ni ni-ungroup"></i></button>
-                                                        </div>
-                                                    </div>
-                                                    <br>
+                                                    @can('create guest')
+                                                        @if($booking->status ==  \App\Enums\BookingStatus::APPROVED->name)
+                                                            <div>
+                                                                <div class="input-group mb-3">
+                                                                    <input type="text" readonly class="form-control" id="copy-input" value="{{ route('guest.invite', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id]) }}">
+                                                                    <button class="btn btn-outline-primary mb-0" type="button" id="button-copy-input"><i class="ni ni-ungroup"></i></button>
+                                                                </div>
+                                                            </div>
+                                                        @endif
+                                                    @endcan
                                                     <div class="table-responsive p-0">
                                                         <table class="table align-items-center mb-0">
                                                             <thead>
@@ -159,6 +162,7 @@
                                                                 @endif
                                                             </tbody>
                                                         </table>
+                                                        {{ $guests->links('components.pagination') }}
                                                     </div>
                                                 </div>
                                             </div>
@@ -167,18 +171,20 @@
                                 </div>
                             </div>   
                         <!-- Recomendacoes -->
-                            <div class="accordion-1">
+                        @can('view booking recommendations')
+                            @if($booking->status ==  \App\Enums\BookingStatus::APPROVED->name)
+                            <div class="accordion-2">
                                 <div class="row">
                                     <div class="accordion" id="accordionRental">
                                         <div class="accordion-item mb-2">
-                                            <h5 class="accordion-header" id="headingOne"><strong>
-                                                <button class="accordion-button border-bottom font-weight-bold collapsed ps-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                            <h5 class="accordion-header" id="headingTwo"><strong>
+                                                <button class="accordion-button border-bottom font-weight-bold collapsed ps-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                                                     Recomendações
                                                 <i class="collapse-close fa fa-plus text-xs pt-1 position-absolute end-0 me-3" aria-hidden="true"></i>
                                                 <i class="collapse-open fa fa-minus text-xs pt-1 position-absolute end-0 me-3" aria-hidden="true"></i>
                                                 </button>
                                             </strong></h5>
-                                            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionRental" style="">
+                                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionRental" style="">
                                                 @foreach ($recommendations as $recommendation)
                                                     <div class="accordion-body text-sm opacity-8">
                                                         <ul>{!!$recommendation['content']!!}</ul>
@@ -189,8 +195,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <br>
-
+                            @endif
+                        @endcan
+                        <br>
                         @can('update booking')
                             <a href="{{ route('booking.edit', ['buffet'=>$buffet->slug, 'booking'=>$booking['hashed_id']]) }}" title="Editar dados" class="btn btn-outline-primary btn-sm fs-6">Editar</a>
                         @endcan
@@ -213,9 +220,11 @@
     </div>
     <script>
         const btn = document.querySelector('#button-copy-input')
-        btn.addEventListener('click', (e) => {
-            copiarTexto()
-        })
+        if(btn) {
+            btn.addEventListener('click', (e) => {
+                copiarTexto()
+            })
+        }
         async function copiarTexto() {
             let textoCopiado = document.getElementById("copy-input").value;
 

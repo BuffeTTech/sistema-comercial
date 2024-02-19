@@ -304,7 +304,8 @@ class BookingController extends Controller
         $guests = $this->guest
             ->where('booking_id',$booking_id)
             ->where('buffet_id', $buffet->id)
-            ->get();
+            ->orderBy('name', 'asc')
+            ->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
 
         $guest_counter = $this->guest_counter($booking, $request);
 
@@ -660,7 +661,8 @@ class BookingController extends Controller
         $guests = $this->guest
                        ->where('booking_id',$current_party->id)
                        ->where('buffet_id', $buffet->id)
-                       ->get();
+                       ->orderBy('name', 'asc')
+                       ->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
 
         $guest_counter = $this->guest_counter($current_party, $request);
 

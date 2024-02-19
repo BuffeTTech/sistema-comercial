@@ -19,7 +19,8 @@
     <!-- CSS Files -->
     <link id="pagestyle" href="{{ asset('assets/css/argon-dashboard.css') }}" rel="stylesheet" />
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="{{ asset('assets/js/teste.js')  }}" type="module"></script>
+    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
 </head>
 
 <body class="{{ $class ?? '' }}">
@@ -29,23 +30,12 @@
     @endguest
 
     @auth
-        @if (in_array(request()->route()->getName(), ['sign-in-static', 'sign-up-static', 'login', 'register', 'recover-password', 'rtl', 'virtual-reality']))
+        @isset($buffet)
+            @include('layouts.navbars.auth.sidenav', ['buffet'=>$buffet])
+        @endisset
+        <main class="main-content border-radius-lg">
             @yield('content')
-        @else
-            @if (!in_array(request()->route()->getName(), ['profile', 'profile-static']))
-                <div class="min-height-300 bg-primary position-absolute w-100"></div>
-            @elseif (in_array(request()->route()->getName(), ['profile-static', 'profile']))
-                <div class="position-absolute w-100 min-height-300 top-0" style="background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/profile-layout-header.jpg'); background-position-y: 50%;">
-                    <span class="mask bg-primary opacity-6"></span>
-                </div>
-            @endif
-            @isset($buffet)
-                @include('layouts.navbars.auth.sidenav', ['buffet'=>$buffet])
-            @endisset
-            <main class="main-content border-radius-lg">
-                @yield('content')
-            </main>
-        @endif
+        </main>
     @endauth
     <!--   Core JS Files   -->
     <script src="{{ asset('assets/js/core/popper.min.js') }}"></script>
