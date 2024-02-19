@@ -160,7 +160,6 @@ window.validarCPF = function(cpf) {
 
     return true;
 }
-
 window.replacePhone = function(value) {
     return value
         .replace(/\D/g, '') // substitui qualquer caracter que nao seja numero por nada

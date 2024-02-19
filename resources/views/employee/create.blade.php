@@ -11,7 +11,7 @@
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive px-4">
-                            <form method="POST" action="{{ route('employee.store', ['buffet'=>$buffet->slug]) }}">
+                            <form method="POST" action="{{ route('employee.store', ['buffet'=>$buffet->slug]) }}" id="form">
                                 @csrf
                                 <div class="form-group">
                                     <label for="name" class="form-control-label">Nome</label>
@@ -35,6 +35,7 @@
                                 <div class="form-group">
                                     <label for="document" class="form-control-label">Documento</label>
                                     <input class="form-control" type="text" placeholder="Insira o CPF/CNPJ" id="document" name="document" value="{{ old('document') }}">
+                                    <span class="text-sm text-red-600 dark:text-red-400 space-y-1 document-error" id="document-error"></span>
                                 </div>
 
                                 <div class="form-group">
@@ -68,32 +69,42 @@
         @include('layouts.footers.auth.footer')
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            console.log('azaa')
-            const doc = document.querySelector("#document")
-            doc.addEventListener('input', (e)=>{
-                e.target.value = replaceCPF(e.target.value);
-                return;
-            })
-    
-            doc.addEventListener('focusout', (e)=>{
-                const cpf_valid = validarCPF(doc.value)
-                if(!cpf_valid) {
-                    //button.disabled = true;
-                    doc_error.innerHTML = "Documento inválido"
-                    return
-                }
-                doc_error.innerHTML = ""
-                //button.disabled = false;
-                return;
-            })
-            const phones = document.querySelectorAll(".phone")
-            phones.forEach(phone => {
-                phone.addEventListener('input', (e)=>{
-                    e.target.value = replacePhone(e.target.value);
-                    return;
-                })
-            });
+        const doc = document.querySelector("#document")
+        const doc_error = document.querySelector("#document-error")
+        const form = document.querySelector("#form")
+
+        form.addEventListener('submit', async function (e) {
+            // e.preventDefault()
+            // const cpfs = document.querySelectorAll('.document')
+
+            // let erro = false
+            // cpfs.forEach(cpf => {
+            //     const cpf_valid = validarCPF(cpf.value)
+            //     if(!cpf_valid) {
+            //         error("O CPF é invalido")
+            //         erro = true
+            //         return;
+            //     }
+            // });
+            // if(erro) return
+            // this.submit();
         })
-    </script>
+
+        doc.addEventListener('input', (e)=>{
+            e.target.value = replaceCPF(e.target.value);
+            return;
+        })
+
+        doc.addEventListener('focusout', (e)=>{
+            const cpf_valid = validarCPF(doc.value)
+            if(!cpf_valid) {
+                //button.disabled = true;
+                doc_error.innerHTML = "Documento inválido"
+                return
+            }
+            doc_error.innerHTML = ""
+            //button.disabled = false;
+            return;
+        })
+</script>
 @endsection

@@ -12,6 +12,7 @@ use App\Http\Controllers\GuestController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SatisfactionSurveyController;
+use App\Http\Controllers\UserProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -78,32 +79,14 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     Route::resource('{buffet}/recommendation',RecommendationController::class);
     Route::patch('/{buffet}/recommendation/{recommendation}/change_status', [RecommendationController::class,'change_status'])->name('recommendation.change_status');
 
-
-});
-
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\PageController;
-use App\Http\Controllers\RegisterController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\UserProfileController;
-use App\Http\Controllers\ResetPassword;
-use App\Http\Controllers\ChangePassword;            
-            
-
-Route::get('/reset-password', [ResetPassword::class, 'show'])->middleware('guest')->name('reset-password');
-Route::post('/reset-password', [ResetPassword::class, 'send'])->middleware('guest')->name('reset.perform');
-// Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('guest')->name('change-password');
-// Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
-Route::group(['middleware' => 'auth'], function () {
-	Route::get('/{buffet}/virtual-reality', [PageController::class, 'vr'])->name('virtual-reality');
-	Route::get('/{buffet}/rtl', [PageController::class, 'rtl'])->name('rtl');
 	Route::get('/{buffet}/profile', [UserProfileController::class, 'show'])->name('profile');
 	Route::post('/{buffet}/profile', [UserProfileController::class, 'update'])->name('profile.update');
-	Route::get('/{buffet}/profile-static', [PageController::class, 'profile'])->name('profile-static'); 
-	Route::get('/{buffet}/sign-in-static', [PageController::class, 'signin'])->name('sign-in-static');
-	Route::get('/{buffet}/sign-up-static', [PageController::class, 'signup'])->name('sign-up-static'); 
-	// Route::get('/{buffet}/{page}', [PageController::class, 'index'])->name('page');
-	// Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 });
+            
+
+// Route::get('/reset-password', [ResetPassword::class, 'show'])->middleware('guest')->name('reset-password');
+// Route::post('/reset-password', [ResetPassword::class, 'send'])->middleware('guest')->name('reset.perform');
+// Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('guest')->name('change-password');
+// Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
 
 require __DIR__.'/auth.php';
