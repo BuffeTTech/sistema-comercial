@@ -10,7 +10,7 @@
         </a>
     </div>
     <hr class="horizontal dark mt-0">
-    <div class="w-auto " id="sidenav-collapse-main">
+    <div class="w-auto collapse navbar-collapse pb-4" id="sidenav-collapse-main" style="height: auto">
         <ul class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link {{ Route::currentRouteName() == 'home' ? 'active' : '' }}" href="{{ route('buffet.dashboard', ['buffet'=>$buffet->slug]) }}">
@@ -135,6 +135,6 @@
                     </a>
                 @endcan
             </li>
-            </ul>
+        </ul>
     </div>
 </aside>

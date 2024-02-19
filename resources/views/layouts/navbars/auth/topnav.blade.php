@@ -18,7 +18,7 @@
                     <input type="text" class="form-control" placeholder="Type here...">
                 </div>
             </div>
-            <ul class="navbar-nav  justify-content-end">
+            <ul class="navbar-nav justify-content-end">
                 <li class="nav-item d-flex align-items-center">
                     <form role="form" method="post" action="{{ route('logout') }}" id="logout-form">
                         @csrf
