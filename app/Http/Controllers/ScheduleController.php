@@ -131,7 +131,7 @@ class ScheduleController extends Controller
         $startDateTime = \Carbon\Carbon::parse($request->start_time);
         $endDateTime = $startDateTime->copy()->addMinutes($request->duration);
 
-        return redirect()->route('schedule.index', ['buffet'=>$buffet_slug])->with(['updated', 'Horário atualizado com sucesso!']);
+        return redirect()->route('schedule.index', ['buffet'=>$buffet_slug])->with(['success', 'Horário atualizado com sucesso!']);
     }
     /**
      * Show the form for editing the specified resource.
@@ -201,7 +201,7 @@ class ScheduleController extends Controller
         ]); 
 
 
-        return redirect()->route('schedule.index', ['buffet'=>$buffet_slug])->with(['updated', 'Horário atualizado com sucesso!']);
+        return redirect()->route('schedule.index', ['buffet'=>$buffet_slug])->with(['success', 'Horário atualizado com sucesso!']);
     }
 
     /**

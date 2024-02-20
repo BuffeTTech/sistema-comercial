@@ -272,7 +272,7 @@ class SatisfactionSurveyController extends Controller
             ->first();
         $booking->update(['status'=>BookingStatus::CLOSED->name]);  
 
-        return redirect()->back()->with(['message'=>'Pesquisa de satisfação salva com sucesso   ']);
+        return redirect()->back()->with(['success'=>'Pesquisa de satisfação salva com sucesso']);
     }
 
     public function api_get_question_by_user_id(Request $request){

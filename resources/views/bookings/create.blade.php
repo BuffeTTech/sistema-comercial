@@ -2,6 +2,29 @@
 
 @section('content')
     @include('layouts.navbars.auth.topnav', ['title' => 'Reserva', 'subtitle'=>'Criar Reserva'])
+    <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <style>
+        .input-radio input[type=radio] {
+            display: none;
+        }
+
+        .input-radio input[type=radio]:checked~label {
+            background-color: #facc15;
+        }
+
+        /* .swiper-button-prev{
+            color: black;
+            margin: -12px;
+        }
+
+        .swiper-button-next{
+            color: black;
+            margin: -13px;
+        } */
+    </style>
+
     <div class="container-fluid py-4">
         <div class="row">
             <div class="col-12">
@@ -31,17 +54,82 @@
                                     <x-input-error :messages="$errors->get('num_guests')" class="mt-2" />
                                 </div>
 
-                                <div class="form-group">
-                                    <label for="food_id" class="form-control-label">Pacotes de Comidas</label>
-                                    <select name="food_id" id="food_id" class="form-control" >
-                                        @foreach($foods as $food)
-                                            <option value="{{$food->slug}}">{{ $food->name_food }}</option>
-                                        @endforeach
-                                    </select>
-                                    <span class="block">
-                                        R$: <span class="font-bold text-xl">{{number_format((float) $food['price'], 2)}}</span> p/ pessoa
-                                    </span>
+                                <div style="position: relative">
+                                    <x-input-label :value="__('Pacote de comidas')" class="dark:text-slate-800"/>
+                                    {{-- <x-text-input id="food_id" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" type="date" name="food_id" :value="old('food_id')" required autofocus placeholder="Dia da festa" /> --}}
+                                    <div class="food_slider">
+                                        <!-- Additional required wrapper -->
+                                        <div class="swiper-wrapper">
+                                            <!-- Slides -->
+                                            @if(count($foods) === 0)
+                                            <h1>Nenhum pacote de comida encontrado!</h1>
+                                            @else
+                                            @foreach($foods as $key => $food)
+        
+                                            <div class="swiper-slide input-radio p-4 max-w-xl rounded overflow-hidden shadow-lg">
+                                                <input {{ $key === 0 ? "required" : "" }} type="radio" name="food_id" id="food-{{$food['slug']}}" value="{{$food['slug']}}" class="px-8 py-8" >
+                                                <label for="food-{{$food['slug']}}" class="px-6 py-4 bg-amber-100 block">
+                                                    <span class="font-bold block text-lg">
+                                                        {{$food['name_food']}}
+                                                    </span>
+                                                    <span class="block">
+                                                        R$: <span class="font-bold text-xl">{{number_format((float) $food['price'], 2)}}</span> p/ pessoa
+                                                    </span>
+                                                    <button id='button-food-{{$food['slug']}}'class="see-food-details-button bg-amber-400 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded
+                                                        inline-flex items-center px-3 py-2 border border-transparent text-sm leading">Ver detalhes</button>
+                                                </label>
+                                            </div>
+                                            @endforeach
+                                            @endif
+                                        </div>
+                                        <!-- If we need pagination -->
+                                        <div class="swiper-pagination"></div>
+        
+                                        <!-- If we need navigation buttons -->
+                                            <div class="swiper-button-prev"></div>
+                                            <div class="swiper-button-next"></div>
+        
+                                    </div>
                                     <x-input-error :messages="$errors->get('food_id')" class="mt-2" />
+                                </div>
+
+                                <div style="position: relative">
+                                    <x-input-label :value="__('Pacote de decoração')" class="dark:text-slate-800"/>
+                                    {{-- <x-text-input id="decoration_id" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" type="date" name="decoration_id" :value="old('decoration_id')" required autofocus placeholder="Dia da festa" /> --}}
+                                    <div class="decoration_slider">
+                                        <!-- Additional required wrapper -->
+                                        <div class="swiper-wrapper">
+                                            <!-- Slides -->
+                                            @if(count($decorations) === 0)
+                                            <h1>Nenhum pacote de comida encontrado!</h1>
+                                            @else
+                                            @foreach($decorations as $key => $decoration)
+        
+                                            <div class="swiper-slide input-radio p-4 max-w-xl rounded overflow-hidden shadow-lg">
+                                                <input {{ $key === 0 ? "required" : "" }} type="radio" name="decoration_id" id="decoration-{{$decoration['slug']}}" value="{{$decoration['slug']}}" class="px-8 py-8" >
+                                                <label for="decoration-{{$decoration['slug']}}" class="px-6 py-4 bg-amber-100 block">
+                                                    <span class="font-bold block text-lg">
+                                                        {{$decoration['main_theme']}}
+                                                    </span>
+                                                    <span class="block">
+                                                        R$: <span class="font-bold text-xl">{{number_format((float) $decoration['price'], 2)}}</span> p/ pessoa
+                                                    </span>
+                                                    <button id='button-decoration-{{$decoration['slug']}}'class="see-decoration-details-button bg-amber-400 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded
+                                                        inline-flex items-center px-3 py-2 border border-transparent text-sm leading">Ver detalhes</button>
+                                                </label>
+                                            </div>
+                                            @endforeach
+                                            @endif
+                                        </div>
+                                        <!-- If we need pagination -->
+                                        <div class="swiper-pagination"></div>
+        
+                                        <!-- If we need navigation buttons -->
+                                            <div class="swiper-button-prev"></div>
+                                            <div class="swiper-button-next"></div>
+        
+                                    </div>
+                                    <x-input-error :messages="$errors->get('decoration_id')" class="mt-2" />
                                 </div>
 
                                 <div class="form-group">
@@ -82,7 +170,135 @@
     </div>
     
 <script>
-    // variaveis
+    const SITEURL = "{{ url('/') }}";
+    const csrf = document.querySelector('meta[name="csrf-token"]').content
+    const food = new Swiper('.food_slider', {
+            // Optional parameters
+            direction: 'horizontal',
+            loop: true,
+            slidesPerView: 3,
+            spaceBetween: 10,
+
+            // If we need pagination
+            pagination: {
+                el: '.swiper-pagination',
+            },
+
+            // Navigation arrows
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+        });
+        const decoration = new Swiper('.decoration_slider', {
+            // Optional parameters
+            direction: 'horizontal',
+            loop: true,
+            slidesPerView: 3,
+            spaceBetween: 10,
+
+            // If we need pagination
+            pagination: {
+                el: '.swiper-pagination',
+            },
+
+            // Navigation arrows
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+        });
+
+        async function get_food(food_slug) {
+            const csrf = document.querySelector('meta[name="csrf-token"]').content
+            const data = await axios.get(SITEURL + '/api/{{ $buffet->slug }}/food/' + food_slug, {
+                headers: {
+                    'X-CSRF-TOKEN': csrf
+                }
+            })
+
+            return data.data;
+        }
+
+        const see_food_details = document.querySelectorAll(".see-food-details-button")
+        see_food_details.forEach((button)=>{
+            button.addEventListener('click', async (e)=>{
+                e.preventDefault()
+
+                const btn_slug = button.id.split('button-food-')[1]
+                
+                const food = await get_food(btn_slug)
+                console.log(food)
+                const data = {
+                    title: food.data.name_food,
+                    content: `
+                        <p><b>Por apenas R$ ${food.data.price}</b></p>
+                        <br>
+                        <p><b>Descrição do pacote:</b></p>
+                        <br>
+                        <p><b>Comidas:</b></p>
+                        ${food.data.food_description}
+                        <br><br>
+                        <p><b>Bebidas:</b></p>
+                        ${food.data.beverages_description}
+                        <br><br>
+                        ${food.data.photos.map(photo=>{
+                            return `
+                            <img class="w-full" src="{{asset('storage/foods/${photo.file_path}')}}">
+                            `
+                        }).join('<br>')}
+                        `
+                }
+                html(data)
+            })
+        })
+
+        async function get_decoration(decoration_slug) {
+            const csrf = document.querySelector('meta[name="csrf-token"]').content
+            const data = await axios.get(SITEURL + '/api/{{ $buffet->slug }}/decoration/' + decoration_slug, {
+                headers: {
+                    'X-CSRF-TOKEN': csrf
+                }
+            })
+
+            return data.data;
+        }
+
+        const see_decoration_details = document.querySelectorAll(".see-decoration-details-button")
+        see_decoration_details.forEach((button)=>{
+            button.addEventListener('click', async (e)=>{
+                e.preventDefault()
+
+                const btn_slug = button.id.split('button-decoration-')[1]
+                
+                const decoration = await get_decoration(btn_slug)
+                const data = {
+                    title: decoration.data.main_theme,
+                    content: `
+                        <p><b>Por apenas R$ ${decoration.data.price}</b></p>
+                        <br>
+                        <p><b>Descrição do pacote:</b></p>
+                        <br>
+                        <p><b>Comidas:</b></p>
+                        ${decoration.data.description}
+                        <br><br>
+                        ${decoration.data.photos.map(photo=>{
+                            return `
+                            <img class="w-full" src="{{asset('storage/decorations/${photo.file_path}')}}">
+                            `
+                        }).join('<br>')}
+                    `
+                    // <img class="w-full" src="{{asset('storage/packages/${food.photo_1}')}}">
+                    // <img class="w-full" src="{{asset('storage/packages/${pk.photo_2}')}}">
+                    // <img class="w-full" src="{{asset('storage/packages/${pk.photo_3}')}}">
+                }
+                html(data)
+            })
+        })
+
+
+
+
     document.addEventListener('DOMContentLoaded', (event) => {
         const SITEURL = "{{ url('/') }}";
         const csrf = document.querySelector('meta[name="csrf-token"]').content
