@@ -1,31 +1,20 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
 @section('content')
-    @include('layouts.navbars.auth.topnav', ['title' => 'Reservas'])
+    @include('layouts.navbars.auth.topnav', ['title' => 'Minhas Reservas'])
     <div class="container-fluid py-4">
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4">
                     <div class="card-header pb-0 d-flex justify-content-between">
-                        <h6>Reservas</h6>
+                        <h6>Minhas Reservas</h6>
                         <div>
                             @can('create booking')
-                                <a href="{{ route('booking.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar Reserva">Criar Reserva</a> 
+                                <a href="{{ route('booking.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar decoração">Criar Reserva</a> 
                             @endcan      
                             @can('list booking')
-                                <a href="{{ route('booking.list', ['buffet'=>$buffet->slug, 'format'=>'all']) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Listar Reservas">Listar Reservas</a> 
+                                <a href="{{ route('booking.list', ['buffet'=>$buffet->slug, 'format'=>'all']) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar decoração">Listar Reservas</a> 
                             @endcan  
-                            @can('view next bookings')
-                                <a href="{{ route('booking.list', ['buffet'=>$buffet->slug, 'format'=>'pendent']) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Listar Reservas Pendentes">Listar Reservas Pendentes</a> 
-                            @endcan  
-                            @can('list user bookings')
-                                <a href="{{ route('booking.my_bookings', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Listar minhas reservas">Listar minhas reservas</a> 
-                            @endcan  
-                            @can('view party mode') 
-                                @if($current_party)
-                                    <a href="{{ route('booking.party_mode', ['buffet'=>$buffet->slug])}}"><button type="button" class="btn btn-info mx-2" >Acessar Festa em Andamento!</button></a>
-                                @endif     
-                            @endcan                         
                         </div>
                     </div>
                     <div id="alert">

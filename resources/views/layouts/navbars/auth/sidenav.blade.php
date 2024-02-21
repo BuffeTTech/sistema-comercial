@@ -37,6 +37,39 @@
                 <h6 class="ms-2 text-uppercase text-xs font-weight-bolder opacity-6 mb-0">Páginas</h6>
             </li>
             <li class="nav-item">
+                @can('view next bookings')
+                    <a class="nav-link {{ Str::startsWith(Route::currentRouteName(), 'booking.') && !in_array(Route::currentRouteName(), ['booking.create', 'booking.my_bookings']) ? 'active' : '' }}" href="{{ route('booking.index', ['buffet'=>$buffet->slug]) }}">
+                        <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-note-03 text-primary text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Reservas</span>
+                    </a>
+                @endcan
+            </li>
+            <li class="nav-item">
+                @can('list user booking')
+                    <a class="nav-link {{ Str::startsWith(Route::currentRouteName(), 'booking.my_bookings') ? 'active' : '' }}" href="{{ route('booking.my_bookings', ['buffet'=>$buffet->slug]) }}">
+                        <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-note-03 text-primary text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Minhas Reservas</span>
+                    </a>
+                @endcan
+            </li>
+            <li class="nav-item">
+                @can('create booking')
+                    <a class="nav-link {{ Str::startsWith(Route::currentRouteName(), 'booking.create') ? 'active' : '' }}" href="{{ route('booking.create', ['buffet'=>$buffet->slug]) }}">
+                        <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-note-03 text-primary text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Criar Reserva</span>
+                    </a>
+                @endcan
+            </li>
+            <li class="nav-item">
                 @can('list recommendation')
                     <a class="nav-link {{ Str::startsWith(Route::currentRouteName(), 'recommendation.') ? 'active' : '' }}" href="{{ route('recommendation.index', ['buffet'=>$buffet->slug]) }}">
                         <div
@@ -49,7 +82,7 @@
             </li>
             <li class="nav-item">
                 @can('list recommendation')
-                    <a class="nav-link {{ Str::startsWith(Route::currentRouteName(), 'calendar.') ? 'active' : '' }}" href="{{ route('calendar', ['buffet'=>$buffet->slug]) }}">
+                    <a class="nav-link {{ Str::startsWith(Route::currentRouteName(), 'calendar') ? 'active' : '' }}" href="{{ route('calendar', ['buffet'=>$buffet->slug]) }}">
                         <div
                             class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="ni ni-calendar-grid-58 text-primary text-sm opacity-10"></i>
@@ -88,28 +121,6 @@
                             <i class="ni ni-calendar-grid-58 text-primary text-sm opacity-10"></i>
                         </div>
                         <span class="nav-link-text ms-1">Horários</span>
-                    </a>
-                @endcan
-            </li>
-            <li class="nav-item">
-                @can('view next bookings')
-                    <a class="nav-link {{ Str::startsWith(Route::currentRouteName(), 'booking.') ? 'active' : '' }}" href="{{ route('booking.index', ['buffet'=>$buffet->slug]) }}">
-                        <div
-                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="ni ni-note-03 text-primary text-sm opacity-10"></i>
-                        </div>
-                        <span class="nav-link-text ms-1">Reservas</span>
-                    </a>
-                @endcan
-            </li>
-            <li class="nav-item">
-                @can('create booking')
-                    <a class="nav-link {{ Str::startsWith(Route::currentRouteName(), 'booking.') ? 'active' : '' }}" href="{{ route('booking.create', ['buffet'=>$buffet->slug]) }}">
-                        <div
-                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="ni ni-note-03 text-primary text-sm opacity-10"></i>
-                        </div>
-                        <span class="nav-link-text ms-1">Criar Reserva</span>
                     </a>
                 @endcan
             </li>

@@ -155,6 +155,28 @@ class BookingController extends Controller
         return view('bookings.index', ['bookings'=>$bookings,'buffet' => $buffet, 'current_party'=>$current_party]);
     }
 
+    public function my_bookings(Request $request) {
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+        
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+        
+        // Lista de somente as próximas reservas 
+        $bookings = $this->booking
+                        ->with(['schedule'=>function ($query) {
+                            $query->orderBy('start_time', 'asc');
+                        }, 'food','decoration', 'user'])
+                        ->where('user_id', auth()->user()->id)
+                        ->orderBy('party_day', 'asc')
+                        ->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
+
+        $this->authorize('viewUserBookings', [Booking::class, $buffet]);
+
+        return view('bookings.user-bookings', ['bookings'=>$bookings,'buffet' => $buffet]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
