@@ -48,13 +48,13 @@
 
                                 <div class="form-group">
                                     <label for="years_birthdayperson" class="form-control-label">Idade do Aniverasariante</label>
-                                    <input required class="form-control" type="years_birthdayperson" placeholder="20" id="years_birthdayperson" name="years_birthdayperson" value="{{ old('years_birthdayperson') }}">
+                                    <input required class="form-control" type="number" placeholder="20" id="years_birthdayperson" name="years_birthdayperson" value="{{ old('years_birthdayperson') }}">
                                     <x-input-error :messages="$errors->get('years_birthdayperson')" class="mt-2" />
                                 </div>
 
                                 <div class="form-group">
                                     <label for="num_guests" class="form-control-label">Número de convidados</label>
-                                    <input required class="form-control" type="num_guests" placeholder="50" id="num_guests" name="num_guests" value="{{ old('num_guests') }}">
+                                    <input required class="form-control" type="number" placeholder="50" id="num_guests" name="num_guests" value="{{ old('num_guests') }}">
                                     <x-input-error :messages="$errors->get('num_guests')" class="mt-2" />
                                 </div>
 

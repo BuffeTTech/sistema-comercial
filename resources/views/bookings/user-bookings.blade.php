@@ -11,10 +11,10 @@
                         <div>
                             @can('create booking')
                                 <a href="{{ route('booking.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar decoração">Criar Reserva</a> 
-                            @endcan      
+                            @endcan
                             @can('list booking')
                                 <a href="{{ route('booking.list', ['buffet'=>$buffet->slug, 'format'=>'all']) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar decoração">Listar Reservas</a> 
-                            @endcan  
+                            @endcan
                         </div>
                     </div>
                     <div id="alert">
@@ -96,11 +96,16 @@
                                                 <td class="text-center">
                                                     <x-status.booking_status :status="$booking['status']" />
                                                 </td>
-                                                @can('view booking')
-                                                    <td class="text-center align-middle">
+                                                <td class="text-center align-middle">
+                                                    @can('view booking')
                                                         <a href="{{ route('booking.show', ['buffet'=>$buffet->slug,'booking'=>$booking->hashed_id]) }}" title="Visualizar recomendação" class="btn btn-outline-primary btn-sm fs-6">👁️</a>
-                                                    </td>
-                                                @endcan
+                                                    @endcan
+                                                    @can('edit booking')
+                                                        @if($booking['status'] === App\Enums\BookingStatus::APPROVED->name || $booking['status'] === App\Enums\BookingStatus::PENDENT->name)
+                                                            <a href="{{ route('booking.edit', ['booking'=>$booking->hashed_id, 'buffet'=>$buffet->slug]) }}" title="Editar '{{$booking->name_birthdayperson}}'" class="btn btn-outline-primary btn-sm fs-6">✏️</a>
+                                                        @endif
+                                                    @endcan
+                                                </td>
                                             </tr>
                                         @endforeach
                                     @endif

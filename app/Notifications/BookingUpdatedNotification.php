@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class BookingCreatedNotification extends Notification implements ShouldQueue
+class BookingUpdatedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -36,14 +36,9 @@ class BookingCreatedNotification extends Notification implements ShouldQueue
         $url = url($this->booking->buffet->slug.'/booking/'.$this->booking->hashed_id);
         return (new MailMessage)
                     ->greeting('Boa tarde, '.$notifiable->name.'!')
-                    ->line('Seu pedido para festa no buffet '.$this->booking->buffet->trading_name.' foi solicitado.')
-                    ->line('Em breve retornaremos o status de sua solicitação!')
-                    ->action('Ver solicitação', $url)
-                    ->line('Dados da reserva:')
-                    ->line('Dia da festa: '.date("Y-m-d H:i",strtotime(Carbon::parse($this->booking->party_day)->setHours($this->booking->schedule['start_time']))))
-                    ->line('Pacote de comida escolhido: '.$this->booking->food->name_food)
-                    ->line('Pacote de decorações escolhido: '.$this->booking->food->name_food)
-                    ->line('Preço final: R$'.$this->booking->price_food + $this->booking->price_decoration + $this->booking->price_schedule);
+                    ->line('Seu pedido para festa no buffet '.$this->booking->buffet->trading_name.' foi alterado.')
+                    ->line('Clique no botão abaixo para ver as alterações em sua reserva.')
+                    ->action('Ver reserva', $url);
     }
 
     /**

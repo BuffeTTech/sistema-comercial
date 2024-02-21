@@ -2,27 +2,29 @@
 
 namespace App\Listeners;
 
-use App\Events\BookingCreatedEvent;
-use App\Notifications\BookingCreatedNotification;
+use App\Events\BookingUpdatedEvent;
+use App\Notifications\BookingUpdatedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Notification;
 
-class SendMailBookingCreatedListener
+class SendMailBookingUpdatedListener
 {
     /**
      * Create the event listener.
      */
     public function __construct()
     {
+        //
     }
 
     /**
      * Handle the event.
      */
-    public function handle(BookingCreatedEvent $event): void
+    public function handle(BookingUpdatedEvent $event): void
     {
         $user = auth()->user();
-        Notification::send($user, new BookingCreatedNotification($event->booking));
+        Notification::send($user, new BookingUpdatedNotification($event->booking));
+
     }
 }
