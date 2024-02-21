@@ -40,12 +40,12 @@
                                         </div>
                                     </form>
                                 </div>
-                                <div class="card-footer text-center pt-0 px-lg-2 px-1">
+                                {{-- <div class="card-footer text-center pt-0 px-lg-2 px-1">
                                     <p class="mb-1 text-sm mx-auto">
                                         Esqueceu sua senha? Resete
                                         <a href="{{ route('reset-password') }}" class="text-primary text-gradient font-weight-bold">aqui</a>
                                     </p>
-                                </div>
+                                </div> --}}
                                 <div class="card-footer text-center pt-0 px-lg-2 px-1">
                                     <p class="mb-4 text-sm mx-auto">
                                         Não tem uma conta?

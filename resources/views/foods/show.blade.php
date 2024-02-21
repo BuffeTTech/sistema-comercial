@@ -63,17 +63,17 @@
                             <a href="{{ route('food.edit', ['buffet'=>$buffet->slug, 'food'=>$food->slug]) }}" title="Editar recomendação" class="btn btn-outline-primary btn-sm fs-6">Editar</a>
                         @endcan
                         @can('change food status')
-                            @if($food['status'] !== App\Enums\FoodStatus::UNACTIVE->name)
+                            @if($food['status'] !== \App\Enums\FoodStatus::UNACTIVE->name)
                                 <form action="{{ route('food.destroy', ['buffet'=>$buffet->slug, 'food'=>$food->slug]) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('delete')
                                     <button type="submit" class="btn btn-outline-primary btn-sm fs-6" title="Desativar recomendação">❌ Desativar pacote de comida</button>                                        
                                 </form>
                             @else
-                                <form action="{{ route('food.change_status', ['food'=>$food['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="post" class="d-inline">
+                                <form action="{{ route('food.change_status', ['food'=>$food->slug, 'buffet'=>$buffet->slug]) }}" method="post" class="d-inline">
                                     @csrf
                                     @method('patch')
-                                    <input type="hidden" name="status" food="{{App\Enums\FoodStatus::ACTIVE->name }}">
+                                    <input type="hidden" name="status" value="{{ \App\Enums\FoodStatus::ACTIVE->name }}">
                                     <button type="submit" title="Ativar recomendação" class="btn btn-outline-primary btn-sm fs-6">✅ Ativar pacote de comida</button>
                                 </form>
                             @endif  

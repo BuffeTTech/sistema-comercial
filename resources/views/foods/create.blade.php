@@ -9,9 +9,12 @@
                     <div class="card-header pb-0">
                         <h6>Criar Pacote de Alimentação</h6>
                     </div>
+                    <div id="alert">
+                        @include('components.alert')
+                    </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive px-4">
-                            <form method="POST" action="{{ route('food.store', ['buffet'=>$buffet->slug]) }}" enctype="multipart/form-data">
+                            <form method="POST" action="{{ route('food.store', ['buffet'=>$buffet->slug]) }}" enctype="multipart/form-data" id="form">
                                 @csrf
                                 <div class="form-group">
                                     <label for="name_food" class="form-control-label">Nome do Pacote</label>
@@ -70,6 +73,19 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {
+        const form = document.querySelector("#form")
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault()
+            const userConfirmed = await confirm(`Deseja criar esta pergunta?`)
+
+            if (userConfirmed) {
+                this.submit();
+            } else {
+                error("Ocorreu um erro!")
+            }
+        })
+        
         const textarea = document.querySelectorAll(".textarea-container")
         textarea.forEach(element => {
             ClassicEditor

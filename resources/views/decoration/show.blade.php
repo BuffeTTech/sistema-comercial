@@ -56,10 +56,10 @@
                                     <button type="submit" class="btn btn-outline-primary btn-sm fs-6" title="Desativar recomendação">❌ Desativar pacote de decoração</button>                                        
                                 </form>
                             @else
-                                <form action="{{ route('decoration.change_status', ['decoration'=>$decoration['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="post" class="d-inline">
+                                <form action="{{ route('decoration.change_status', ['decoration'=>$decoration['slug'], 'buffet'=>$buffet->slug]) }}" method="post" class="d-inline">
                                     @csrf
                                     @method('patch')
-                                    <input type="hidden" name="status" decoration="{{App\Enums\DecorationStatus::ACTIVE->name }}">
+                                    <input type="hidden" name="status" value="{{App\Enums\DecorationStatus::ACTIVE->name }}">
                                     <button type="submit" title="Ativar recomendação" class="btn btn-outline-primary btn-sm fs-6">✅ Ativar pacote de decoração</button>
                                 </form>
                             @endif  

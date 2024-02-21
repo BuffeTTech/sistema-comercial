@@ -119,7 +119,9 @@
                                                         <a href="{{ route('booking.show', ['booking'=>$booking->hashed_id, 'buffet'=>$buffet->slug]) }}" title="Visualizar '{{$booking->name_birthdayperson}}'" class="btn btn-outline-primary btn-sm fs-6">👁️</a>
                                                     @endcan
                                                     @can('edit booking')
-                                                        <a href="{{ route('booking.edit', ['booking'=>$booking->hashed_id, 'buffet'=>$buffet->slug]) }}" title="Editar '{{$booking->name_birthdayperson}}'" class="btn btn-outline-primary btn-sm fs-6">✏️</a>
+                                                        @if($booking['status'] === App\Enums\BookingStatus::APPROVED->name || $booking['status'] === App\Enums\BookingStatus::PENDENT->name)
+                                                            <a href="{{ route('booking.edit', ['booking'=>$booking->hashed_id, 'buffet'=>$buffet->slug]) }}" title="Editar '{{$booking->name_birthdayperson}}'" class="btn btn-outline-primary btn-sm fs-6">✏️</a>
+                                                        @endif
                                                     @endcan
                                                 </td>
                                             </tr>

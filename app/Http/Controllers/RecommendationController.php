@@ -99,7 +99,7 @@ class RecommendationController extends Controller
             'buffet_id' => $buffet->id,
         ]);
 
-        return redirect()->route('recommendation.show',['buffet'=>$buffet->slug, 'recommendation'=>$recommendation->hashed_id]);
+        return redirect()->route('recommendation.show',['buffet'=>$buffet->slug, 'recommendation'=>$recommendation->hashed_id])->with(['success'=>'Recomendação criada com sucesso!']);
 
     }
 
@@ -154,7 +154,7 @@ class RecommendationController extends Controller
             'content' => $request->content
         ]);
 
-        return redirect()->route('recommendation.index',['buffet'=>$buffet->slug]);
+        return redirect()->route('recommendation.edit', ['buffet'=>$buffet->slug, 'recommendation'=>$recommendation->hashed_id])->with(['success'=>'Recomendação atualizada com sucesso!']);
 
     }
 
@@ -180,7 +180,7 @@ class RecommendationController extends Controller
 
         $this->authorize('update', [Recommendation::class,$recommendation, $buffet]);
 
-        return view('recommendation.update',['buffet'=>$buffet,'recommendation'=>$recommendation]);
+        return view('recommendation.update',['buffet'=>$buffet,'recommendation'=>$recommendation])->with(['success'=>'Recomendação atualizada com sucesso!']);
     }
 
     public function destroy(Request $request){
@@ -209,7 +209,7 @@ class RecommendationController extends Controller
             'status'=>RecommendationStatus::UNACTIVE->name
         ]);
 
-        return redirect()->route('recommendation.index',['buffet'=>$buffet->slug]);
+        return redirect()->back()->with(['success'=>'Recomendação inativada com sucesso!']);
 
     }
 
@@ -251,6 +251,6 @@ class RecommendationController extends Controller
             'status'=>$request->status
         ]);
 
-        return redirect()->route('recommendation.index',['buffet'=>$buffet->slug]);
+        return redirect()->back()->with(['success'=>'Status da recomendação atualizado com sucesso!']);
     }
 }

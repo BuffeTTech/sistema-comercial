@@ -130,7 +130,7 @@ class FoodController extends Controller
             }
         }
 
-        return redirect()->route('food.show', ['food'=>$food->slug, 'buffet'=>$buffet->slug]); 
+        return redirect()->back()->with(['success'=>'Pacote de comida criado com sucesso!']); 
     }
 
     /**
@@ -310,7 +310,7 @@ class FoodController extends Controller
 
         $pk = $this->food->find($food->id);
         
-        return redirect()->route('food.edit', ['buffet'=>$buffet->slug, 'food'=>$pk->slug]);
+        return redirect()->route('food.edit', ['buffet'=>$buffet->slug, 'food'=>$pk->slug])->with(['success'=>'Pacote de comida atualizado com sucesso!']);
     }
 
     /**
@@ -333,7 +333,7 @@ class FoodController extends Controller
 
         $food->update(['status' => FoodStatus::UNACTIVE->name]);
         
-        return redirect()->back()->with(['message' => 'Deletado com sucesso.'])->withInput();
+        return redirect()->back()->with(['success' => 'Pacote de comida desativado com sucesso.'])->withInput();
      }
 
      public function activate_food(Request $request) {
@@ -352,7 +352,7 @@ class FoodController extends Controller
         
         $food->update(['status' => FoodStatus::ACTIVE->name]);
         
-        return redirect()->back()->with(['message' => 'Deletado com sucesso.'])->withInput();
+        return redirect()->back()->with(['success' => 'Pacote de comida ativado com sucesso.'])->withInput();
      }
 
      public function change_status(Request $request)
@@ -373,7 +373,7 @@ class FoodController extends Controller
 
         $food->update(['status'=>$request->status]);
 
-        return redirect()->route('food.index', ['buffet'=>$buffet->slug]);
+        return redirect()->back()->with(['success'=>'Status do pacote de comida atualizado com sucesso!']);
      }
 
      // API

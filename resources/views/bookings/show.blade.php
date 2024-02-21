@@ -230,8 +230,7 @@
 
             try {
                 await navigator.clipboard.writeText(textoCopiado);
-                alert('copiado')
-                // await basic('Link copiado para a área de transferência');
+                await basic('Link copiado para a área de transferência');
             } catch (error) {
                 console.error('Falha ao copiar texto: ', error);
             }

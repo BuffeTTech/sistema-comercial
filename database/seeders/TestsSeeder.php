@@ -145,16 +145,16 @@ class TestsSeeder extends Seeder
             'address'=>$buffet_address->id
         ]);
 
-        $logo = BuffetPhoto::create([
-            'file_name'=>'ddasdasdas.jpg',
-            'file_path'=>'/ddasdasdas-.jpg',
-            'file_extension'=>'jpg',
-            'mime_type'=>'image/jpeg',
-            'file_size'=>'31904',
-            'buffet_id'=>$buffet->id
-        ]);
+        // $logo = BuffetPhoto::create([
+        //     'file_name'=>'ddasdasdas.jpg',
+        //     'file_path'=>'/ddasdasdas-.jpg',
+        //     'file_extension'=>'jpg',
+        //     'mime_type'=>'image/jpeg',
+        //     'file_size'=>'31904',
+        //     'buffet_id'=>$buffet->id
+        // ]);
 
-        $buffet->update(['logo_id'=>$logo->id]);
+        // $buffet->update(['logo_id'=>$logo->id]);
 
         $buffet_subscription = BuffetSubscription::create([
             'buffet_id'=>$buffet->id,
@@ -233,8 +233,8 @@ class TestsSeeder extends Seeder
             'buffet_id'=>$buffet->id
         ]);
         $schedule10 = Schedule::create([
-            'day_week'=>DayWeek::THURSDAY->name,
-            'start_time'=>'22:00',
+            'day_week'=>DayWeek::TUESDAY->name,
+            'start_time'=>'21:00',
             'duration'=>150,
             'buffet_id'=>$buffet->id
         ]);
@@ -295,29 +295,29 @@ class TestsSeeder extends Seeder
             'name_birthdayperson'=>'Aniversario top',
             'years_birthdayperson'=>15,
             'num_guests'=>15,
-            'party_day'=>'2024-02-18',
+            'party_day'=>'2024-02-20',
             'buffet_id'=>$buffet->id,
             'food_id'=>$food->id,
             'price_food'=>$food->price,
             'decoration_id'=>$decoration->id,
             'price_decoration'=>$decoration->price,
-            'schedule_id'=>$schedule1->id,
+            'schedule_id'=>$schedule10->id,
             'price_schedule'=>0,
             'discount'=>0,
-            'status'=>BookingStatus::APPROVED->name,
-            'user_id'=>$user1->id
+            'status'=>BookingStatus::FINISHED->name,
+            'user_id'=>$user->id
         ]);
         $booking2 = Booking::create([
             'name_birthdayperson'=>'Aniversario top 2',
             'years_birthdayperson'=>15,
             'num_guests'=>15,
-            'party_day'=>'2024-02-17',
+            'party_day'=>'2024-02-20',
             'buffet_id'=>$buffet->id,
             'food_id'=>$food->id,
             'price_food'=>$food->price,
             'decoration_id'=>$decoration->id,
             'price_decoration'=>$decoration->price,
-            'schedule_id'=>$schedule1->id,
+            'schedule_id'=>$schedule10->id,
             'price_schedule'=>0,
             'discount'=>0,
             'status'=>BookingStatus::PENDENT->name,

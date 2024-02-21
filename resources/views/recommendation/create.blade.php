@@ -9,9 +9,12 @@
                     <div class="card-header pb-0">
                         <h6>Recomendações de festas</h6>
                     </div>
+                    <div id="alert">
+                        @include('components.alert')
+                    </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive px-4">
-                            <form method="POST" action="{{ route('recommendation.store', ['buffet'=>$buffet->slug]) }}">
+                            <form method="POST" action="{{ route('recommendation.store', ['buffet'=>$buffet->slug]) }}" id="form">
                                 @csrf
                                 <div class="form-group">
                                     <label for="content">Conteúdo</label>
@@ -33,10 +36,22 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {
-    ClassicEditor
-        .create(document.querySelector('#content'))
-        .catch(error => {
-            console.error(error);
-        });
+    const form = document.querySelector("#form")
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault()
+        const userConfirmed = await confirm(`Deseja criar esta pergunta?`)
+
+        if (userConfirmed) {
+            this.submit();
+        } else {
+            error("Ocorreu um erro!")
+        }
+    })
+        ClassicEditor
+            .create(document.querySelector('#content'))
+            .catch(error => {
+                console.error(error);
+            });
     });
 </script>

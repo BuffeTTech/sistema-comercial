@@ -131,7 +131,7 @@ class ScheduleController extends Controller
         $startDateTime = \Carbon\Carbon::parse($request->start_time);
         $endDateTime = $startDateTime->copy()->addMinutes($request->duration);
 
-        return redirect()->route('schedule.index', ['buffet'=>$buffet_slug])->with(['success', 'Horário atualizado com sucesso!']);
+        return redirect()->back()->with(['success', 'Horário atualizado com sucesso!']);
     }
     /**
      * Show the form for editing the specified resource.
@@ -189,6 +189,7 @@ class ScheduleController extends Controller
         if($isConflicted){
             return redirect()->back()->withErrors(['start_time' => 'Existem conflitos de horário para o dia escolhido'])->withInput();
         }
+
         
         $schedule->update([
             'day_week' => $request->day_week,
@@ -200,8 +201,7 @@ class ScheduleController extends Controller
             'buffet_id'=> $buffet->id, 
         ]); 
 
-
-        return redirect()->route('schedule.index', ['buffet'=>$buffet_slug])->with(['success', 'Horário atualizado com sucesso!']);
+        return redirect()->route('schedule.edit', ['buffet'=>$buffet->slug, 'schedule'=>$schedule->hashed_id])->with(['success', 'Horário atualizado com sucesso!'])->withInput();
     }
 
     /**
@@ -227,7 +227,7 @@ class ScheduleController extends Controller
         $schedule->update(['status'=> ScheduleStatus::UNACTIVE->name]);
 
 
-        return redirect()->route('schedule.index', ['buffet'=>$buffet_slug]);
+        return redirect()->back()->with(['success'=>'Horário desativado com sucesso!']);
     }
 
     public function change_status(Request $request){
@@ -254,6 +254,6 @@ class ScheduleController extends Controller
         
         $schedule->update(['status'=>$request->status]); 
 
-        return redirect()->route('schedule.index', ['buffet'=>$buffet_slug]); 
+        return redirect()->back()->with(['success'=>'Status do horário desativado com sucesso!']); 
     }
 }

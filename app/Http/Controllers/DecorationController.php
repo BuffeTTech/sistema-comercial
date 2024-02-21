@@ -142,7 +142,7 @@ class DecorationController extends Controller
                 }
             }
         }
-        return redirect()->route('decoration.show',['buffet'=>$buffet->slug, 'decoration'=>$decoration->slug]);
+        return redirect()->back()->with(['success'=>'Decoração criada com sucesso!']);
     }
 
     /**
@@ -194,8 +194,6 @@ class DecorationController extends Controller
         $decoration_slug = $request->decoration; 
         $decoration_photos = DecorationPhotos::where('decorations_id', $decoration->id)->get(); 
 
-        
-
         return view('decoration.update',['buffet'=>$buffet,'decoration'=>$decoration, 'decoration_photos'=>$decoration_photos, 'configurations'=>$configurations]);
     }
 
@@ -235,7 +233,7 @@ class DecorationController extends Controller
         
         $decoration_photos = $this->photos->where('id', $request->slug)->where('decorations_id', $decoration->id)->get(); 
 
-        return redirect()->route('decoration.edit', ['buffet'=>$buffet->slug, 'decoration'=>$dec->slug]);
+        return redirect()->route('decoration.edit', ['buffet'=>$buffet->slug, 'decoration'=>$dec->slug])->with(['success'=>'Decoração atualizada!']);
 
     }
 
@@ -297,7 +295,7 @@ class DecorationController extends Controller
 
         $decoration->update(['status' => DecorationStatus::UNACTIVE->name]);
 
-        return redirect()->back()->with(['message' => 'Deletado com sucesso.'])->withInput();
+        return redirect()->back()->with(['success'=>'Decoração deletada com sucesso.'])->withInput();
     }
 
     public function activate_decoration(Request $request) {
@@ -315,7 +313,7 @@ class DecorationController extends Controller
         
         $decoration->update(['status' => DecorationStatus::ACTIVE->name]);
         
-        return redirect()->back()->with(['message' => 'Deletado com sucesso.'])->withInput();
+        return redirect()->back()->with(['success'=>'Decoração ativada com sucesso.'])->withInput();
      }
 
 
@@ -338,7 +336,7 @@ class DecorationController extends Controller
         $this->authorize('change_status', [Decoration::class, $decoration, $buffet]);
         $decoration->update(['status'=>$request->status]);
 
-        return redirect()->route('decoration.index', ['buffet'=>$buffet->slug]);
+        return redirect()->back()->with(['success'=>'Status da decoração atualizado com sucesso!']);
     }
 
     // API

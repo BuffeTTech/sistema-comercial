@@ -9,6 +9,9 @@
                     <div class="card-header pb-0">
                         <h6>Atualizar Pacote de Alimentação</h6>
                     </div>
+                    <div id="alert">
+                        @include('components.alert')
+                    </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive px-4">
                             <form method="POST" action="{{ route('food.update', ['buffet'=>$buffet->slug, 'food'=>$food->slug]) }}" enctype="multipart/form-data">

@@ -23,7 +23,6 @@ class StoreGuestRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [];
         return [
             'rows' => 'required|array',
             'rows.*.name' => 'required|string|max:255',

@@ -8,7 +8,9 @@
                     <div class="card-header pb-0">
                         <h6>Confirmar Presença para festa de {{$booking->name_birthdayperson}}</h6>
                     </div>
-
+                    <div id="alert">
+                        @include('components.alert')
+                    </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive px-4">
                             <form method="POST" action="{{ route('guest.store', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id]) }}" enctype="multipart/form-data" id="form">
@@ -20,26 +22,25 @@
                                         <div class="form-group">
                                             <label for="name0" class="form-control-label">Nome</label>
                                             <input class="form-control" type="text" placeholder="Nome" id="name0" name="rows[0][name]" value="{{ old('rows[0][name]') }}">
-                                            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                                            <x-input-error :messages="$errors->get('rows.0.name')" class="mt-2" />
                                         </div>
 
                                         <div class="form-group">
                                             <label for="document0" class="form-control-label">CPF</label>
                                             <input class="form-control document" type="text" placeholder="CPF" id="document0" name="rows[0][document]" value="{{ old('rows[0][document]') }}">
                                             <span class="text-sm text-red-600 dark:text-red-400 space-y-1 document-error" id="document-error0"></span>
-                                            <x-input-error :messages="$errors->get('document')" class="mt-2" />
+                                            <x-input-error :messages="$errors->get('rows.0.document')" class="mt-2" />
                                         </div>
 
                                         <div class="form-group">
                                             <label for="age0" class="form-control-label">Idade</label>
                                             <input class="form-control" type="number" value="{{old('rows[0][age]')}}" id="age0" placeholder="Idade" name="rows[0][age]">
-                                            <x-input-error :messages="$errors->get('age')" class="mt-2" />
+                                            <x-input-error :messages="$errors->get('rows.0.age')" class="mt-2" />
                                         </div>
                                     </div>
                                 </div>
                                 <button type="button" id="clone-button" class="btn btn-success">+</button>
                                 <button class="btn btn-primary" type="submit">Cadastrar Convidados</button>
-
                             </form>
                         </div>
                     </div>

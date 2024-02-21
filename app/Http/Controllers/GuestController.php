@@ -119,7 +119,7 @@ class GuestController extends Controller
         }
 
         if(isset($rows[0]['status']) && $rows[0]['status'] == GuestStatus::EXTRA->name) {
-            return redirect()->back()->with(['error'=>"Convidado adicionado com sucesso"]);
+            return redirect()->back()->with(['success'=>"Convidado adicionado com sucesso"]);
         } else {
             return view('guest.guest_invited', ['buffet'=>$buffet, 'booking'=>$booking, 'guest'=>$guest]);
         }
@@ -160,7 +160,7 @@ class GuestController extends Controller
         ]);
 
 
-        return redirect()->back();
+        return redirect()->back()->with(['success'=>'Status do convidado alterado com sucesso!']);
     }
 
 }

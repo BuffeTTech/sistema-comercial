@@ -113,7 +113,7 @@ class SatisfactionSurveyController extends Controller
             "buffet_id"=>$buffet->id
         ]);
 
-        return redirect()->route('survey.show', ['buffet'=>$buffet_slug, 'survey'=>$survey->hashed_id]);
+        return redirect()->back()->with(['success'=>'Pergunta criada com sucesso!']);
     }
 
     public function show(Request $request){
@@ -176,7 +176,7 @@ class SatisfactionSurveyController extends Controller
             "buffet_id"=>$buffet->id
         ]);
 
-        return redirect()->route('survey.show', ['buffet'=>$buffet_slug, 'survey'=>$survey->hashed_id]);
+        return redirect()->route('survey.edit', ['buffet'=>$buffet->slug, 'survey'=>$survey->hashed_id])->with(['success'=>'Pergunta atualizada com sucesso!']);
 
     }
 
@@ -196,7 +196,7 @@ class SatisfactionSurveyController extends Controller
         }
         $survey->update(['status'=> false]);
 
-        return redirect()->route('survey.index',['buffet'=>$buffet_slug]);
+        return redirect()->back()->with(['success'=>'Pergunta desativada com sucesso!']);
 
     }
 
@@ -229,7 +229,7 @@ class SatisfactionSurveyController extends Controller
 
         $survey->update(['status'=> (bool)$request->status]);
 
-        return redirect()->route('survey.index',['buffet'=>$buffet_slug]);
+        return redirect()->back()->with(['success'=>'Status da pergunta alterado com sucesso!']);
 
     }
 
@@ -278,12 +278,16 @@ class SatisfactionSurveyController extends Controller
     public function api_get_question_by_user_id(Request $request){
         $buffet_slug = $request->buffet;
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
-
+        
         if(!$buffet || !$buffet_slug) {
             return response()->json(['message' => 'Buffet não encontrado'], 422);
         }
-
-        $user_id = $this->hashids->decode($request->user_id)[0];
+        
+        $user_id = $this->hashids->decode($request->user_id);
+        if(!$user_id) {
+            return redirect()->back()->withErrors(['message'=>'Horário não encontrado'])->withInput();
+        }
+        $user_id = $user_id[0];
 
         $booking = $this->booking
                             ->where('buffet_id', $buffet->id)

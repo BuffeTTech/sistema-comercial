@@ -166,7 +166,7 @@ class EmployeeController extends Controller
 
         Mail::to($request->email)->queue(new UserCreated(password: $password, user: $user));
 
-        return back()->with('success', 'Usuário cadastrado com sucesso!');
+        return redirect()->back()->with(['success'=>'Funcionário cadastrado com sucesso!']);
     }
     
     public function edit(Request $request){
@@ -247,7 +247,7 @@ class EmployeeController extends Controller
             $employee->syncRoles($request->role);
         }
 
-        return back()->with('success', "Usuário atualizado com sucesso!");
+        return redirect()->route('employee.edit', ['buffet'=>$buffet->slug, 'employee'=>$employee->hashed_id])->with(['success'=>'Funcionário atualizado com sucesso!']);
     }
     
     public function show(Request $request){
@@ -307,7 +307,7 @@ class EmployeeController extends Controller
 
         $employee->syncRoles($buffet_subscription->subscription->slug.'.user');
 
-        return redirect()->back()->with(['message'=>"Usuario 'deletado' com sucesso."]);
+        return redirect()->back()->with(['success'=>"Usuario 'deletado' com sucesso."]);
     }
 
 }
