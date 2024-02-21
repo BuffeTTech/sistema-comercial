@@ -168,8 +168,8 @@ window.replacePhone = function(value) {
         .replace(/(-\d{4})\d+?$/, '$1'); // captura 4 numeros seguidos de um traço e não deixa ser digitado mais nada
 }
 
-window.replaceCEP = function(cep){
-    cep = cep.replace(/\D/g, '');
-    cep = cep.slice(0, 8);
-    return cep.replace(/(\d{5})(\d{3}).*$/, '$1-$2');
+window.replaceCEP = function(value) {
+    return value
+        .replace(/\D/g, '') // Remove todos os caracteres que não são dígitos
+        .replace(/(\d{5})(\d{0,3}).*/, '$1-$2'); // Adiciona um hífen após os primeiros cinco dígitos e limita a 3 caracteres após o hífen
 }

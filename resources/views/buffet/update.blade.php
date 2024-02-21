@@ -14,7 +14,7 @@
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive px-4">
-                            <form method="POST" action="{{ route('buffet.update', ['buffet'=>$buffet->slug]) }}" enctype="multipart/form-data">
+                            <form method="POST" action="{{ route('buffet.update', ['buffet'=>$buffet->slug]) }}" enctype="multipart/form-data" id="form">
                                 @csrf
                                 @method('put')
 
@@ -29,21 +29,22 @@
                                     
                                     <div class="form-group">
                                         <label for="email_buffet" class="form-control-label">Email Comercial*</label>
-                                        <textarea class="form-control textarea-container" id="email_buffet" rows="3" name="email_buffet" placeholder="buffetalegria@example.com">{{old('email_buffet') ?? $buffet->email_buffet}}</textarea>
+                                        <input class="form-control" type="email" placeholder="buffet-alegria" id="email_buffet" name="email_buffet" value="{{old('email_buffet') ?? $buffet->email}}">
                                         <x-input-error :messages="$errors->get('email_buffet')" class="mt-2" />
                                     </div>
 
                                     <div class="form-group">
                                         <label for="document_buffet" class="form-control-label">Documento do Buffet*</label>
-                                        <textarea class="form-control textarea-container" id="document_buffet" rows="3" name="document_buffet" placeholder="CNPJ">{{old('document_buffet') ?? $buffet->document_buffet}}</textarea>
+                                        <input class="form-control" type="text" placeholder="buffet-alegria" id="document_buffet" name="document_buffet" value="{{old('document_buffet') ?? $buffet->document}}">
                                         <x-input-error :messages="$errors->get('document_buffet')" class="mt-2" />
+                                        <span class="text-sm text-danger space-y-1 document-error" id="document_buffet-error"></span>
                                     </div>
 
                                     <div class="form-group">
                                         <label for="slug" class="form-control-label">Slug</label>
-                                        <input class="form-control" type="slug" placeholder="buffet-alegria" id="slug" name="slug" value="{{old('slug') ?? $buffet->slug}}">
+                                        <input class="form-control" type="text" placeholder="buffet-alegria" id="slug" name="slug" value="{{old('slug') ?? $buffet->slug}}">
                                         <x-input-error :messages="$errors->get('slug')" class="mt-2" />
-                                        <x-input-helper :value="'O nome unico relativo a URL do seu Pacote.'" class="mt-2" />
+                                        <x-input-helper :value="'O nome unico relativo a URL do seu buffet.'" class="mt-2" />
                                     </div>
 
                                 </div>
@@ -53,37 +54,33 @@
 
                                     <div class="form-group">
                                         <label for="street" class="form-control-label">CEP</label>
-                                        <input class="form-control" type="zipcode" placeholder="12345-678" id="zipcode" name="zipcode" value="{{old('zipcode') ?? $buffet->buffet_address->zipcode}}">
+                                        <input class="form-control" type="text" placeholder="12345-678" id="zipcode" name="zipcode" value="{{old('zipcode') ?? $buffet->buffet_address->zipcode}}">
                                         <x-input-error :messages="$errors->get('zipcode')" class="mt-2" />
-                                        <x-input-helper :value="'O nome unico relativo a URL do seu Pacote.'" class="mt-2" />
+                                        <span class="text-sm text-danger space-y-1 document-error" id="zipcode-error"></span>
                                     </div>
 
                                     <div class="form-group">
                                         <label for="street" class="form-control-label">Logradouro</label>
-                                        <input class="form-control" type="street" placeholder="Rua Confete" id="street" name="street" value="{{old('street') ?? $buffet->buffet_address->street}}">
+                                        <input class="form-control" type="text" placeholder="Rua Confete" id="street" name="street" value="{{old('street') ?? $buffet->buffet_address->street}}">
                                         <x-input-error :messages="$errors->get('street')" class="mt-2" />
-                                        <x-input-helper :value="'O nome unico relativo a URL do seu Pacote.'" class="mt-2" />
                                     </div>
                                     
                                     <div class="form-group">
                                         <label for="neighborhood" class="form-control-label">Bairro</label>
-                                        <input class="form-control" type="neighborhood" placeholder="Bairro Alegria" id="neighborhood" name="neighborhood" value="{{old('neighborhood') ?? $buffet->buffet_address->neighborhood}}">
+                                        <input class="form-control" type="text" placeholder="Bairro Alegria" id="neighborhood" name="neighborhood" value="{{old('neighborhood') ?? $buffet->buffet_address->neighborhood}}">
                                         <x-input-error :messages="$errors->get('neighborhood')" class="mt-2" />
-                                        <x-input-helper :value="'O nome unico relativo a URL do seu Pacote.'" class="mt-2" />
                                     </div>
 
                                     <div class="form-group">
                                         <label for="state" class="form-control-label">Estado</label>
-                                        <input class="form-control" type="state" placeholder="São Paulo" id="state" name="state" value="{{old('state') ?? $buffet->buffet_address->state}}">
+                                        <input class="form-control" type="text" placeholder="São Paulo" id="state" name="state" value="{{old('state') ?? $buffet->buffet_address->state}}">
                                         <x-input-error :messages="$errors->get('state')" class="mt-2" />
-                                        <x-input-helper :value="'O nome unico relativo a URL do seu Pacote.'" class="mt-2" />
                                     </div>
 
                                     <div class="form-group">
                                         <label for="city" class="form-control-label">Cidade</label>
-                                        <input class="form-control" type="city" placeholder="Campinas"  id="city" name="city" value="{{old('city') ?? $buffet->buffet_address->city}}">
+                                        <input class="form-control" type="text" placeholder="Campinas"  id="city" name="city" value="{{old('city') ?? $buffet->buffet_address->city}}">
                                         <x-input-error :messages="$errors->get('city')" class="mt-2" />
-                                        <x-input-helper :value="'O nome unico relativo a URL do seu Pacote.'" class="mt-2" />
                                     </div>
 
                                     <div class="form-group">
@@ -96,22 +93,20 @@
 
                                     <div class="form-group">
                                         <label for="complement" class="form-control-label">Complemento</label>
-                                        <textarea class="form-control textarea-container" id="complement" rows="3" name="complement" placeholder="">{{old('complement') ?? $buffet->buffet_address->complement}}</textarea>
+                                        <input class="form-control" type="text" placeholder=""  id="complement" name="complement" value="{{old('complement') ?? $buffet->buffet_address->complement}}">
                                         <x-input-error :messages="$errors->get('complement')" class="mt-2" />
                                     </div>
                                     <input type="hidden" name="country" value="Brazil">
                                     <div class="form-group">
                                         <label for="phone1_buffet" class="form-control-label">Telefone 1</label>
-                                        <input class="form-control" type="phone1_buffet" placeholder="(XX) XXXXX-XXXX"  id="phone1_buffet" name="phone1_buffet" value="{{old('phone1_buffet') ?? $buffet->buffet_phone1->number ?? null}}">
+                                        <input class="form-control" type="text" placeholder="(XX) XXXXX-XXXX"  id="phone1_buffet" name="phone1_buffet" value="{{old('phone1_buffet') ?? $buffet->buffet_phone1->number ?? null}}">
                                         <x-input-error :messages="$errors->get('phone1_buffet')" class="mt-2" />
-                                        <x-input-helper :value="'O nome unico relativo a URL do seu Pacote.'" class="mt-2" />
                                     </div>
 
                                     <div class="form-group">
                                         <label for="phone2_buffet" class="form-control-label">Telefone</label>
-                                        <input class="form-control" type="phone2_buffet" placeholder="(XX) XXXXX-XXXX"  id="phone2_buffet" name="phone2_buffet" value="{{old('phone2_buffet') ?? $buffet->buffet_phone2->number ?? null}}">
+                                        <input class="form-control" type="text" placeholder="(XX) XXXXX-XXXX"  id="phone2_buffet" name="phone2_buffet" value="{{old('phone2_buffet') ?? $buffet->buffet_phone2->number ?? null}}">
                                         <x-input-error :messages="$errors->get('phone2_buffet')" class="mt-2" />
-                                        <x-input-helper :value="'O nome unico relativo a URL do seu Pacote.'" class="mt-2" />
                                     </div>
 
                                     <button class="btn btn-primary" type="submit">Atualizar Buffet</button>
@@ -141,18 +136,96 @@
         </div>
         @include('layouts.footers.auth.footer')
     </div>
-@endsection
-<script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
+    <script>
+        const zipcode = document.querySelector('#zipcode');
+        const street = document.querySelector('#street');
+        const neighborhood = document.querySelector('#neighborhood');
+        const state = document.querySelector('#state');
+        const city = document.querySelector('#city');
+        const number = document.querySelector('#number');
+        const complement = document.querySelector('#complement');
+        const zipcode_error = document.querySelector("#zipcode-error")
+        const document_buffet = document.querySelector("#document_buffet")
+        const doc_buffet_error = document.querySelector("#document_buffet-error")
+        const form = document.querySelector("#form")
+        
+        document_buffet.addEventListener('input', (e)=>{
+            e.target.value = replaceCNPJ(e.target.value);
+            return;
+        })
 
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        const textarea = document.querySelectorAll(".textarea-container")
-        textarea.forEach(element => {
-            ClassicEditor
-                .create(element)
-                .catch(error => {
-                    console.error(error);
-                });
+        document_buffet.addEventListener('focusout', (e)=>{
+            const cnpj_valid = validarCNPJ(e.target.value)
+            if(!cnpj_valid) {
+                doc_buffet_error.innerHTML = "Documento inválido"
+                return
+            }
+            doc_buffet_error.innerHTML = ""
+            return;
+        })
+
+        zipcode.addEventListener('input', async (e) => {
+            e.target.value = replaceCEP(e.target.value)
+        })
+
+        zipcode.addEventListener('focusout', async (e) => {
+            try {
+                // const onlyNumbers = /^[0-9]+$/;
+                // const cepValid = /^[0-9]{8}$/;
+
+                // if(!onlyNumbers.test(e.target.value) || !cepValid.test(e.target.value)) {
+                //     console.log(onlyNumbers.test(e.target.value), cepValid.test(e.target.value))
+                //     throw {cep_error: 'CEP inválido'}
+                // }
+                const cep = e.target.value.replace(/\D/g, '');
+
+                const response = await fetch(`http://viacep.com.br/ws/${cep}/json`)
+
+                const responseCep = await response.json()
+                console.log(responseCep)
+
+                if(responseCep?.erro) {
+                    throw {cep_error: 'CEP inválido'}
+                }
+                zipcode_error.innerHTML = ""
+                street.value = responseCep.logradouro
+                neighborhood.value = responseCep.bairro
+                state.value = responseCep.uf
+                city.value = responseCep.localidade
+                number.value = ""
+                complement.value = ""
+
+                // number.innerHTML = response
+                // complement.innerHTML = response
+                // country.innerHTML = response
+
+            } catch(error) {
+                street.value = ""
+                neighborhood.value = ""
+                state.value = ""
+                city.value = ""
+                complement.value = ""
+                number.value = ""
+                zipcode_error.innerHTML = "CEP Inválido"
+                console.log(error)
+            }
         });
-    });
-</script>
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const cnpj_valid = validarCNPJ(document_buffet.value);
+            if (!cnpj_valid) {
+                error('Documento inválido');
+                return;
+            }
+
+            const userConfirmed = await confirm(`Deseja atualizar o buffet?`);
+
+            if (userConfirmed) {
+                // Envie o formulário manualmente
+                this.form.submit();
+            }
+        });
+    </script>
+@endsection
