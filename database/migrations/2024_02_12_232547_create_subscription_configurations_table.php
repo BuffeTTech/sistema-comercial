@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('max_food_photos')->nullable()->default(0); // se for null é pq nao tem limite!
             $table->integer('max_decoration_photos')->nullable()->default(0); // se for null é pq nao tem limite!
             $table->integer('max_recommendations')->nullable()->default(0); // se for null é pq nao tem limite!
+            $table->integer('max_survey_questions')->nullable()->default(0); // se for null é pq nao tem limite!
             $table->foreignId('subscription_id')->constrained(
                 table: 'subscriptions', indexName: 'subscription_configurations_subscriptions_id'
             );

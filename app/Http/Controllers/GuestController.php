@@ -47,7 +47,7 @@ class GuestController extends Controller
             // return redirect()->back()->withErrors(['booking'=>'Reserva não encontrada'])->withInput();
         }
 
-        $this->authorize('create', [Guest::class, $booking, $buffet]);
+        // $this->authorize('create', [Guest::class, $booking, $buffet]);
 
         if($booking->status !== BookingStatus::APPROVED->name) {
             abort(401);
@@ -63,13 +63,13 @@ class GuestController extends Controller
         
         if(!$buffet || !$buffet_slug) {
             // abort(404);
-            return redirect()->back()->withErrors(['message'=>'Buffet não encontrado'])->withInput();
+            return redirect()->back()->withErrors(['error'=>'Buffet não encontrado'])->withInput();
         }
 
         $booking_id = $this->hashids->decode($request->booking);
         if(!$booking_id) {
             // abort(404);
-            return redirect()->back()->withErrors(['message'=>'Reserva não encontrada'])->withInput();
+            return redirect()->back()->withErrors(['error'=>'Reserva não encontrada'])->withInput();
         }
         
         $booking_id = $booking_id[0];
@@ -77,20 +77,20 @@ class GuestController extends Controller
         $booking = $this->booking->where('id',$booking_id)->get()->first();
         if(!$booking) {
             // abort(404);
-            return redirect()->back()->withErrors(['message'=>'Reserva não encontrada'])->withInput();
+            return redirect()->back()->withErrors(['error'=>'Reserva não encontrada'])->withInput();
         }
         
         $this->authorize('create', [Guest::class, $booking, $buffet]);
 
         if($booking->status !== BookingStatus::APPROVED->name) {
             // abort(401);
-            return redirect()->back()->withErrors(['message'=>'Esta festa não está aceitando convidados'])->withInput();
+            return redirect()->back()->withErrors(['error'=>'Esta festa não está aceitando convidados'])->withInput();
         }
 
         $rows = $request->rows;
         $rows_to_insert = [];
 
-        foreach ($rows as $guest) {
+        foreach ($rows as $key=>$guest) {
             $guest_exists = $this->guest
                              ->where('document',$guest['document'])
                              ->where('buffet_id', $buffet->id)
@@ -99,7 +99,7 @@ class GuestController extends Controller
                              ->first();
 
             if($guest_exists) {
-                return redirect()->back()->withErrors(['error'=>'O convidado '.$guest['name'].' já está na festa com o status '.GuestStatus::getEnumByName($guest_exists->status)->value])->withInput();
+                return redirect()->back()->withErrors(['error'=>'O convidado '.$guest['name'].' do CPF '.$guest['document'].' já está na festa com o status '.GuestStatus::getEnumByName($guest_exists->status)->value])->withInput();
             }
 
             $data = [
@@ -119,7 +119,7 @@ class GuestController extends Controller
         }
 
         if(isset($rows[0]['status']) && $rows[0]['status'] == GuestStatus::EXTRA->name) {
-            return redirect()->back()->with(['message'=>"Convidado adicionado com sucesso"]);
+            return redirect()->back()->with(['success'=>"Convidado adicionado com sucesso"]);
         } else {
             return view('guest.guest_invited', ['buffet'=>$buffet, 'booking'=>$booking, 'guest'=>$guest]);
         }
@@ -160,7 +160,7 @@ class GuestController extends Controller
         ]);
 
 
-        return redirect()->back();
+        return redirect()->back()->with(['success'=>'Status do convidado alterado com sucesso!']);
     }
 
 }

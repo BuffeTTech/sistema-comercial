@@ -62,7 +62,16 @@ class EmployeeController extends Controller
 
         $this->authorize('viewAny', [User::class, $buffet]);
 
-        return view('employee.index', ['buffet'=>$buffet, 'employees'=>$employees, 'configurations'=>$configurations]); 
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
+        }
+
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
+        $total = $this->user->where('buffet_id',$buffet->id)->where('status', UserStatus::ACTIVE->name)->get();
+
+        return view('employee.index', ['buffet'=>$buffet, 'employees'=>$employees, 'configurations'=>$configurations, 'total'=>count($total)]); 
     }
     
     public function create(Request $request){
@@ -157,7 +166,7 @@ class EmployeeController extends Controller
 
         Mail::to($request->email)->queue(new UserCreated(password: $password, user: $user));
 
-        return back()->with('success', 'Usuário cadastrado com sucesso!');
+        return redirect()->back()->with(['success'=>'Funcionário cadastrado com sucesso!']);
     }
     
     public function edit(Request $request){
@@ -238,7 +247,7 @@ class EmployeeController extends Controller
             $employee->syncRoles($request->role);
         }
 
-        return back()->with('success', "Usuário atualizado com sucesso!");
+        return redirect()->route('employee.edit', ['buffet'=>$buffet->slug, 'employee'=>$employee->hashed_id])->with(['success'=>'Funcionário atualizado com sucesso!']);
     }
     
     public function show(Request $request){
@@ -298,7 +307,7 @@ class EmployeeController extends Controller
 
         $employee->syncRoles($buffet_subscription->subscription->slug.'.user');
 
-        return redirect()->back()->with(['message'=>"Usuario 'deletado' com sucesso."]);
+        return redirect()->back()->with(['success'=>"Usuario 'deletado' com sucesso."]);
     }
 
 }

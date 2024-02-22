@@ -63,7 +63,7 @@ class DecorationController extends Controller
         $this->authorize('viewAny', [Decoration::class, $buffet]);
 
         $decorations = $this->decoration->where('buffet_id',$buffet->id)->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
-        return view('decoration.index',['decorations'=>$decorations,'buffet'=>$buffet_slug],);
+        return view('decoration.index',['decorations'=>$decorations,'buffet'=>$buffet],);
     }
 
     public function not_found() {
@@ -101,7 +101,7 @@ class DecorationController extends Controller
         $buffet_slug = $request->buffet;
         $buffet = Buffet::where('slug', $buffet_slug)->first();
         //dd($buffet); 
-        if($this->decoration->where('slug', $request->decoration)->where('buffet_id', $buffet->id)->get()->first()){
+        if($decoration = $this->decoration->where('slug', $slug)->where('buffet_id', $buffet->id)->get()->first()){
             return redirect()->back()->withErrors(['slug' => 'decoration already exists.'])->withInput();
         }
 
@@ -112,8 +112,8 @@ class DecorationController extends Controller
             return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
         }
         $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
-        if(!isset($request->images) || count($request->foods_photo) != $configurations['max_decoration_photos']) {
-            return redirect()->back()->withErrors(['decorations_photo_generic'=> 'Não existem '.$configurations['max_decoration_photos'].' fotos na requisição'])->withInput();
+        if(!isset($request->decoration_photos) || count($request->decoration_photos) != $configurations['max_decoration_photos']) {
+            return redirect()->back()->withErrors(['photo'=> 'Não existem '.$configurations['max_decoration_photos'].' fotos na requisição'])->withInput();
         }
 
         $decoration = $this->decoration->create([
@@ -142,7 +142,7 @@ class DecorationController extends Controller
                 }
             }
         }
-        return redirect()->route('decoration.show',['buffet'=>$buffet_slug, 'decoration'=>$decoration]);
+        return redirect()->back()->with(['success'=>'Decoração criada com sucesso!']);
     }
 
     /**
@@ -164,7 +164,7 @@ class DecorationController extends Controller
         $decoration_photos = DecorationPhotos::where('decorations_id', $decoration->id)->get(); 
         
 
-        return view('decoration.show',['buffet'=>$buffet_slug, 'decoration'=>$decoration, 'decoration_photos'=>$decoration_photos]);
+        return view('decoration.show',['buffet'=>$buffet, 'decoration'=>$decoration, 'decoration_photos'=>$decoration_photos]);
     }
 
     /**
@@ -184,10 +184,17 @@ class DecorationController extends Controller
         }
         $this->authorize('update', [Decoration::class, $decoration, $buffet]);
 
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
+        }
+
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
         $decoration_slug = $request->decoration; 
         $decoration_photos = DecorationPhotos::where('decorations_id', $decoration->id)->get(); 
 
-        return view('decoration.update',['buffet'=>$buffet,'decoration'=>$decoration, 'decoration_photos'=>$decoration_photos]);
+        return view('decoration.update',['buffet'=>$buffet,'decoration'=>$decoration, 'decoration_photos'=>$decoration_photos, 'configurations'=>$configurations]);
     }
 
     /**
@@ -207,7 +214,7 @@ class DecorationController extends Controller
             return redirect()->back()->whithErrors('slug', 'decoration not found')->withInput; 
         }
         $this->authorize('update', [Decoration::class, $decoration, $buffet]);
-
+        
         $decoration_exists = $this->decoration->where('slug', $request->slug)->where('buffet_id', $buffet->id)->get()->first();
         if($decoration_exists && $decoration_exists->id !== $decoration->id){
             return redirect()->back()->withErrors(['slug' => 'decoration already exists'])->withInput(); 
@@ -226,7 +233,7 @@ class DecorationController extends Controller
         
         $decoration_photos = $this->photos->where('id', $request->slug)->where('decorations_id', $decoration->id)->get(); 
 
-        return redirect()->route('decoration.edit', ['buffet'=>$buffet->slug, 'decoration'=>$dec->slug]);
+        return redirect()->route('decoration.edit', ['buffet'=>$buffet->slug, 'decoration'=>$dec->slug])->with(['success'=>'Decoração atualizada!']);
 
     }
 
@@ -242,10 +249,9 @@ class DecorationController extends Controller
         if(!$decoration){
             return redirect()->back()->whithErrors('slug', 'decoration not found')->withInput; 
         }
-        $decoration_photos = $this->photos->where('id', $request->decoration_photos)->where('decorations', $decoration->id)->get()->first();
-
+        $decoration_photos = $this->photos->where('id', $request->decoration_photos)->where('decorations_id', $decoration->id)->get()->first();
         if(!$decoration_photos){
-            return redirect()->route('decoration.index', ['buffet'=>$request->buffet])->withErrors(['photo'=>"photo not found"])->withInput();
+            return redirect()->route('decoration.index', ['buffet'=>$buffet->slug])->withErrors(['photo'=>"photo not found"])->withInput();
         }
         $this->authorize('update', [Decoration::class, $decoration, $buffet]);
 
@@ -267,12 +273,10 @@ class DecorationController extends Controller
                         'file_size'=>$upload['file_size'],
                         'decorations_id'=>$decoration->id,
                     ]);
-                } else {
-                    return redirect()->back()->withErrors(['photo'=>"error photo not valid"])->withInput();
                 }
             }
         }
-        return redirect()->back()->withInput();
+        return redirect()->route('decoration.edit', ['buffet'=>$buffet->slug, 'decoration'=>$decoration->slug]);
     }
 
     public function destroy(Request $request)
@@ -291,7 +295,7 @@ class DecorationController extends Controller
 
         $decoration->update(['status' => DecorationStatus::UNACTIVE->name]);
 
-        return redirect()->back()->with(['message' => 'Deletado com sucesso.'])->withInput();
+        return redirect()->back()->with(['success'=>'Decoração deletada com sucesso.'])->withInput();
     }
 
     public function activate_decoration(Request $request) {
@@ -309,7 +313,7 @@ class DecorationController extends Controller
         
         $decoration->update(['status' => DecorationStatus::ACTIVE->name]);
         
-        return redirect()->back()->with(['message' => 'Deletado com sucesso.'])->withInput();
+        return redirect()->back()->with(['success'=>'Decoração ativada com sucesso.'])->withInput();
      }
 
 
@@ -332,7 +336,7 @@ class DecorationController extends Controller
         $this->authorize('change_status', [Decoration::class, $decoration, $buffet]);
         $decoration->update(['status'=>$request->status]);
 
-        return redirect()->route('decoration.index', ['buffet'=>$buffet_slug]);
+        return redirect()->back()->with(['success'=>'Status da decoração atualizado com sucesso!']);
     }
 
     // API

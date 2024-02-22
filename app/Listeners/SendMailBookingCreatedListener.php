@@ -24,6 +24,5 @@ class SendMailBookingCreatedListener
     {
         $user = auth()->user();
         Notification::send($user, new BookingCreatedNotification($event->booking));
-
     }
 }

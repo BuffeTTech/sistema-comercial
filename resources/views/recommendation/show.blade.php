@@ -1,23 +1,45 @@
-<x-app-layout>
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 float-left" style="width: 50%; border-right: 3px solid #000000;">
-                    <div class="bg-gray-50 border-b-2 border-gray-200">
-                        <p><strong>Conteúdo:</strong> {{ $recommendation->content }}</p><br>
-                        @php
-                        $class_active = "p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50";
-                        $class_unactive = 'p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50';
-                        @endphp
+@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
-                    <div class="flex items-center ml-auto float-down">
-                        <a href="{{ route('recommendation.edit', ['buffet'=>$buffet->slug, 'recommendation'=>$recommendation]) }}" class="bg-amber-300 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded">
-                            <div class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4">
-                                Editar
-                            </div>
-                        </a>
+@section('content')
+    @include('layouts.navbars.auth.topnav', ['title' => 'Recomendações', 'subtitle'=>"Visualizar Recomendação"])
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header pb-0">
+                        <h6>Recomendações de festas</h6>
                     </div>
+                    <div id="alert">
+                        @include('components.alert')
+                    </div>
+                    <div class="card-body px-0 pt-0 pb-2">
+                        <div class="px-4">
+                            <h5>Conteudo</h5>
+                            {!! $recommendation->content !!}
+                            @can('update recommendation')
+                                <a href="{{ route('recommendation.edit', ['buffet'=>$buffet->slug, 'recommendation'=>$recommendation->hashed_id]) }}" title="Editar recomendação" class="btn btn-outline-primary btn-sm fs-6">Editar</a>
+                            @endcan
+                            @can('change recommendation status')
+                                @if($recommendation['status'] !== App\Enums\RecommendationStatus::UNACTIVE->name)
+                                    <form action="{{ route('recommendation.destroy', ['buffet'=>$buffet->slug, 'recommendation'=>$recommendation->hashed_id]) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('delete')
+                                        <button type="submit" class="btn btn-outline-primary btn-sm fs-6" title="Desativar recomendação">❌ Desativar Recomendação</button>                                        
+                                    </form>
+                                @else
+                                    <form action="{{ route('recommendation.change_status', ['recommendation'=>$recommendation['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="post" class="d-inline">
+                                        @csrf
+                                        @method('patch')
+                                        <input type="hidden" name="status" recommendation="{{App\Enums\RecommendationStatus::ACTIVE->name }}">
+                                        <button type="submit" title="Ativar recomendação" class="btn btn-outline-primary btn-sm fs-6">✅ Ativar Recomendação</button>
+                                    </form>
+                                @endif  
+                            @endcan
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        @include('layouts.footers.auth.footer')
     </div>
-</x-app-layout>
+@endsection

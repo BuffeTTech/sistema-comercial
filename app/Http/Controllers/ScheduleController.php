@@ -75,11 +75,11 @@ class ScheduleController extends Controller
         $schedules = $this->schedule->where('buffet_id', $buffet->id)
             ->orderByRaw("FIELD(day_week, '" . implode("', '", DayWeek::array()) . "')")
             ->orderBy('start_time', 'asc')
-            ->paginate($request->get('per page', 5), ['*'], 'page', $request->get('page', 1)); 
+            ->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1)); 
 
-        // $this->authorize('viewAny', [Schedule::class, $buffet]);
+        $this->authorize('viewAny', [Schedule::class, $buffet]);
         
-        return view('schedule.index', ['buffet'=>$buffet_slug, 'schedules'=>$schedules]); 
+        return view('schedule.index', ['buffet'=>$buffet, 'schedules'=>$schedules]); 
     }
 
     /**
@@ -131,32 +131,8 @@ class ScheduleController extends Controller
         $startDateTime = \Carbon\Carbon::parse($request->start_time);
         $endDateTime = $startDateTime->copy()->addMinutes($request->duration);
 
-        return redirect()->route('schedule.show', ['buffet'=>$buffet_slug, 'schedule' =>$schedule->hashed_id]);
+        return redirect()->back()->with(['success', 'Horário atualizado com sucesso!']);
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Request $request)
-    {
-        $buffet_slug = $request->buffet; 
-        $buffet = Buffet::where('slug', $buffet_slug)->get()->first();
-
-        $schedule_id = $this->hashids->decode($request->schedule);
-        if(!$schedule_id) {
-            return redirect()->back()->withErrors(['message'=>'Horário não encontrado'])->withInput();
-        }
-        $schedule_id = $schedule_id[0];
-
-        if(!$schedule = $this->schedule->where('id', $schedule_id)->where('buffet_id', $buffet->id)->first()){
-            return redirect()->route('schedule.index', ['buffet'=>$buffet_slug])->withErrors(['schedule'=>'Horário não encontrado'])->withInput();
-        }
-
-        $this->authorize('view', [Schedule::class, $schedule, $buffet]);
-    
-        return view('schedule.show',['buffet'=>$buffet_slug, 'schedule'=>$schedule]); 
-    }
-
     /**
      * Show the form for editing the specified resource.
      */
@@ -181,7 +157,7 @@ class ScheduleController extends Controller
             return redirect()->back()->withErrors(['message'=>'Horário inativo. Altere seu status para ativo antes de tentar edita-lo'])->withInput();
         }
 
-        return view('schedule.update', ['buffet'=>$buffet_slug, 'schedule'=>$schedule]);
+        return view('schedule.update', ['buffet'=>$buffet, 'schedule'=>$schedule]);
     }
 
     /**
@@ -213,6 +189,7 @@ class ScheduleController extends Controller
         if($isConflicted){
             return redirect()->back()->withErrors(['start_time' => 'Existem conflitos de horário para o dia escolhido'])->withInput();
         }
+
         
         $schedule->update([
             'day_week' => $request->day_week,
@@ -224,8 +201,7 @@ class ScheduleController extends Controller
             'buffet_id'=> $buffet->id, 
         ]); 
 
-
-        return redirect()->route('schedule.show', ['buffet'=>$buffet_slug, 'schedule'=>$schedule->id]);
+        return redirect()->route('schedule.edit', ['buffet'=>$buffet->slug, 'schedule'=>$schedule->hashed_id])->with(['success', 'Horário atualizado com sucesso!'])->withInput();
     }
 
     /**
@@ -251,7 +227,7 @@ class ScheduleController extends Controller
         $schedule->update(['status'=> ScheduleStatus::UNACTIVE->name]);
 
 
-        return redirect()->route('schedule.index', ['buffet'=>$buffet_slug]);
+        return redirect()->back()->with(['success'=>'Horário desativado com sucesso!']);
     }
 
     public function change_status(Request $request){
@@ -278,6 +254,6 @@ class ScheduleController extends Controller
         
         $schedule->update(['status'=>$request->status]); 
 
-        return redirect()->route('schedule.index', ['buffet'=>$buffet_slug]); 
+        return redirect()->back()->with(['success'=>'Status do horário desativado com sucesso!']); 
     }
 }

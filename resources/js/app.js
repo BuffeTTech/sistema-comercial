@@ -1,7 +1,10 @@
-import './bootstrap';
-
+import PerfectScrollbar from 'perfect-scrollbar';
+window.PerfectScrollbar = PerfectScrollbar;
 import Alpine from 'alpinejs';
 import Swal from 'sweetalert2'
+
+import './bootstrap'
+import './custom'
 
 window.Alpine = Alpine;
 
@@ -157,7 +160,6 @@ window.validarCPF = function(cpf) {
 
     return true;
 }
-
 window.replacePhone = function(value) {
     return value
         .replace(/\D/g, '') // substitui qualquer caracter que nao seja numero por nada
@@ -166,8 +168,8 @@ window.replacePhone = function(value) {
         .replace(/(-\d{4})\d+?$/, '$1'); // captura 4 numeros seguidos de um traço e não deixa ser digitado mais nada
 }
 
-window.replaceCEP = function(cep){
-    cep = cep.replace(/\D/g, '');
-    cep = cep.slice(0, 8);
-    return cep.replace(/(\d{5})(\d{3}).*$/, '$1-$2');
+window.replaceCEP = function(value) {
+    return value
+        .replace(/\D/g, '') // Remove todos os caracteres que não são dígitos
+        .replace(/(\d{5})(\d{0,3}).*/, '$1-$2'); // Adiciona um hífen após os primeiros cinco dígitos e limita a 3 caracteres após o hífen
 }

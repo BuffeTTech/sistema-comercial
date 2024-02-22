@@ -18,7 +18,7 @@ class Authenticate extends Middleware
         if(!$buffet || !$buffet_slug) {
             return route('home');
         }
-            // buffet exists
+        // buffet exists
         return $request->expectsJson() ? null : route('login', ['buffet'=>$buffet_slug]);
     }
 }

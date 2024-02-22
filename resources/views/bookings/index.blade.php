@@ -1,82 +1,130 @@
-<x-app-layout>
+@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <div class="overflow-auto">
+@section('content')
+    @include('layouts.navbars.auth.topnav', ['title' => 'Reservas'])
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header pb-0 d-flex justify-content-between">
+                        <h6>Reservas</h6>
                         <div>
-                            <h1 class="inline-flex items-center border border-transparent text-lg leading-4 font-semi-bold">Listagem das reservas</h1>
-                            <h2><a href="{{ route('booking.create', ['buffet'=> $buffet->slug]) }}">Criar Reserva</a></h2>
-                            <h2><a href="{{ route('booking.list', ['buffet'=>$buffet->slug])}}">Listar todas reservas</a></h2>
+                            @can('create booking')
+                                <a href="{{ route('booking.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar Reserva">Criar Reserva</a> 
+                            @endcan      
+                            @can('list booking')
+                                <a href="{{ route('booking.list', ['buffet'=>$buffet->slug, 'format'=>'all']) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Listar Reservas">Listar Reservas</a> 
+                            @endcan  
+                            @can('view next bookings')
+                                <a href="{{ route('booking.list', ['buffet'=>$buffet->slug, 'format'=>'pendent']) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Listar Reservas Pendentes">Listar Reservas Pendentes</a> 
+                            @endcan  
+                            @can('list user bookings')
+                                <a href="{{ route('booking.my_bookings', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Listar minhas reservas">Listar minhas reservas</a> 
+                            @endcan  
+                            @can('view party mode') 
+                                @if($current_party)
+                                    <a href="{{ route('booking.party_mode', ['buffet'=>$buffet->slug])}}"><button type="button" class="btn btn-info mx-2" >Acessar Festa em Andamento!</button></a>
+                                @endif     
+                            @endcan                         
                         </div>
-                        @if($current_party)
-                            <div>
-                                <h2><a href="{{ route('booking.party_mode', ['buffet'=>$buffet->slug])}}"><strong>Acessar Festa em Andamento!</strong></a></h2>
-
-                            </div>
-                        @endif
-                        {{-- @php
-                            $user = auth()->user();
-                        @endphp
-                        @if(isset($current_party) && ($user->hasRole('operational') || $user->hasRole('administrative')))
-                            <div class="bg-amber-400 p-4 text-white rounded-md my-3">
-                                <h1>Há uma festa em andamento! <a href="{{route('bookings.party_mode', $current_party->id)}}" class="font-bold">Clique aqui</a></h1>
-                            </div>
-                        @endif --}}
-                    <table class="w-full">
-                        <thead class="bg-gray-50 border-b-2 border-gray-200">
-                            <tr>
-                                <!-- w-24 p-3 text-sm font-semibold tracking-wide text-left -->
-                                
-                                <th class="p-3 text-sm font-semibold tracking-wide text-left">Nome Aniversariante</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Máx. Convidados</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Comida</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Decoração</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Dia da festa</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Inicio</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Fim</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Status</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Ações</th>
-
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @if(count($bookings) === 0)
-                            <tr>
-                                <td colspan="8" class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">Nenhuma reserva encontrado</td>
-                            </tr>
-                            @else
-                                @foreach($bookings as $key=>$booking)
-                                <tr class="bg-white">
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                    <a href="{{ route('booking.show', ['booking'=>$booking['hashed_id'], 'buffet'=>$buffet->slug]) }}" class="font-bold text-blue-500 hover:underline">{{ $booking->name_birthdayperson }}</a>
-                                    </td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $booking->num_guests }}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $booking->food['slug'] }}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $booking->decoration['slug'] }}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ date('d/m/Y',strtotime($booking->party_day)) }}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ date("H:i", strtotime($booking->schedule['start_time'])) }}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ date("H:i", strtotime(\Carbon\Carbon::parse($booking->schedule['start_time'])->addMinutes($booking->schedule['duration']))) }}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.booking_status :status="$booking['status']" /></td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                        <a href="{{ route('booking.show', ['booking'=>$booking['hashed_id'], 'buffet'=>$buffet->slug]) }}" title="Visualizar '{{$booking->name_birthdayperson}}'">👁️</a>
-                                        <a href="{{ route('booking.edit', ['booking'=>$booking['hashed_id'], 'buffet'=>$buffet->slug]) }}" title="Editar '{{$booking->name_birthdayperson}}'">✏️</a>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            @endif
-
-                        </tbody>
-                    </table>
-                    {{ $bookings->links('components.pagination') }}
                     </div>
-
+                    <div id="alert">
+                        @include('components.alert')
+                    </div>
+                    <div class="card-body px-0 pt-0 pb-2">
+                        <div class="table-responsive p-0">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Nome Aniversariante</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Máx. Convidados</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Comida</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Decoração</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Dia da Festa</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Inicio</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Fim</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Status</th>
+                                        <th class="text-secondary opacity-7"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if(count($bookings) === 0)
+                                    <tr>
+                                        <td colspan="7" class="p-3 text-sm text-center">Nenhuma reserva encontrada</td>
+                                    </tr>
+                                    @else
+                                        @foreach($bookings as $booking)
+                                            <tr>
+                                                <td class="text-center">
+                                                    <div class="d-flex px-2 py-1">
+                                                        <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                            <h6 class="mb-0 text-sm">{{$booking['name_birthdayperson'] }}</h6>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="d-flex px-2 py-1">
+                                                        <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                            <p class="text-sm mb-0">{{$booking['num_guests']}}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="d-flex px-2 py-1">
+                                                        <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                            <p class="text-sm mb-0">{{$booking->food['slug']}}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="d-flex px-2 py-1">
+                                                        <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                            <p class="text-sm mb-0">{{$booking->decoration['slug']}}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="d-flex px-2 py-1">
+                                                        <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                            <p class="text-sm mb-0">{{ date('d/m/Y',strtotime($booking->party_day))  }}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="d-flex px-2 py-1">
+                                                        <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                            <p class="text-sm mb-0">{{date("H:i", strtotime($booking->schedule['start_time']))}}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="d-flex px-2 py-1">
+                                                        <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                            <p class="text-sm mb-0">{{ date("H:i", strtotime(\Carbon\Carbon::parse($booking->schedule['start_time'])->addMinutes($booking->schedule['duration']))) }}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <x-status.booking_status :status="$booking['status']" />
+                                                </td>
+                                                @can('view booking')
+                                                    <td class="text-center align-middle">
+                                                        <a href="{{ route('booking.show', ['buffet'=>$buffet->slug,'booking'=>$booking->hashed_id]) }}" title="Visualizar recomendação" class="btn btn-outline-primary btn-sm fs-6">👁️</a>
+                                                    </td>
+                                                @endcan
+                                            </tr>
+                                        @endforeach
+                                    @endif
+                                </tbody>
+                            </table>
+                            <div class="px-2">
+                                {{ $bookings->links('components.pagination') }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <br><br> 
-            <iframe src="{{ route('booking.calendar', ['buffet'=>$buffet->slug]) }}" frameborder="1" width="1000px" height="700px"></iframe>
-
         </div>
+        @include('layouts.footers.auth.footer')
     </div>
-</x-app-layout>
+@endsection

@@ -15,6 +15,7 @@ use App\Http\Requests\SatisfactionSurvey\StoreSatisfactionAnswerRequest;
 use App\Http\Requests\SatisfactionSurvey\UpdateSatisfactionQuestionRequest; 
 use App\Http\Requests\SatisfactionSurvey\UpdateSatisfactionAnswerRequest; 
 use App\Models\BuffetSubscription;
+use App\Models\SubscriptionConfiguration;
 use Carbon\Carbon;
 use Hashids\Hashids;
 
@@ -43,7 +44,18 @@ class SatisfactionSurveyController extends Controller
 
         $surveys = $this->survey->where('buffet_id', $buffet->id)->paginate($request->get('per page', 5), ['*'], 'page', $request->get('page', 1));
 
-        return view('survey.index',['buffet'=>$buffet, 'surveys'=>$surveys]); 
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['generic_error'=> "Buffet is not active"])->withInput();
+        }
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
+        if(count($surveys) >= $configurations['max_survey_questions']) {
+            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais perguntas neste plano.'])->withInput();
+        }
+        $total = $this->survey->where('buffet_id',$buffet->id)->where('status', true)->get();
+
+        return view('survey.index',['buffet'=>$buffet, 'surveys'=>$surveys, 'total'=>count($total), 'configurations'=>$configurations]); 
     }
 
     public function create(Request $request){
@@ -55,7 +67,19 @@ class SatisfactionSurveyController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
         
-        $this->authorize('create', [SatisfactionQuestion::class, $buffet]);        
+        $this->authorize('create', [SatisfactionQuestion::class, $buffet]);      
+        
+        $surveys = $this->survey->where('buffet_id',$buffet->id)->where('status', true)->get();
+
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['generic_error'=> "Buffet is not active"])->withInput();
+        }
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
+        if(count($surveys) >= $configurations['max_survey_questions']) {
+            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais perguntas neste plano.'])->withInput();
+        }
 
         return view('survey.create', ['buffet'=>$buffet]);
     }
@@ -70,6 +94,18 @@ class SatisfactionSurveyController extends Controller
 
         $this->authorize('create', [SatisfactionQuestion::class,$buffet]);  
 
+        $surveys = $this->survey->where('buffet_id',$buffet->id)->where('status', true)->get();
+
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['generic_error'=> "Buffet is not active"])->withInput();
+        }
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
+        if(count($surveys) >= $configurations['max_survey_questions']) {
+            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais perguntas neste plano.'])->withInput();
+        }
+
         $survey = $this->survey->create([
             "question"=>$request->question, 
             "status"=>$request->status ?? true, 
@@ -77,7 +113,7 @@ class SatisfactionSurveyController extends Controller
             "buffet_id"=>$buffet->id
         ]);
 
-        return redirect()->route('survey.show', ['buffet'=>$buffet_slug, 'survey'=>$survey->hashed_id]);
+        return redirect()->back()->with(['success'=>'Pergunta criada com sucesso!']);
     }
 
     public function show(Request $request){
@@ -96,7 +132,6 @@ class SatisfactionSurveyController extends Controller
         }
 
         $this->authorize('view', [$survey, $buffet]);
-
         return view('survey.show', ['buffet'=>$buffet, 'survey'=>$survey]);
     }
     public function edit(Request $request){
@@ -141,7 +176,7 @@ class SatisfactionSurveyController extends Controller
             "buffet_id"=>$buffet->id
         ]);
 
-        return redirect()->route('survey.show', ['buffet'=>$buffet_slug, 'survey'=>$survey->hashed_id]);
+        return redirect()->route('survey.edit', ['buffet'=>$buffet->slug, 'survey'=>$survey->hashed_id])->with(['success'=>'Pergunta atualizada com sucesso!']);
 
     }
 
@@ -154,13 +189,14 @@ class SatisfactionSurveyController extends Controller
         }
 
         $survey_id = $this->hashids->decode($request->survey)[0];
-        $survey = $this->survey->where('id',$survey_id)->update(['status'=> false]);
+        $survey = $this->survey->where('id',$survey_id);
 
         if(!$survey){
             return redirect()->back()->withErrors(['message' => 'question not found.'])->withInput();
         }
+        $survey->update(['status'=> false]);
 
-        return redirect()->route('survey.index',['buffet'=>$buffet_slug]);
+        return redirect()->back()->with(['success'=>'Pergunta desativada com sucesso!']);
 
     }
 
@@ -173,13 +209,27 @@ class SatisfactionSurveyController extends Controller
         }
 
         $survey_id = $this->hashids->decode($request->survey)[0];
-        $survey = $this->survey->where('id',$survey_id)->update(['status'=> true]);
+        $survey = $this->survey->where('id',$survey_id);
 
         if(!$survey){
             return redirect()->back()->withErrors(['message' => 'question not found.'])->withInput();
         }
 
-        return redirect()->route('survey.index',['buffet'=>$buffet_slug]);
+        $surveys = $this->survey->where('buffet_id',$buffet->id)->where('status', true)->get();
+
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['generic_error'=> "Buffet is not active"])->withInput();
+        }
+        $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
+        if(count($surveys) >= $configurations['max_survey_questions']) {
+            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais perguntas neste plano.'])->withInput();
+        }
+
+        $survey->update(['status'=> (bool)$request->status]);
+
+        return redirect()->back()->with(['success'=>'Status da pergunta alterado com sucesso!']);
 
     }
 
@@ -222,18 +272,22 @@ class SatisfactionSurveyController extends Controller
             ->first();
         $booking->update(['status'=>BookingStatus::CLOSED->name]);  
 
-        return redirect()->back()->with(['message'=>'Pesquisa de satisfação salva com sucesso   ']);
+        return redirect()->back()->with(['success'=>'Pesquisa de satisfação salva com sucesso']);
     }
 
     public function api_get_question_by_user_id(Request $request){
         $buffet_slug = $request->buffet;
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
-
+        
         if(!$buffet || !$buffet_slug) {
             return response()->json(['message' => 'Buffet não encontrado'], 422);
         }
-
-        $user_id = $this->hashids->decode($request->user_id)[0];
+        
+        $user_id = $this->hashids->decode($request->user_id);
+        if(!$user_id) {
+            return redirect()->back()->withErrors(['message'=>'Horário não encontrado'])->withInput();
+        }
+        $user_id = $user_id[0];
 
         $booking = $this->booking
                             ->where('buffet_id', $buffet->id)

@@ -1,60 +1,88 @@
-<x-app-layout>
+@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 float-left" style="width: 50%; border-right: 3px solid #000000;">
-                    <div class="bg-gray-50 border-b-2 border-gray-200">
-                        <p><strong>Pergunta: </strong> {{ $survey->id }}</p><br>
-                        <p><strong>Status: </strong> </strong><x-status.survey_status :status="$survey->status" /></p><br>
-                        <p><strong>Formato: </strong>{{ App\Enums\QuestionType::fromValue($survey->question_type) }}</p><br>
-                        <p>{!! $survey->question !!}</p><br>
-                        <p><strong>Respostas:</strong></p><br>
-                        <div class="overflow-auto">
-                            <table class="w-full">
-                                <thead class="bg-gray-50 border-b-2 border-gray-200">
-                                    <tr>
-                                        <!-- w-24 p-3 text-sm font-semibold tracking-wide text-left -->
-                                        
-                                        <th class="w-20 p-3 text-sm font-semibold tracking-wide text-center">ID</th>
-                                        <th class="p-3 text-sm font-semibold tracking-wide text-left">Resposta</th>
-                                        <th class="p-3 text-sm font-semibold tracking-wide text-center">Reserva</th>
-        
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-100">
-                                    @if(count($survey['user_answers']) === 0)
-                                    <tr>
-                                        <td colspan="8" class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">Nenhuma resposta encontrada</td>
-                                    </tr>
-                                    @else
-                                        @php
-                                            $limite_char = 30; // O número de caracteres que você deseja exibir
-                                        @endphp
-                                        @foreach($survey['user_answers'] as $key=>$value)
-                                        <tr class="bg-white">
-                                            <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $key+1 }}</td>
-                                            <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-left">{{ $value->answer }}</td>
-                                            <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                                <a href="{{ route('booking.show', ['booking'=>$value->booking->hashed_id, 'buffet'=>$buffet->slug]) }}" class="font-bold text-blue-500 hover:underline">{{ $value->booking['name_birthdayperson'] }}</a>
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    @endif
-                                </tbody>
-                            </table>
-                        <br><br>
-
-                        <div class="flex items-center ml-auto float-down">
-                            <a href="{{ route('survey.edit', ['survey'=>$survey->hashed_id, 'buffet'=>$buffet->slug]) }}" class="bg-amber-300 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded">
-                                <div class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4">
-                                    Editar
+@section('content')
+    @include('layouts.navbars.auth.topnav', ['title' => 'Pesquisa de Satisfação', 'subtitle'=>"Visualizar pesquisa de satisfação"])
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header pb-0">
+                        <h6>Pesquisa de satisfação</h6>
+                    </div>
+                    <div id="alert">
+                        @include('components.alert')
+                    </div>
+                    <div class="card-body px-0 pt-0 pb-2">
+                        <div class="px-4">
+                            <h3>{{ $survey->main_theme }}</h3>
+                            <p class="text-md mb-0"><strong>Pergunta: </strong> {{ $survey->question }}</p>
+                            <p class="text-lg mb-0"><strong>Status: </strong> </strong><x-status.survey_status :status="$survey->status" /></p>
+                            <p class="text-lg mb-0"><strong>Formato: </strong>{{ App\Enums\QuestionType::fromValue($survey->question_type) }}</p>
+                            <p class="text-lg mb-0"><strong>Respostas: </strong> {{ $survey->answers }}</p>
+                                <div class="overflow-auto">
+                                    <table class="table align-items-center mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Resposta</th>
+                                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Reserva</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if($survey->answers === 0)
+                                            <tr>
+                                                <td colspan="2" class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">Nenhuma Resposta encontrada</td>
+                                            </tr>
+                                            @else
+                                                @php
+                                                    $limite_char = 30; // O número de caracteres que você deseja exibir
+                                                @endphp
+                                                @foreach($survey['user_answers'] as $key=>$value)
+                                                <tr class="bg-white">
+                                                    <td class="text-center">
+                                                        <div class="d-flex px-2 py-1">
+                                                            <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                                <p class="mb-0 text-sm">{{ $value->answer }}</p>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <div class="d-flex px-2 py-1">
+                                                            <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                                <p class="text-sm mb-0"><a href="{{ route('booking.show', ['booking'=>$value->booking->hashed_id, 'buffet'=>$buffet->slug]) }}"  class="font-bold text-blue-500 hover:underline">{{ $value->booking['name_birthdayperson'] }}</a></p>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            @endif
+                
+                                        </tbody>
+                                    </table>
                                 </div>
-                            </a>
-                        </div>
+
+                        @can('update survey question')
+                            <a href="{{ route('survey.edit', ['buffet'=>$buffet->slug, 'survey'=>$survey->hashed_id]) }}" title="Editar recomendação" class="btn btn-outline-primary btn-sm fs-6">Editar</a>
+                        @endcan
+                        @can('change survey question status')
+                            @if($survey['status'] == true)
+                                <form action="{{ route('survey.destroy', ['buffet'=>$buffet->slug, 'survey'=>$survey->hashed_id]) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('delete')
+                                    <button type="submit" class="btn btn-outline-primary btn-sm fs-6" title="Desativar recomendação">❌ Desativar pergunta</button>                                        
+                                </form>
+                            @else
+                                <form action="{{ route('survey.change_status', ['survey'=>$survey['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="post" class="d-inline">
+                                    @csrf
+                                    @method('patch')
+                                    <input type="hidden" name="status" survey="true">
+                                    <button type="submit" title="Ativar recomendação" class="btn btn-outline-primary btn-sm fs-6">✅ Ativar pergunta</button>
+                                </form>
+                            @endif  
+                        @endcan
                     </div>
                 </div>
             </div>
         </div>
+        @include('layouts.footers.auth.footer')
     </div>
-</x-app-layout>
+@endsection

@@ -155,6 +155,28 @@ class BookingController extends Controller
         return view('bookings.index', ['bookings'=>$bookings,'buffet' => $buffet, 'current_party'=>$current_party]);
     }
 
+    public function my_bookings(Request $request) {
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+        
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+        
+        // Lista de somente as próximas reservas 
+        $bookings = $this->booking
+                        ->with(['schedule'=>function ($query) {
+                            $query->orderBy('start_time', 'asc');
+                        }, 'food','decoration', 'user'])
+                        ->where('user_id', auth()->user()->id)
+                        ->orderBy('party_day', 'asc')
+                        ->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
+
+        $this->authorize('viewUserBookings', [Booking::class, $buffet]);
+
+        return view('bookings.user-bookings', ['bookings'=>$bookings,'buffet' => $buffet]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -171,7 +193,7 @@ class BookingController extends Controller
         $foods = $this->food->where('buffet_id', $buffet->id)->where('status', FoodStatus::ACTIVE->name)->get();
         $decorations = $this->decoration->where('buffet_id', $buffet->id)->where('status', DecorationStatus::ACTIVE->name)->get();
 
-        return view('bookings.create', ['buffet'=>$buffet, 'foods'=>$foods, 'decorations'=>$decorations]);
+        return view('bookings.create', ['buffet'=>$buffet, 'foods'=>$foods, 'decorations'=>$decorations])->with(['success'=>'Reserva criada com sucesso!']);
     }
 
     /**
@@ -271,7 +293,8 @@ class BookingController extends Controller
 
         event(new BookingCreatedEvent($booking));
 
-        return redirect()->route('booking.show', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id]);
+        return redirect()->back()->with(['success'=>'Reserva criada com sucesso! Fique atento em seu e-mail.']);
+        // return redirect()->route('booking.show', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id])->with(['success'=>'Recomendação criada com sucesso! Fique atento em seu e-mail.']);
 
     }
 
@@ -304,7 +327,8 @@ class BookingController extends Controller
         $guests = $this->guest
             ->where('booking_id',$booking_id)
             ->where('buffet_id', $buffet->id)
-            ->get();
+            ->orderBy('name', 'asc')
+            ->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
 
         $guest_counter = $this->guest_counter($booking, $request);
 
@@ -337,10 +361,14 @@ class BookingController extends Controller
         $booking = $this->booking->where('id', $booking_id)->where('buffet_id', $buffet->id)->get()->first();
         
         if(!$booking) {
-            return redirect()->back()->withErrors(['errors'=>'Booking not found'])->withInput();
+            return redirect()->back()->withErrors(['errors'=>'Reserva não encontrada'])->withInput();
         }
 
         $this->authorize('update', [Booking::class, $booking, $buffet]);
+
+        if($booking['status'] !== BookingStatus::APPROVED->name && $booking['status'] !== BookingStatus::PENDENT->name) {
+            return redirect()->back()->withErrors(['errors'=>'Esta reserva não pode mais ser editada.'])->withInput();
+        }
 
         $foods = $this->food->where('buffet_id', $buffet->id)->where('status', FoodStatus::ACTIVE->name)->get();
         $decorations = $this->decoration->where('buffet_id', $buffet->id)->where('status', DecorationStatus::ACTIVE->name)->get();
@@ -370,10 +398,14 @@ class BookingController extends Controller
         // valida se o booking existe
         $booking = $this->booking->where('buffet_id', $buffet->id)->where('id', $booking_id)->get()->first();
         if(!$booking) {
-            return redirect()->back()->withErrors(['errors'=>'Booking not found'])->withInput();
+            return redirect()->back()->withErrors(['errors'=>'Reserva não encontrada'])->withInput();
         }
         
         $this->authorize('update', [Booking::class, $booking, $buffet]);
+
+        if($booking['status'] !== BookingStatus::APPROVED->name && $booking['status'] !== BookingStatus::PENDENT->name) {
+            return redirect()->back()->withErrors(['errors'=>'Esta reserva não pode mais ser editada.'])->withInput();
+        }
 
         // valida a hora
         $schedule = $this->schedule->where('id', $request->schedule_id)->where('buffet_id', $buffet->id)->get()->first();
@@ -456,7 +488,7 @@ class BookingController extends Controller
 
         event(new BookingUpdatedEvent($booking));
 
-        return redirect()->route('booking.edit', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id]);
+        return redirect()->route('booking.edit', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id])->with(['success'=>'Reserva atualizada com sucesso!']);
     }
 
     public function destroy(Request $request)
@@ -525,6 +557,17 @@ class BookingController extends Controller
         return view('bookings.calendar', ['buffet'=>$buffet]);
     }
 
+    public function buffet_calendar(Request $request) {
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+
+        return view('bookings.calendar-page', ['buffet'=>$buffet]);
+    }
+
     public function reschedule_party() {
         
     }
@@ -574,7 +617,7 @@ class BookingController extends Controller
 
             $booking = $this->booking->where('id', $booking_id)->get()->first();
             if(!$booking) {
-                return response()->json(['message' => 'Booking not found'], 422);
+                return response()->json(['message' => 'Reserva não encontrada'], 422);
             }
 
             $booking_id = $booking->id;
@@ -643,13 +686,14 @@ class BookingController extends Controller
         $current_party = $this->current_party();
         if(!$current_party) {
             // a propria blade tem um if pra validar se existe ou não
-            return view('bookings.party_mode',['booking'=>$current_party,'buffet'=>$buffet_slug]);
+            return view('bookings.party_mode',['booking'=>$current_party,'buffet'=>$buffet]);
         }
 
         $guests = $this->guest
                        ->where('booking_id',$current_party->id)
                        ->where('buffet_id', $buffet->id)
-                       ->get();
+                       ->orderBy('name', 'asc')
+                       ->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
 
         $guest_counter = $this->guest_counter($current_party, $request);
 

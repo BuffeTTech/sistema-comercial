@@ -1,80 +1,125 @@
-<x-app-layout>
+@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <div class="overflow-auto">
-                        <div>
-                            <h1 class="inline-flex items-center border border-transparent text-lg leading-4 font-semi-bold">Listagem dos pacotes de comidas e bebidas</h1>
-                            <h2><a href="{{ route('food.create', ['buffet'=> $buffet]) }}">Criar pacote de Comidas e Bebidas</a></h2>
-                        </div>
-                    <table class="w-full">
-                        <thead class="bg-gray-50 border-b-2 border-gray-200">
-                            <tr>
-                                <!-- w-24 p-3 text-sm font-semibold tracking-wide text-left -->
-                                
-                                <th class="w-20 p-3 text-sm font-semibold tracking-wide text-center">ID</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-left">Nome do Pacote</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Descrição das comidas</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Descrição das bebidas</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Preço do pacote</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Slug</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Status</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Ações</th>
-
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @if(count($foods) === 0)
-                            <tr>
-                                <td colspan="8" class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">Nenhum pacote encontrado</td>
-                            </tr>
-                            @else
-                                @php
-                                    $limite_char = 30; // O número de caracteres que você deseja exibir
-                                    $class_active = "p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50";
-                                    $class_unactive = 'p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50';
-                                @endphp
-                                @foreach($foods as $value)
-                                <tr class="bg-white">
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['id'] }}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                    <a href="{{ route('food.show', ['food'=>$value['slug'], 'buffet'=>$buffet]) }}" class="font-bold text-blue-500 hover:underline">{{ $value['name_food'] }}</a>
-                                    </td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap">{!! mb_strimwidth($value['food_description'], 0, $limite_char, " ...") !!}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{!! mb_strimwidth($value['beverages_description'], 0, $limite_char, " ...") !!}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">R$ {{ (float)$value['price'] }}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">{{ $value['slug'] }}</td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"><x-status.food_status :status="$value['status']" /></td>
-                                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center">
-                                        <a href="{{ route('food.show', ['food'=>$value['slug'], 'buffet'=>$buffet]) }}" title="Visualizar '{{$value['name_food']}}'">👁️</a>
-                                        <a href="{{ route('food.edit', ['food'=>$value['slug'], 'buffet'=>$buffet]) }}" title="Editar '{{$value['name_food']}}'">✏️</a>
-                                        @if($value['status'] !== App\Enums\FoodStatus::UNACTIVE->name)
-                                            <form action="{{ route('food.destroy', ['food'=>$value['slug'], 'buffet'=>$buffet]) }}" method="post" class="inline">
-                                                @csrf
-                                                @method('delete')
-                                                <button type="submit" title="Deletar '{{ $value['name_food'] }}'">❌</button>
-                                            </form>
-                                            @else
-                                            <form action="{{ route('food.activate_food', ['food'=>$value['slug'], 'buffet'=>$buffet]) }}" method="post" class="inline">
-                                                @csrf
-                                                @method('patch')
-                                                <button type="submit" title="Deletar '{{ $value['name_food'] }}'">✅</button>
-                                            </form>
-                                        @endif
-                                    </td>
-                                </tr>
-                                @endforeach
-                            @endif
-
-                        </tbody>
-                    </table>
-                    {{ $foods->links('components.pagination') }}
+@section('content')
+    @include('layouts.navbars.auth.topnav', ['title' => 'Comidas'])
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header pb-0 d-flex justify-content-between">
+                        <h6>Comidas de festa</h6>
+                        <a href="{{ route('food.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar Comida">Criar Comida</a>                                        
                     </div>
-
+                    <div id="alert">
+                        @include('components.alert')
+                    </div>
+                    <div class="card-body px-0 pt-0 pb-2">
+                        <div class="table-responsive p-0">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
+                                            Nome do pacote</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
+                                            Descrição das comidas</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
+                                            Descriçao das bebidas</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
+                                            Preço do pacote</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
+                                            Slug</th>
+                                        <th
+                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Status</th>
+                                        <th class="text-secondary opacity-7"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if(count($foods) === 0)
+                                    <tr>
+                                        <td colspan="3" class="p-3 text-sm text-center">Nenhuma comida encontrada</td>
+                                    </tr>
+                                    @else
+                                        @php
+                                            $limite_char = 30; // O número de caracteres que você deseja exibir
+                                        @endphp
+                                        @foreach($foods as $value)
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                        <h6 class="mb-0 text-sm">{{ $value['name_food'] }}</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                        <p class="text-sm mb-0">{{ mb_strimwidth($value['food_description'], 0, $limite_char, " ...") }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                        <p class="text-sm mb-0">{{ mb_strimwidth($value['beverages_description'], 0, $limite_char, " ...") }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                        <p class="text-sm mb-0">{{ (float)$value['price'] }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                        <p class="text-sm mb-0">{{ $value['slug'] }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <x-status.food_status :status="$value['status']" />
+                                            </td>
+                                            <td class="align-middle">
+                                                @can('view food')
+                                                    <a href="{{ route('food.show', ['buffet'=>$buffet->slug,'food'=>$value->slug]) }}" title="Visualizar recomendação" class="btn btn-outline-primary btn-sm fs-6">👁️</a>
+                                                @endcan
+                                                @can('update food')
+                                                    <a href="{{ route('food.edit', ['buffet'=>$buffet->slug, 'food'=>$value->slug]) }}" title="Editar recomendação" class="btn btn-outline-primary btn-sm fs-6">✏️</a>
+                                                @endcan
+                                                @can('change food status')
+                                                    @if($value['status'] !== App\Enums\FoodStatus::UNACTIVE->name)
+                                                        <form action="{{ route('food.destroy', ['buffet'=>$buffet->slug, 'food'=>$value->slug]) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            @method('delete')
+                                                            <button type="submit" class="btn btn-outline-primary btn-sm fs-6" title="Desativar recomendação" >❌</button>                                        
+                                                        </form>
+                                                    @else
+                                                        <form action="{{ route('food.change_status', ['food'=>$value['slug'], 'buffet'=>$buffet->slug]) }}" method="post" class="d-inline">
+                                                            @csrf
+                                                            @method('patch')
+                                                            <input type="hidden" name="status" value="{{App\Enums\FoodStatus::ACTIVE->name }}">
+                                                            <button type="submit" title="Ativar comida" class="btn btn-outline-primary btn-sm fs-6">✅</button>
+                                                        </form>
+                                                    @endif    
+                                                @endcan
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    @endif
+                                </tbody>
+                            </table>
+                            <div class="px-2">
+                                {{ $foods->links('components.pagination') }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        @include('layouts.footers.auth.footer')
     </div>
-</x-app-layout>
+@endsection

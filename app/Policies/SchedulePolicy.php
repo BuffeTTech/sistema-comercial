@@ -32,28 +32,6 @@ class SchedulePolicy
     }
 
     /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Schedule $schedule, Buffet $buffet): bool
-    {
-        if($user == null) {
-            return false;
-        }
-
-        // Verifica se o usuário é cadastrado no buffet
-        if($user->buffet_id == $buffet->id) {
-            return $user->can('show schedule');
-        }
-
-        // Verifica se usuário é o dono do buffet
-        if($user->id == $buffet->owner_id) {
-            return $user->can('show schedule');
-        }
-
-        return false;
-    }
-
-    /**
      * Determine whether the user can create models.
      */
     public function create(User $user, Buffet $buffet): bool

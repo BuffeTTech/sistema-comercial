@@ -32,6 +32,10 @@ class RegisteredUserController extends Controller
             //redirecionar para a landing page do sistema administrativo
         } else {
             // buffet exists
+            $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+            if($buffet_subscription->expires_in < Carbon::now()) {
+                return redirect(RouteServiceProvider::NOT_FOUND);
+            }
             return view('auth.register', compact('buffet'));
         }
     }
@@ -53,10 +57,7 @@ class RegisteredUserController extends Controller
                 'cpf_ou_cnpj',
                 'unique:users,document'
             ],
-            // 'document_type' => [
-            //     'required',
-            //     Rule::in(array_column(DocumentType::cases(), 'name'))
-            // ],
+            'terms' => 'required',
             'phone1'=> ['required', 'string', 'celular_com_ddd']
         ]);
 

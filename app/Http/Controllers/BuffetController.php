@@ -31,6 +31,7 @@ class BuffetController extends Controller
     {
         
     }
+
     public function dashboard(Request $request) {
         $buffet_slug = $request->buffet;
         $buffet = $this->buffet->where('slug', $buffet_slug)->first();
@@ -316,7 +317,7 @@ class BuffetController extends Controller
         
         event(new EditBuffetEvent(buffet: $buffet, old_slug: $old_slug));
 
-        return back()->with('success', "Update successfully");
+        return redirect()->route('buffet.edit', ['buffet'=>$buffet->slug])->with(['success'=>'Buffet Editado com sucesso.']);
     }
 
     /**
@@ -347,9 +348,8 @@ class BuffetController extends Controller
         if($logo) {
             $previousFilePath = storage_path(self::$image_repository).$logo->file_path;
         }
-
-         $photo = $request->buffet_logo;
-         if ($request->has('buffet_logo')) {
+         $photo = $request->photo;
+         if ($request->has('photo')) {
             if ($photo->isValid()) { 
                
                 if($upload = $this->upload_image(photo: $photo))  {
@@ -379,14 +379,11 @@ class BuffetController extends Controller
                         ]);
                         $buffet->update(['logo_id'=>$photo_created->id]);
                     }
-
-                } else {
-                    return redirect()->back()->withErrors(['photo'=>"error photo not valid"])->withInput();
                 }
             }
         }
 
-        return redirect()->back()->withInput();
+        return redirect()->route('buffet.edit', ['buffet'=>$buffet->slug])->withInput();
     }
 
     private function upload_image($photo) {

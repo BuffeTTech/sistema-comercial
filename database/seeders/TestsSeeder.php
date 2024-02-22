@@ -7,6 +7,7 @@ use App\Enums\BuffetStatus;
 use App\Enums\DayWeek;
 use App\Enums\GuestStatus;
 use App\Enums\QuestionType;
+use App\Enums\RecommendationStatus;
 use App\Enums\SatisfactionQuestionStatus;
 use App\Enums\SubscriptionStatus;
 use App\Enums\UserStatus;
@@ -21,6 +22,8 @@ use App\Models\Food;
 use App\Models\FoodPhoto;
 use App\Models\Guest;
 use App\Models\Phone;
+use App\Models\Recommendation;
+use App\Models\SatisfactionAnswer;
 use App\Models\SatisfactionQuestion;
 use App\Models\Schedule;
 use App\Models\Subscription;
@@ -52,7 +55,8 @@ class TestsSeeder extends Seeder
             "max_employees"=>6,
             "max_food_photos"=>3,
             "max_decoration_photos"=>3,
-            "max_recommendations"=>3,
+            "max_recommendations"=>7,
+            "max_survey_questions"=>6,
             "subscription_id"=>$pacote_alegria->id,
         ]);
         $user_role = Role::create(['name' => $pacote_alegria->slug.'.user']);
@@ -70,7 +74,7 @@ class TestsSeeder extends Seeder
         $p7 = Permission::create(['name'=>'update booking']);
         $p8 = Permission::create(['name'=>'cancel booking']);
         $p9 = Permission::create(['name'=>'change booking status']);
-        $p10 = Permission::create(['name'=>'create guest']);
+        // $p10 = Permission::create(['name'=>'create guest']);
         $p11 = Permission::create(['name'=>'change guest status']);
         $p12 = Permission::create(['name'=>'show guest']);
         $user_role->givePermissionTo($p3->name);
@@ -83,9 +87,11 @@ class TestsSeeder extends Seeder
         $administrative_role->givePermissionTo($p7->name);
         $administrative_role->givePermissionTo($p8->name);
         $administrative_role->givePermissionTo($p9->name);
-        $administrative_role->givePermissionTo($p10->name);
+        // $administrative_role->givePermissionTo($p10->name);
         $administrative_role->givePermissionTo($p11->name);
         $administrative_role->givePermissionTo($p12->name);
+        $user_role->givePermissionTo($p6->name);
+        $user_role->givePermissionTo($p2->name);
       
         $create_survey = Permission::create(['name'=>'create survey question']);
         $show_survey = Permission::create(['name'=>'show survey question']);
@@ -139,16 +145,16 @@ class TestsSeeder extends Seeder
             'address'=>$buffet_address->id
         ]);
 
-        $logo = BuffetPhoto::create([
-            'file_name'=>'169998221749.jpg',
-            'file_path'=>'/169998221749.170554800088-.jpg',
-            'file_extension'=>'jpg',
-            'mime_type'=>'image/jpeg',
-            'file_size'=>'31904',
-            'buffet_id'=>$buffet->id
-        ]);
+        // $logo = BuffetPhoto::create([
+        //     'file_name'=>'ddasdasdas.jpg',
+        //     'file_path'=>'/ddasdasdas-.jpg',
+        //     'file_extension'=>'jpg',
+        //     'mime_type'=>'image/jpeg',
+        //     'file_size'=>'31904',
+        //     'buffet_id'=>$buffet->id
+        // ]);
 
-        $buffet->update(['logo_id'=>$logo->id]);
+        // $buffet->update(['logo_id'=>$logo->id]);
 
         $buffet_subscription = BuffetSubscription::create([
             'buffet_id'=>$buffet->id,
@@ -170,11 +176,11 @@ class TestsSeeder extends Seeder
             'buffet_id' => $buffet->id,
             'phone1'=>$user1_phone->id
         ]);
-        $user1->assignRole($operational_role->name);
+        $user1->assignRole($user_role->name);
 
         $schedule1 = Schedule::create([
             'day_week'=>DayWeek::SUNDAY->name,
-            'start_time'=>'12:00',
+            'start_time'=>'21:00',
             'duration'=>120,
             'buffet_id'=>$buffet->id
         ]);
@@ -227,8 +233,8 @@ class TestsSeeder extends Seeder
             'buffet_id'=>$buffet->id
         ]);
         $schedule10 = Schedule::create([
-            'day_week'=>DayWeek::THURSDAY->name,
-            'start_time'=>'19:00',
+            'day_week'=>DayWeek::TUESDAY->name,
+            'start_time'=>'21:00',
             'duration'=>150,
             'buffet_id'=>$buffet->id
         ]);
@@ -244,16 +250,16 @@ class TestsSeeder extends Seeder
         ]);
 
         FoodPhoto::create([
-            'file_name'=>'169998221766.jpg',
-            'file_path'=>'/169998221766.170554800078-.jpg',
+            'file_name'=>'dadsadasd.jpg',
+            'file_path'=>'/dadsadasd.jpg',
             'file_extension'=>'jpg',
             'mime_type'=>'image/jpeg',
             'file_size'=>'40847',
             'food_id'=>$food->id
         ]);
         FoodPhoto::create([
-            'file_name'=>'169998221749.jpg',
-            'file_path'=>'/169998221749.170554800088-.jpg',
+            'file_name'=>'ddasdasdas.jpg',
+            'file_path'=>'/ddasdasdas.jpg',
             'file_extension'=>'jpg',
             'mime_type'=>'image/jpeg',
             'file_size'=>'31904',
@@ -289,32 +295,32 @@ class TestsSeeder extends Seeder
             'name_birthdayperson'=>'Aniversario top',
             'years_birthdayperson'=>15,
             'num_guests'=>15,
-            'party_day'=>'2024-01-31',
+            'party_day'=>'2024-02-20',
             'buffet_id'=>$buffet->id,
             'food_id'=>$food->id,
             'price_food'=>$food->price,
             'decoration_id'=>$decoration->id,
             'price_decoration'=>$decoration->price,
-            'schedule_id'=>$schedule1->id,
+            'schedule_id'=>$schedule10->id,
             'price_schedule'=>0,
             'discount'=>0,
             'status'=>BookingStatus::FINISHED->name,
-            'user_id'=>$user1->id
+            'user_id'=>$user->id
         ]);
         $booking2 = Booking::create([
             'name_birthdayperson'=>'Aniversario top 2',
             'years_birthdayperson'=>15,
             'num_guests'=>15,
-            'party_day'=>'2024-02-04',
+            'party_day'=>'2024-02-20',
             'buffet_id'=>$buffet->id,
             'food_id'=>$food->id,
             'price_food'=>$food->price,
             'decoration_id'=>$decoration->id,
             'price_decoration'=>$decoration->price,
-            'schedule_id'=>$schedule1->id,
+            'schedule_id'=>$schedule10->id,
             'price_schedule'=>0,
             'discount'=>0,
-            'status'=>BookingStatus::APPROVED->name,
+            'status'=>BookingStatus::PENDENT->name,
             'user_id'=>$user1->id
         ]);
 
@@ -376,9 +382,20 @@ class TestsSeeder extends Seeder
         $question1 = SatisfactionQuestion::create([
             'question' => 'Qualidade da comida', 
             'status'  => true,
-            'answers'  => 0,
+            'answers'  => 2,
             'question_type' => QuestionType::M->name,
             'buffet_id' => $buffet->id,
+        ]);
+
+        SatisfactionAnswer::create([
+            "question_id"=>$question1->id,
+            "booking_id"=>$booking->id,
+            "answer"=>'25%-50%'
+        ]);
+        SatisfactionAnswer::create([
+            "question_id"=>$question1->id,
+            "booking_id"=>$booking2->id,
+            "answer"=>'25%-50%'
         ]);
 
         $question2 = SatisfactionQuestion::create([
@@ -407,6 +424,37 @@ class TestsSeeder extends Seeder
             'status'=>true,
             'question_type'=>QuestionType::M->name,
             'answers'=>0,
+            'buffet_id'=>$buffet->id
+        ]);
+
+        Recommendation::create([
+            'content'=>'<p>Esta é uma recomendação foda!</p>',
+            'status'=>RecommendationStatus::ACTIVE->name,
+            'buffet_id'=>$buffet->id
+        ]);
+        Recommendation::create([
+            'content'=>'<p>🎉 Prepare-se para a festa mais divertida do ano! Estamos animados para convidar todos os pequenos a se juntarem a nós em uma celebração cheia de cores, brincadeiras e sorrisos. Não perca essa festa incrível!</p>',
+            'status'=>RecommendationStatus::ACTIVE->name,
+            'buffet_id'=>$buffet->id
+        ]);
+        Recommendation::create([
+            'content'=>'<p>🎈 Seus amiguinhos estão convocados para uma festa cheia de magia e diversão! Teremos jogos, guloseimas deliciosas e, é claro, muita música para animar a pista de dança dos pequenos. Estamos ansiosos para compartilhar momentos mágicos juntos!</p>',
+            'status'=>RecommendationStatus::ACTIVE->name,
+            'buffet_id'=>$buffet->id
+        ]);
+        Recommendation::create([
+            'content'=>'<p>🌟 A aventura vai começar! Estamos preparando uma festa incrível para os pequenos aventureiros. Com decoração temática, atividades emocionantes e um bolo delicioso, garantimos sorrisos do início ao fim. Esperamos por vocês!</p>',
+            'status'=>RecommendationStatus::ACTIVE->name,
+            'buffet_id'=>$buffet->id
+        ]);
+        Recommendation::create([
+            'content'=>'<p>🚀 Embarque nesta jornada festiva conosco! A festa espacial mais esperada do ano está chegando, com alienígenas amigáveis, planetas coloridos e muita diversão intergaláctica. Não perca essa experiência única!</p>',
+            'status'=>RecommendationStatus::ACTIVE->name,
+            'buffet_id'=>$buffet->id
+        ]);
+        Recommendation::create([
+            'content'=>'<p>🎨 Preparem seus pincéis e aventuras criativas! Nossa festa terá uma explosão de cores, atividades artísticas e muita alegria. Convidamos todos os pequenos artistas para uma tarde cheia de diversão e descobertas!</p>',
+            'status'=>RecommendationStatus::ACTIVE->name,
             'buffet_id'=>$buffet->id
         ]);
 
