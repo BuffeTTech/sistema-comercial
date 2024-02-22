@@ -21,8 +21,8 @@
                                 <form action="{{ route('booking.change_status', ['buffet' => $buffet->slug, 'booking' => $booking->hashed_id]) }}" method="POST">
                                     @csrf
                                     @method('patch')
-                                    <input type="hidden" name="status" value="{{App\Enums\BookingStatus::CANCELED->name}}">
-                                    <button type="submit" class="btn btn-outline-danger btn-sm fs-6" title="Cancelar Festa">❌ Cancelar Reserva</button>                                        
+                                    <input type="hidden" name="status" value="{{App\Enums\BookingStatus::FINISHED->name}}">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm fs-6" title="Cancelar Festa">❌ Finalizar Festa</button>                                        
                                 </form>
                                 @endif  
                             @endcan
