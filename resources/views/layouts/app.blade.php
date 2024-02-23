@@ -56,9 +56,7 @@
                                 }
                             })
                     
-                            console.log(data.data)
-            
-                            if(data.data.length == 0) return;
+                            if(data.data.hasOwnProperty('message')) return;
                 
                             const questions = data.data.questions.map((question, index)=>{
                                 console.log(question)
@@ -94,7 +92,6 @@
                                     `
                                 }
                             })
-                            console.log(questions)
                             const booking = data.data.data.booking
                             
                             const data_modal = {
