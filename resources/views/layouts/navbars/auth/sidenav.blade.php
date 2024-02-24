@@ -146,6 +146,17 @@
                     </a>
                 @endcan
             </li>
+            <li class="nav-item">
+                @can('list user')
+                    <a class="nav-link {{ Str::startsWith(Route::currentRouteName(), 'user.') ? 'active' : '' }}" href="{{ route('user.index', ['buffet'=>$buffet->slug]) }}">
+                        <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-settings text-primary text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Usuários</span>
+                    </a>
+                @endcan
+            </li>
         </ul>
     </div>
 </aside>

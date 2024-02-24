@@ -13,6 +13,7 @@ use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\ResetPassword;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SatisfactionSurveyController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -83,6 +84,8 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
 
 	Route::get('/{buffet}/profile', [UserProfileController::class, 'show'])->name('profile');
 	Route::post('/{buffet}/profile', [UserProfileController::class, 'update'])->name('profile.update');
+    
+    Route::resource('{buffet}/user',UserController::class);
 });
             
 

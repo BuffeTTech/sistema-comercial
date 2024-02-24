@@ -60,7 +60,7 @@ class EmployeeController extends Controller
             ->withoutRole($buffet_subscription->subscription->slug.'.user')
             ->paginate($request->get('per page', 5), ['*'], 'page', $request->get('page', 1));
 
-        $this->authorize('viewAny', [User::class, $buffet]);
+        $this->authorize('viewAnyEmployee', [User::class, $buffet]);
 
         $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
         if($buffet_subscription->expires_in < Carbon::now()) {
@@ -99,7 +99,7 @@ class EmployeeController extends Controller
 
         $roles = $this->role->where('name', 'like', $buffet_subscription->subscription->slug.'.%')->get();
         
-        $this->authorize('create', [User::class, $buffet]);
+        $this->authorize('createEmployee', [User::class, $buffet]);
 
         return view('employee.create', ['buffet'=>$buffet, 'roles'=>$roles, 'buffet_subscription'=>$buffet_subscription]);
     }
@@ -112,7 +112,7 @@ class EmployeeController extends Controller
             return redirect()->back()->withErrors(['generic_error'=>'Buffet não encontrado.'])->withInput();
         }
 
-        $this->authorize('create', [User::class, $buffet]);
+        $this->authorize('createEmployee', [User::class, $buffet]);
 
         $buffet_subscription = $this->buffet_subscription->where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
         if($buffet_subscription->expires_in < Carbon::now()) {
@@ -194,7 +194,7 @@ class EmployeeController extends Controller
         if(!$employee){
             return redirect()->back()->withErrors(['user'=>'Funcionário não encontrado.'])->withInput();
         }
-        $this->authorize('update', [User::class, $employee, $buffet]);
+        $this->authorize('updateEmployee', [User::class, $employee, $buffet]);
 
         return view('employee.update', ['buffet'=>$buffet, 'employee'=>$employee, 'roles'=>$roles, 'buffet_subscription'=>$buffet_subscription]);
     }
@@ -224,7 +224,7 @@ class EmployeeController extends Controller
         if(!$employee){
             return redirect()->back()->withErrors(['user'=>'Funcionário não encontrado.'])->withInput();
         }
-        $this->authorize('update', [User::class, $employee, $buffet]);
+        $this->authorize('updateEmployee', [User::class, $employee, $buffet]);
             
         if($request->phone1) {
             if($employee->phone1) {
@@ -270,7 +270,7 @@ class EmployeeController extends Controller
             ->where('buffet_id', $buffet->id)
             ->find($user_id); 
         
-        $this->authorize('view', [User::class, $employee, $buffet]);
+        $this->authorize('viewEmployee', [User::class, $employee, $buffet]);
 
         if(!$employee){
             return redirect()->back()->withErrors(['user'=>'Funcionário não encontrado.'])->withInput();
@@ -303,7 +303,7 @@ class EmployeeController extends Controller
             return redirect()->back()->withErrors(['user'=>'Funcionário não encontrado.'])->withInput();
         }
 
-        $this->authorize('destroy', [User::class, $employee, $buffet]);
+        $this->authorize('deleteEmployee', [User::class, $employee, $buffet]);
 
         $employee->syncRoles($buffet_subscription->subscription->slug.'.user');
 
