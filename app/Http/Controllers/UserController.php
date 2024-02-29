@@ -63,8 +63,10 @@ class UserController extends Controller
         $configurations = $this->subscription_configuration->where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
 
         $total = $this->user->where('buffet_id',$buffet->id)->where('status', UserStatus::ACTIVE->name)->get();
+        
+        $roles = $this->role->where('name', 'like', $buffet_subscription->subscription->slug.'.%')->get();
 
-        return view('user.index', ['buffet'=>$buffet, 'users'=>$users, 'configurations'=>$configurations, 'total'=>count($total)]); 
+        return view('user.index', ['buffet'=>$buffet, 'users'=>$users, 'configurations'=>$configurations, 'total'=>count($total), 'buffet_subscription'=>$buffet_subscription, 'roles'=>$roles]); 
     }
 
     
@@ -90,5 +92,46 @@ class UserController extends Controller
 
     public function destroy(Request $request){
         abort(401);    
+    }
+
+    public function change_role(Request $request) {
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+
+        $buffet_subscription = BuffetSubscription::where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+        if($buffet_subscription->expires_in < Carbon::now()) {
+            return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
+        }
+
+        $user_id = $this->hashids->decode($request->user)[0];
+
+        $user = $this->user
+            ->where('buffet_id', $buffet->id)
+            ->find($user_id); 
+
+        if(!$user){
+            return redirect()->back()->withErrors(['user'=>'Usuário não encontrado.'])->withInput();
+        }
+        $this->authorize('changeUserRole', [User::class, $user, $buffet]);
+
+        $total = $this->user->where('buffet_id',$buffet->id)->where('status', UserStatus::ACTIVE->name)->get();
+
+        $configurations = $this->subscription_configuration->where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
+
+        if($request->role === $user->roles[0]->name) {
+            return redirect()->back()->withErrors(['error'=>"Este usuário já possui esta permissão"]);
+        }
+
+        if(count($total) >= $configurations['max_employees']) {
+            return redirect()->back()->withErrors(['error'=>"Este buffet ja possui o limite de funcionários cadastrados"]);
+        }
+
+        $user->syncRoles($request->role);
+
+        return redirect()->back()->with(['success'=>'Usuário atualizado com sucesso!']);
     }
 }

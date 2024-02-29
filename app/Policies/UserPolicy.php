@@ -103,6 +103,24 @@ class UserPolicy
         return false;
     }
 
+    public function changeUserRole(User $user, User $employee, Buffet $buffet) {
+        if($user == null) {
+            return false;
+        }
+
+        // Verifica se o usuário é cadastrado no buffet
+        if($user->buffet_id == $buffet->id) {
+            return $user->can('change user role');
+        }
+
+        // Verifica se usuário é o dono do buffet
+        if($user->id == $buffet->owner_id) {
+            return $user->can('change user role');
+        }
+
+        return false;
+    }
+
     /**
      * Determine whether the user can delete the model.
      */

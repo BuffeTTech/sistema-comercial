@@ -20,6 +20,11 @@
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Nome</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Email</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Cargo</th>
+                                            @can('change user role')
+                                                @if($total < $configurations['max_employees'])
+                                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Atualizar Cargo</th>
+                                                @endif
+                                            @endcan
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Status</th>
                                         <th class="text-secondary opacity-7"></th>
                                     </tr>
@@ -53,6 +58,36 @@
                                                         </div>
                                                     </div>
                                                 </td>
+                                                @can('change user role')
+                                                    @if($total < $configurations['max_employees'])
+                                                <td>
+                                                    <div class="d-flex px-2 py-1">
+                                                        <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
+                                                                    <form method="POST" action="{{ route('user.change_role', ['buffet'=>$buffet->slug, 'user'=>$value->hashed_id]) }}">
+                                                                        @csrf
+                                                                        @method('PATCH')
+
+                                                                        <div class="form-group">
+                                                                            <select name="role" id="role" class="form-control" onchange="this.form.submit()">
+                                                                                @php
+                                                                                    $slug = $buffet_subscription->subscription->slug;
+                                                                                @endphp
+                                                                                @foreach($roles as $role)
+                                                                                    <option 
+                                                                                        {{ $value->roles[0]->name == $role['name'] ? "selected" : "" }}
+                                                                                        value="{{ $role->name }}">
+                                                                                            {{ ucwords(explode($slug.'.', $role->name)[1]) }}
+                                                                                    </option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                            <x-input-error :messages="$errors->get('role')" class="mt-2" />
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    @endif
+                                                @endcan
                                                 <td class="text-center">
                                                     <x-status.user_status :status="$value['status']" />
                                                 </td>
