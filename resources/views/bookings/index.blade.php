@@ -25,7 +25,7 @@
                                 @if($current_party)
                                     <a href="{{ route('booking.party_mode', ['buffet'=>$buffet->slug])}}" class="btn btn-info btn-sm fs-6 btn-tooltip" title="Acessar festa em andamento">Acessar Festa em Andamento!</a>
                                 @endif     
-                            @endcan                         
+                            @endcan                  
                         </div>
                     </div>
                     <div id="alert">

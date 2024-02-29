@@ -13,25 +13,29 @@ use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\ResetPassword;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SatisfactionSurveyController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+// Route::get('/{buffet}', [SiteController::class,'buffetTest'])->name('buffetTest');
+Route::get('/buffet', [SiteController::class,'buffetAlegria'])->name('buffetTest');
 
 // Todas as rotas de landing page caso existam devem ser feitas aqui, antes dos middlewares
 
 Route::get('/{buffet}/booking/calendar', [BookingController::class,'calendar'])->name('booking.calendar');
 
 
-Route::middleware(['auth', 'verified'])->group(function () {
-//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// Route::middleware(['auth', 'verified'])->group(function () {
+// //     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+// //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+// //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/dashboard', [SiteController::class, 'dashboard'])->name('dashboard');
-});
+//     Route::get('/dashboard', [SiteController::class, 'dashboard'])->name('dashboard');
+// }); 
+
 
 Route::get('{buffet}/booking/{booking}/guest/',[GuestController::class, 'create'])->name('guest.invite');
 Route::post('{buffet}/booking/{booking}/guest',[GuestController::class, 'store'])->name('guest.store');
@@ -83,6 +87,9 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
 
 	Route::get('/{buffet}/profile', [UserProfileController::class, 'show'])->name('profile');
 	Route::post('/{buffet}/profile', [UserProfileController::class, 'update'])->name('profile.update');
+    
+    Route::resource('{buffet}/user',UserController::class);
+    Route::patch('/{buffet}/user/{user}/change_role', [UserController::class,'change_role'])->name('user.change_role');
 });
             
 

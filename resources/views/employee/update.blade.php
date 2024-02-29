@@ -60,7 +60,7 @@
                                         @endphp
                                         @foreach($roles as $role)
                                             <option 
-                                                {{ old('role') == $role['name'] || $employee->name == $role['name'] ? "selected" : "" }}
+                                                {{ old('role') == $role['name'] || $employee->roles[0]->name == $role['name'] ? "selected" : "" }}
                                                 value="{{ $role->name }}">
                                                     {{ ucwords(explode($slug.'.', $role->name)[1]) }}
                                             </option>

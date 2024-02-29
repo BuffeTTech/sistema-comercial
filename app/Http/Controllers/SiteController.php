@@ -27,4 +27,20 @@ class SiteController extends Controller
         // Não tem permissão
         abort(401);
     }
+
+    public function buffetAlegria(Request $request){
+        $buffet = $this->buffet->where('slug', 'buffet-alegria')->get()->first();
+
+        return view('buffetTest', ['buffet'=>$buffet]);
+    }
+    public function buffetTest(Request $request){
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet not found'])->withInput();
+        }
+
+        return view('buffetTest', ['buffet'=>$buffet]);
+    }
 }
