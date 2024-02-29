@@ -24,8 +24,6 @@ class BookingPolicy
             return $user->can('show party mode');
         }
 
-        
-
         return false;
     }
     public function viewPendentBookings(User $user, Buffet $buffet): bool
@@ -121,12 +119,12 @@ class BookingPolicy
             if($booking->user_id == $user->id) {
                 return true;
             }
-            return $user->can('show booking');
+            return $user->can('view booking');
         }
 
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('show booking');
+            return $user->can('view booking');
         }
 
         return false;

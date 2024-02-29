@@ -23,7 +23,7 @@
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Nome</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Email</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Cargo</th>
-                                        @can('change user role')
+                                        @can('change buffet user role')
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Atualizar Cargo</th>
                                         @endcan
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Status</th>
@@ -59,7 +59,7 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                @can('change user role')
+                                                @can('change buffet user role')
                                                     <td>
                                                         <div class="d-flex px-2 py-1">
                                                             <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
@@ -99,7 +99,7 @@
                                                             <a href="{{ route('employee.edit', ['employee'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" title="Editar '{{$value->name}}'" class="btn btn-outline-primary btn-sm fs-6">✏️</a>
                                                         @endif
                                                     @endcan
-                                                    @can('change employee status')
+                                                    @can('change buffet user role')
                                                         @if($value['status'] !== App\Enums\UserStatus::UNACTIVE->name)
                                                             <form action="{{ route('employee.destroy', ['employee'=>$value['hashed_id'], 'buffet'=>$buffet->slug]) }}" method="POST" class="d-inline">
                                                                 @csrf

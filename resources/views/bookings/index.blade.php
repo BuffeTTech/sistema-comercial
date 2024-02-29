@@ -21,7 +21,7 @@
                             @can('list user bookings')
                                 <a href="{{ route('booking.my_bookings', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Listar minhas reservas">Listar minhas reservas</a> 
                             @endcan  
-                            @can('view party mode') 
+                            @can('show party mode') 
                                 @if($current_party)
                                     <a href="{{ route('booking.party_mode', ['buffet'=>$buffet->slug])}}" class="btn btn-info btn-sm fs-6 btn-tooltip" title="Acessar festa em andamento">Acessar Festa em Andamento!</a>
                                 @endif     

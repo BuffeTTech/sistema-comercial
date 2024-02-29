@@ -27,7 +27,7 @@
                         @can('update employee')
                             <a href="{{ route('employee.edit', ['buffet'=>$buffet->slug, 'employee'=>$employee['hashed_id']]) }}" title="Editar dados" class="btn btn-outline-primary btn-sm fs-6">Editar</a>
                         @endcan
-                        @can('change employee status')
+                        @can('change buffet user role')
                             @if($employee['status'] !== App\Enums\UserStatus::UNACTIVE->name)
                                 <form action="{{ route('employee.destroy', ['buffet'=>$buffet->slug, 'employee'=>$employee['hashed_id']]) }}" method="POST" class="d-inline">
                                     @csrf
