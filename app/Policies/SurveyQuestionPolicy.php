@@ -62,12 +62,12 @@ class SurveyQuestionPolicy
         
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $satisfactionQuestion->buffet_id) {
-            return $user->can('show survey question');
+            return $user->can('view survey question');
         }
         
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('show survey question');
+            return $user->can('view survey question');
         }
 
         return false;

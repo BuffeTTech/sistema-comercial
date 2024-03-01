@@ -48,12 +48,12 @@ class UserPolicy
 
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {
-            return $user->can('show employee');
+            return $user->can('view employee');
         }
 
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('show employee');
+            return $user->can('view employee');
         }
 
         return false;
@@ -173,12 +173,12 @@ class UserPolicy
 
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {
-            return $user->can('show buffet user');
+            return $user->can('view buffet user');
         }
 
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('show buffet user');
+            return $user->can('view buffet user');
         }
 
         return false;

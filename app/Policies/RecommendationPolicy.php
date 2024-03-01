@@ -67,12 +67,12 @@ class RecommendationPolicy
 
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {
-            return $user->can('show recommendation');
+            return $user->can('view recommendation');
         }
 
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('show recommendation');
+            return $user->can('view recommendation');
         }
 
         return false;
