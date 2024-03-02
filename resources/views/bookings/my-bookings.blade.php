@@ -12,7 +12,7 @@
                             @can('create booking')
                                 <a href="{{ route('booking.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar decoração">Criar Reserva</a> 
                             @endcan
-                            @can('list booking')
+                            @can('list bookings')
                                 <a href="{{ route('booking.list', ['buffet'=>$buffet->slug, 'format'=>'all']) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar decoração">Listar Reservas</a> 
                             @endcan
                         </div>

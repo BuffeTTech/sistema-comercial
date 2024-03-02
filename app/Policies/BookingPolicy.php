@@ -75,18 +75,18 @@ class BookingPolicy
 
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {
-            return $user->can('list booking');
+            return $user->can('list bookings');
         }
 
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('list booking');
+            return $user->can('list bookings');
         }
 
         return false;
     }
 
-    public function viewUserBookings(User $user, Buffet $buffet): bool
+    public function listUserBookings(User $user, Buffet $buffet): bool
     {
         if($user == null) {
             return false;
@@ -94,12 +94,30 @@ class BookingPolicy
 
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {
-            return $user->can('list user booking');
+            return $user->can('list user bookings');
         }
 
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('list user booking');
+            return $user->can('list user bookings');
+        }
+
+        return false;
+    }
+    public function listMyBookings(User $user, Buffet $buffet): bool
+    {
+        if($user == null) {
+            return false;
+        }
+
+        // Verifica se o usuário é cadastrado no buffet
+        if($user->buffet_id == $buffet->id) {
+            return $user->can('list my bookings');
+        }
+
+        // Verifica se usuário é o dono do buffet
+        if($user->id == $buffet->owner_id) {
+            return $user->can('list my bookings');
         }
 
         return false;

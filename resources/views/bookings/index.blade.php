@@ -12,13 +12,13 @@
                             @can('create booking')
                                 <a href="{{ route('booking.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar Reserva">Criar Reserva</a> 
                             @endcan      
-                            @can('list booking')
+                            @can('list bookings')
                                 <a href="{{ route('booking.list', ['buffet'=>$buffet->slug, 'format'=>'all']) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Listar Reservas">Listar Reservas</a> 
                             @endcan  
                             @can('view next bookings')
                                 <a href="{{ route('booking.list', ['buffet'=>$buffet->slug, 'format'=>'pendent']) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Listar Reservas Pendentes">Listar Reservas Pendentes</a> 
                             @endcan  
-                            @can('list user bookings')
+                            @can('list my bookings')
                                 <a href="{{ route('booking.my_bookings', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Listar minhas reservas">Listar minhas reservas</a> 
                             @endcan  
                             @can('show party mode') 

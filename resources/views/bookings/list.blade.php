@@ -9,7 +9,7 @@
                     <div class="card-header pb-0 d-flex justify-content-between">
                         <h6>Listagem de todas as reservas {{$format == 'pendent' ? 'pendentes' : ''}}</h6>
                         @if($format == "pendent")
-                            @can('list booking')
+                            @can('list bookings')
                                 <a href="?format=all" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar decoração">Ver todas as reservas</a> 
                             @endcan
                         @else
