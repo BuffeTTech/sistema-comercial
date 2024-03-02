@@ -28,13 +28,13 @@ Route::get('/buffet', [SiteController::class,'buffetAlegria'])->name('buffetTest
 Route::get('/{buffet}/booking/calendar', [BookingController::class,'calendar'])->name('booking.calendar');
 
 
-// Route::middleware(['auth', 'verified'])->group(function () {
-// //     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-// //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-// //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+Route::middleware(['auth', 'verified'])->group(function () {
+//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-//     Route::get('/dashboard', [SiteController::class, 'dashboard'])->name('dashboard');
-// }); 
+    Route::get('/dashboard', [SiteController::class, 'dashboard'])->name('dashboard');
+}); 
 
 
 Route::get('{buffet}/booking/{booking}/guest/',[GuestController::class, 'create'])->name('guest.invite');

@@ -135,7 +135,7 @@
                                     </div>
                                 @endcan
                             </div>
-                            @can('list booking guests')
+                            @can('list bookings guests')
                                 <div class="card">
                                     <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
                                         <h5>Convidados Confirmados</h5>

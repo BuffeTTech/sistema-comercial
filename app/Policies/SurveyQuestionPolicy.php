@@ -62,12 +62,12 @@ class SurveyQuestionPolicy
         
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $satisfactionQuestion->buffet_id) {
-            return $user->can('show survey question');
+            return $user->can('view survey question');
         }
         
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('show survey question');
+            return $user->can('view survey question');
         }
 
         return false;
@@ -114,7 +114,7 @@ class SurveyQuestionPolicy
             return $user->can('update survey question');
         }
 
-        return $user->can('update survey question');
+        return false;
     }
 
     /**
@@ -135,7 +135,7 @@ class SurveyQuestionPolicy
             return $user->can('delete survey question');
         }
 
-        return $user->can('delete survey question');
+        return false;
     }
 
     public function answer(User $user, SatisfactionQuestion $satisfactionQuestion, Buffet $buffet): bool
@@ -153,6 +153,23 @@ class SurveyQuestionPolicy
             return $user->can('answer survey question');
         }
 
-        return $user->can('answer survey question');
+        return false;
+    }
+    public function change_question_status(User $user, SatisfactionQuestion $satisfactionQuestion, Buffet $buffet): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+        // Verifica se o usuário é cadastrado no buffet
+        if($user->buffet_id == $buffet->id) {
+            return $user->can('change survey question status');
+        }
+
+        // Verifica se usuário é o dono do buffet
+        if($user->id == $buffet->owner_id) {
+            return $user->can('change survey question status');
+        }
+
+        return false;
     }
 }

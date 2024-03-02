@@ -20,7 +20,7 @@
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Nome</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Email</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Cargo</th>
-                                            @can('change user role')
+                                            @can('change buffet user role')
                                                 @if($total < $configurations['max_employees'])
                                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Atualizar Cargo</th>
                                                 @endif
@@ -58,7 +58,7 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                @can('change user role')
+                                                @can('change buffet user role')
                                                     @if($total < $configurations['max_employees'])
                                                 <td>
                                                     <div class="d-flex px-2 py-1">

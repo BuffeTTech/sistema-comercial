@@ -48,7 +48,7 @@
                 @endcan
             </li>
             <li class="nav-item">
-                @can('list user booking')
+                @can('list my bookings')
                     <a class="nav-link {{ Str::startsWith(Route::currentRouteName(), 'booking.my_bookings') ? 'active' : '' }}" href="{{ route('booking.my_bookings', ['buffet'=>$buffet->slug]) }}">
                         <div
                             class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">

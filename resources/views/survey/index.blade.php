@@ -70,13 +70,13 @@
                                                 <x-status.survey_status :status="$value['status']" />
                                             </td>
                                             <td class="align-middle">
-                                                @can('view survey')
+                                                @can('view survey question')
                                                     <a href="{{ route('survey.show', ['buffet'=>$buffet->slug,'survey'=>$value->hashed_id]) }}" title="Visualizar pergunta" class="btn btn-outline-primary btn-sm fs-6">👁️</a>
                                                 @endcan
-                                                @can('update survey')
+                                                @can('update survey question')
                                                     <a href="{{ route('survey.edit', ['buffet'=>$buffet->slug, 'survey'=>$value->hashed_id]) }}" title="Editar pergunta" class="btn btn-outline-primary btn-sm fs-6">✏️</a>
                                                 @endcan
-                                                @can('change survey status')
+                                                @can('change survey question status')
                                                     @if($value['status'] == true)
                                                         <form action="{{ route('survey.destroy', ['buffet'=>$buffet->slug, 'survey'=>$value->hashed_id]) }}" method="POST" class="d-inline">
                                                             @csrf

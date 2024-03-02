@@ -37,6 +37,24 @@ class RecommendationPolicy
 
         return false;
     }
+    public function change_status(User $user, Buffet $buffet): bool
+    {
+        if($user == null) {
+            return false;
+        }
+
+        // Verifica se o usuário é cadastrado no buffet
+        if($user->buffet_id == $buffet->id) {
+            return $user->can('change recommendation status');
+        }
+        
+        // Verifica se usuário é o dono do buffet
+        if($user->id == $buffet->owner_id) {
+            return $user->can('change recommendation status');
+        }
+
+        return false;
+    }
 
     /**
      * Determine whether the user can view the model.
@@ -49,12 +67,12 @@ class RecommendationPolicy
 
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {
-            return $user->can('show recommendation');
+            return $user->can('view recommendation');
         }
 
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('show recommendation');
+            return $user->can('view recommendation');
         }
 
         return false;

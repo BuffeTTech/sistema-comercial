@@ -39,12 +39,12 @@ class DecorationPolicy
 
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {
-            return $user->can('show decoration');
+            return $user->can('view decoration');
         }
 
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('show decoration');
+            return $user->can('view decoration');
         }
 
         return false;

@@ -172,9 +172,9 @@ class BookingController extends Controller
                         ->orderBy('party_day', 'asc')
                         ->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
 
-        $this->authorize('viewUserBookings', [Booking::class, $buffet]);
+        $this->authorize('listMyBookings', [Booking::class, $buffet]);
 
-        return view('bookings.user-bookings', ['bookings'=>$bookings,'buffet' => $buffet]);
+        return view('bookings.my-bookings', ['bookings'=>$bookings,'buffet' => $buffet]);
     }
 
     /**

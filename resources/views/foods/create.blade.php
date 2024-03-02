@@ -68,31 +68,31 @@
         </div>
         @include('layouts.footers.auth.footer')
     </div>
-@endsection
-<script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        const form = document.querySelector("#form")
-
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault()
-            const userConfirmed = await confirm(`Deseja criar esta pergunta?`)
-
-            if (userConfirmed) {
-                this.submit();
-            } else {
-                error("Ocorreu um erro!")
-            }
-        })
-        
-        const textarea = document.querySelectorAll(".textarea-container")
-        textarea.forEach(element => {
-            ClassicEditor
-                .create(element)
-                .catch(error => {
-                    console.error(error);
-                });
+    <script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const form = document.querySelector("#form")
+    
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault()
+                const userConfirmed = await confirm(`Deseja criar esta pergunta?`)
+    
+                if (userConfirmed) {
+                    this.submit();
+                } else {
+                    error("Ocorreu um erro!")
+                }
+            })
+            
+            const textarea = document.querySelectorAll(".textarea-container")
+            textarea.forEach(element => {
+                ClassicEditor
+                    .create(element)
+                    .catch(error => {
+                        console.error(error);
+                    });
+            });
         });
-    });
-</script>
+    </script>
+@endsection

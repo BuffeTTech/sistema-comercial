@@ -42,12 +42,12 @@ class FoodPolicy
 
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {
-            return $user->can('show food');
+            return $user->can('view food');
         }
 
         // Verifica se usuário é o dono do buffet
         if($user->id == $buffet->owner_id) {
-            return $user->can('show food');
+            return $user->can('view food');
         }
 
         return false;

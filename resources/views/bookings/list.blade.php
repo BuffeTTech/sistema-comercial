@@ -9,7 +9,7 @@
                     <div class="card-header pb-0 d-flex justify-content-between">
                         <h6>Listagem de todas as reservas {{$format == 'pendent' ? 'pendentes' : ''}}</h6>
                         @if($format == "pendent")
-                            @can('list booking')
+                            @can('list bookings')
                                 <a href="?format=all" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar decoração">Ver todas as reservas</a> 
                             @endcan
                         @else
@@ -118,7 +118,7 @@
                                                     @can('view booking')
                                                         <a href="{{ route('booking.show', ['booking'=>$booking->hashed_id, 'buffet'=>$buffet->slug]) }}" title="Visualizar '{{$booking->name_birthdayperson}}'" class="btn btn-outline-primary btn-sm fs-6">👁️</a>
                                                     @endcan
-                                                    @can('edit booking')
+                                                    @can('update booking')
                                                         @if($booking['status'] === App\Enums\BookingStatus::APPROVED->name || $booking['status'] === App\Enums\BookingStatus::PENDENT->name)
                                                             <a href="{{ route('booking.edit', ['booking'=>$booking->hashed_id, 'buffet'=>$buffet->slug]) }}" title="Editar '{{$booking->name_birthdayperson}}'" class="btn btn-outline-primary btn-sm fs-6">✏️</a>
                                                         @endif
