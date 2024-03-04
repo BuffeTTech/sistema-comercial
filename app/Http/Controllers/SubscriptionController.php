@@ -36,7 +36,7 @@ class SubscriptionController extends Controller
 
         $subscription_exists = $this->subscription->where('slug', $request->subscription['slug'])->get()->first();
         if($subscription_exists) {
-            return response(403)->json();
+            return response()->json([], 403);
         }
 
         $subscription = $this->subscription->create([
@@ -57,7 +57,7 @@ class SubscriptionController extends Controller
             "subscription_id"=>$subscription->id,
         ]);
 
-        return response(status: 201)->json([$subscription, $configuration]);
+        return response()->json([$subscription, $configuration], 201);
     }
     public function insert_role_in_permission(Request $request){
         $permission = $request->permission;

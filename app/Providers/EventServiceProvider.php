@@ -6,6 +6,8 @@ use App\Events\BookingCreatedEvent;
 use App\Events\BookingUpdatedEvent;
 use App\Events\ChangeBookingStatusEvent;
 use App\Events\EditBuffetEvent;
+use App\Listeners\ChangeBookingStatusInAdministrativeListener;
+use App\Listeners\CreateBookingInAdministrativeListener;
 use App\Listeners\EditBookingInAdministrativeListener;
 use App\Listeners\EditBuffetInAdministrativeListener;
 use App\Listeners\SendMailBookingCreatedListener;
@@ -29,10 +31,12 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         BookingCreatedEvent::class => [
-            SendMailBookingCreatedListener::class
+            SendMailBookingCreatedListener::class,
+            CreateBookingInAdministrativeListener::class
         ],
         ChangeBookingStatusEvent::class => [
-            SendMailBookingStatusListener::class
+            SendMailBookingStatusListener::class,
+            ChangeBookingStatusInAdministrativeListener::class
         ],
         EditBuffetEvent::class => [
             EditBuffetInAdministrativeListener::class

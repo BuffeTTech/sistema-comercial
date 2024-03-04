@@ -19,7 +19,8 @@ class BookingUpdatedEvent
      * Create a new event instance.
      */
     public function __construct(
-        public Booking $booking
+        public Booking $original_booking,
+        public Booking $new_booking,
     )
     {
         //
