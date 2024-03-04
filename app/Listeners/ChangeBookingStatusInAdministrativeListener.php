@@ -23,6 +23,5 @@ class ChangeBookingStatusInAdministrativeListener
     public function handle(ChangeBookingStatusEvent $event): void
     {
         $response = Http::acceptJson()->put(config('app.administrative_url').'/api'.'/'.$event->booking->buffet->slug.'/'.'booking/status', ['booking'=>$event->booking]);
-        dd($response->body());
     }
 }
