@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             FoodSeeder::class, 
 
-            // TestsSeeder::class
+            TestsSeeder::class
         ]);
     }
 }
