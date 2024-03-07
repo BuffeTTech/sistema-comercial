@@ -76,7 +76,7 @@
     
             form.addEventListener('submit', async function(e) {
                 e.preventDefault()
-                const userConfirmed = await confirm(`Deseja criar esta pergunta?`)
+                const userConfirmed = await confirm(`Deseja criar este pacote?`)
     
                 if (userConfirmed) {
                     this.submit();

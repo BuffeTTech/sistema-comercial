@@ -31,16 +31,15 @@
         </div>
         @include('layouts.footers.auth.footer')
     </div>
-@endsection
-
-<script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-    ClassicEditor
-        .create(document.querySelector('#content'))
-        .catch(error => {
-            console.error(error);
+    <script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+        ClassicEditor
+            .create(document.querySelector('#content'))
+            .catch(error => {
+                console.error(error);
+            });
         });
-    });
-</script>
+    </script>
+@endsection

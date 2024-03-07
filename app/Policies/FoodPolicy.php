@@ -105,7 +105,6 @@ class FoodPolicy
         if($user == null) {
             return false;
         }
-
         // Verifica se o usuário é cadastrado no buffet
         if($user->buffet_id == $buffet->id) {
             return $user->can('delete food');

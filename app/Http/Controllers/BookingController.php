@@ -468,7 +468,8 @@ class BookingController extends Controller
             return redirect()->back()->withErrors(['decoration_id'=>"Pacote de decoração não encontrado"])->withInput();
         }
 
-        // Cria a reserva
+        $old_booking = clone $booking;
+
         $booking->update([
             'name_birthdayperson'=>$request->name_birthdayperson,
             'years_birthdayperson'=>$request->years_birthdayperson,
@@ -483,10 +484,15 @@ class BookingController extends Controller
             'schedule_id'=>$schedule->id,
             'price_schedule'=>0,
             'discount'=>0,
-            'status'=>BookingStatus::PENDENT->name
         ]);
 
-        event(new BookingUpdatedEvent($booking));
+        if($request->status) {
+            $booking->update([
+                'status'=>$request->status
+            ]);
+        }
+
+        event(new BookingUpdatedEvent($old_booking, $booking->fresh()));
 
         return redirect()->route('booking.edit', ['buffet'=>$buffet->slug, 'booking'=>$booking->hashed_id])->with(['success'=>'Reserva atualizada com sucesso!']);
     }
@@ -636,6 +642,7 @@ class BookingController extends Controller
                 ->where('schedules.day_week', $dayOfWeek)
                 ->where('schedules.status', ScheduleStatus::ACTIVE->name)
                 ->select('schedules.*')
+                ->groupBy('schedules.id') // Agrupa pelo campo id
                 ->get()
                 ->map(function ($item) use ($booking_id) {
                     if ($item->id === $booking_id) {
@@ -668,6 +675,7 @@ class BookingController extends Controller
                 ->where('schedules.buffet_id', $buffet->id)
                 ->where('schedules.day_week', $dayOfWeek)
                 ->select('schedules.*')
+                ->groupBy('schedules.id') // Agrupa pelo campo id
                 ->get();
 
 

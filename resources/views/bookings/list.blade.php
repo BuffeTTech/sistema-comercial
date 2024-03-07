@@ -8,15 +8,20 @@
                 <div class="card mb-4">
                     <div class="card-header pb-0 d-flex justify-content-between">
                         <h6>Listagem de todas as reservas {{$format == 'pendent' ? 'pendentes' : ''}}</h6>
-                        @if($format == "pendent")
-                            @can('list bookings')
-                                <a href="?format=all" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar decoração">Ver todas as reservas</a> 
-                            @endcan
-                        @else
-                            @can('view pendent bookings')
-                                <a href="?format=pendent" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar decoração">Ver reservas pendentes</a> 
-                            @endcan
-                        @endif
+                        <div>
+                            @if($format == "pendent")
+                                @can('list bookings')
+                                    <a href="?format=all" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar decoração">Ver todas as reservas</a> 
+                                @endcan
+                            @else
+                                @can('view pendent bookings')
+                                    <a href="?format=pendent" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar decoração">Ver reservas pendentes</a> 
+                                @endcan
+                            @endif
+                            @can('view next bookings')
+                                <a href="{{ route('booking.index', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Listar próximas reservas">Listar próximas reservas</a> 
+                            @endcan  
+                        </div>
                     </div>
                     <div id="alert">
                         @include('components.alert')

@@ -147,7 +147,7 @@
                 @endcan
             </li>
             <li class="nav-item">
-                @can('list user')
+                @can('list buffet user')
                     <a class="nav-link {{ Str::startsWith(Route::currentRouteName(), 'user.') ? 'active' : '' }}" href="{{ route('user.index', ['buffet'=>$buffet->slug]) }}">
                         <div
                             class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">

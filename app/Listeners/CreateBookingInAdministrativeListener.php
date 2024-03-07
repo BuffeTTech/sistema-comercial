@@ -2,8 +2,10 @@
 
 namespace App\Listeners;
 
+use App\Events\BookingCreatedEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Http;
 
 class CreateBookingInAdministrativeListener
 {
@@ -18,8 +20,10 @@ class CreateBookingInAdministrativeListener
     /**
      * Handle the event.
      */
-    public function handle(object $event): void
+    public function handle(BookingCreatedEvent $event): void
     {
-        //
+        $booking = $event->booking;
+        $booking['schedule'] = $event->booking->schedule;
+        $response = Http::acceptJson()->post(config('app.administrative_url').'/api'.'/'.$event->booking->buffet->slug.'/'.'booking/', ['booking'=>$booking]);
     }
 }

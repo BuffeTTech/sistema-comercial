@@ -291,7 +291,7 @@ class DecorationController extends Controller
         if (!$decoration = $this->decoration->where('slug', $request->decoration)->where('buffet_id', $buffet->id)->get()->first()) {
            return redirect()->back()->withErrors(['slug' => 'Decoração não encontrada.'])->withInput();
         }
-        $this->authorize('update', [Decoration::class, $decoration, $buffet]);
+        $this->authorize('change_status', [Decoration::class, $decoration, $buffet]);
 
         $decoration->update(['status' => DecorationStatus::UNACTIVE->name]);
 

@@ -52,19 +52,18 @@
         </div>
         @include('layouts.footers.auth.footer')
     </div> 
+    <script>
+        const form = document.querySelector("#form")
+    
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault()
+            const userConfirmed = await confirm(`Deseja atualizar este horário?`)
+    
+            if (userConfirmed) {
+                this.submit();
+            } else {
+                error("Ocorreu um erro!")
+            }
+        })
+    </script> 
 @endsection
-
-<script>
-    const form = document.querySelector("#form")
-
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault()
-        const userConfirmed = await confirm(`Deseja atualizar este horário?`)
-
-        if (userConfirmed) {
-            this.submit();
-        } else {
-            error("Ocorreu um erro!")
-        }
-    })
-</script> 

@@ -5,6 +5,7 @@ use App\Http\Controllers\BuffetController;
 use App\Http\Controllers\DecorationController;
 use App\Http\Controllers\FoodController;
 use App\Http\Controllers\SatisfactionSurveyController;
+use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,3 +33,5 @@ Route::delete('/subscription/permission/{permission}', [SubscriptionController::
 
 
 Route::get('/{buffet}/survey/user/{user_id}', [SatisfactionSurveyController::class, 'api_get_question_by_user_id'])->name('api.bookings.get_questions_by_user_id'); //API
+
+Route::post('/presentation', [SiteController::class, 'presentation_data']);
