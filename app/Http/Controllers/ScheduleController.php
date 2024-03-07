@@ -222,7 +222,7 @@ class ScheduleController extends Controller
         if(!$schedule){
             return redirect()->back()->withErrors(['schedule'=>'Horário não encontrado'])->withInput();
         }
-        $this->authorize('destroy', [Schedule::class, $schedule, $buffet]);
+        $this->authorize('change_status', [Schedule::class, $schedule, $buffet]);
 
         $schedule->update(['status'=> ScheduleStatus::UNACTIVE->name]);
 

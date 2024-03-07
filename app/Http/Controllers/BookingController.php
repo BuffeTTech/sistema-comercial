@@ -484,8 +484,13 @@ class BookingController extends Controller
             'schedule_id'=>$schedule->id,
             'price_schedule'=>0,
             'discount'=>0,
-            'status'=>BookingStatus::PENDENT->name
         ]);
+
+        if($request->status) {
+            $booking->update([
+                'status'=>$request->status
+            ]);
+        }
 
         event(new BookingUpdatedEvent($old_booking, $booking->fresh()));
 

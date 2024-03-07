@@ -328,8 +328,8 @@ class FoodController extends Controller
         if (!$food = $this->food->where('slug', $request->food)->where('buffet_id', $buffet->id)->get()->first()) {
             return redirect()->back()->withErrors(['slug' => 'food not found.'])->withInput();
         }
-        
-        $this->authorize('destroy', [Food::class, $food, $buffet]);
+
+        $this->authorize('change_status', [Food::class, $food, $buffet]);
 
         $food->update(['status' => FoodStatus::UNACTIVE->name]);
         

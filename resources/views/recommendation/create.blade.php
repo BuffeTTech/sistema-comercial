@@ -30,28 +30,27 @@
         </div>
         @include('layouts.footers.auth.footer')
     </div>
+    <script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+        const form = document.querySelector("#form")
+    
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault()
+            const userConfirmed = await confirm(`Deseja criar esta recomendação?`)
+    
+            if (userConfirmed) {
+                this.submit();
+            } else {
+                error("Ocorreu um erro!")
+            }
+        })
+            ClassicEditor
+                .create(document.querySelector('#content'))
+                .catch(error => {
+                    console.error(error);
+                });
+        });
+    </script>
 @endsection
-
-<script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-    const form = document.querySelector("#form")
-
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault()
-        const userConfirmed = await confirm(`Deseja criar esta pergunta?`)
-
-        if (userConfirmed) {
-            this.submit();
-        } else {
-            error("Ocorreu um erro!")
-        }
-    })
-        ClassicEditor
-            .create(document.querySelector('#content'))
-            .catch(error => {
-                console.error(error);
-            });
-    });
-</script>

@@ -58,7 +58,7 @@
                                     <x-input-error :messages="$errors->get('num_guests')" class="mt-2" />
                                 </div>
 
-                                <div style="position: relative">
+                                <div style="position: relative;">
                                     <x-input-label :value="__('Pacote de comidas')"/>
                                     {{-- <x-text-input id="food_id" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" type="date" name="food_id" :value="old('food_id')" required autofocus placeholder="Dia da festa" /> --}}
                                     <div class="food_slider">

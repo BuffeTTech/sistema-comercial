@@ -53,7 +53,7 @@ class UserController extends Controller
             ->role($buffet_subscription->subscription->slug.'.user')
             ->paginate($request->get('per page', 5), ['*'], 'page', $request->get('page', 1));
 
-        $this->authorize('viewAny', [User::class, $buffet]);
+        $this->authorize('viewAnyUser', [User::class, $buffet]);
 
         $buffet_subscription = $this->buffet_subscription->where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
         if($buffet_subscription->expires_in < Carbon::now()) {

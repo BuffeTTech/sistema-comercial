@@ -2,14 +2,41 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserStatus;
+use App\Models\Address;
+use App\Models\Booking;
 use App\Models\Buffet;
+use App\Models\BuffetSubscription;
+use App\Models\Decoration;
+use App\Models\Food;
+use App\Models\Guest;
+use App\Models\Phone;
+use App\Models\Recommendation;
+use App\Models\SatisfactionAnswer;
+use App\Models\SatisfactionQuestion;
+use App\Models\Schedule;
+use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class SiteController extends Controller
 {
     public function __construct(
-        protected Buffet $buffet
+        protected Buffet $buffet,
+        protected User $user,
+        protected Schedule $schedule,
+        protected Booking $booking,
+        protected Food $food,
+        protected Decoration $decoration,
+        protected Guest $guest,
+        protected Recommendation $recommendation,
+        protected Address $address,
+        protected Phone $phone,
+        protected BuffetSubscription $buffet_subscription, 
+        protected SatisfactionQuestion $survey,
+        protected SatisfactionAnswer $answer,  
     )
     {
     }
@@ -42,5 +69,252 @@ class SiteController extends Controller
         }
 
         return view('buffetTest', ['buffet'=>$buffet]);
+    }
+
+    public function presentation_data(Request $request){
+        $data = $request->data;
+        foreach($data as $key=>$value){
+            $owner = $this->user->where('email', $value['owner']['email'])->where('document', $value['owner']['document'])->where('status', UserStatus::ACTIVE->name)->get()->first();
+            if(!$owner) {
+                $owner = $this->user->create([
+                    "name"=>$value['owner']['name'],
+                    "email"=>$value['owner']['email'],
+                    "document"=>$value['owner']['document'],
+                    "document_type"=>$value['owner']['document_type'],
+                    "email_verified_at"=>now(),
+                    "status"=>$value['owner']['status'],
+                    "password"=>Hash::make($value['owner']['password']),
+                    "buffet_id"=>null,
+                ]);
+                if(isset($value['owner']['address'])) {
+                    $owner_address = $this->address->create([
+                        "zipcode"=>$value['owner']['address']['zipcode'],
+                        "street"=>$value['owner']['address']['street'],
+                        "number"=>$value['owner']['address']['number'],
+                        "complement"=>$value['owner']['address']['complement'],
+                        "neighborhood"=>$value['owner']['address']['neighborhood'],
+                        "state"=>$value['owner']['address']['state'],
+                        "city"=>$value['owner']['address']['city'],
+                        "country"=>$value['owner']['address']['country'],
+                    ]);
+                    $owner->update(['address'=>$owner_address->id]);
+                }
+                if(isset($value['owner']['phones'])) {
+                    $phones = [];
+                    foreach($value['owner']['phones'] as $key=>$phone) {
+                        $user_phone = $this->phone->create(['number'=>$phone['number']]);
+                        array_push($phones, $user_phone);
+                    }
+                    if(isset($phones[0])){
+                        $owner->update(['phone1'=>$phones[0]->id]);
+                    }
+                    if(isset($phones[1])){
+                        $owner->update(['phone2'=>$phones[1]->id]);
+                    }
+                }
+            }
+            $buffet = $this->buffet->where('slug', $value['buffet']['slug'])->get()->first();
+            if(!$buffet) {
+                $buffet = $this->buffet->create([
+                    "trading_name"=>$value['buffet']['trading_name'],
+                    "email"=>$value['buffet']['email'],
+                    "document"=>$value['buffet']['document'],
+                    "slug"=>$value['buffet']['slug'],
+                    "status"=>$value['buffet']['status'],
+                    "owner_id"=>$owner->id
+                ]);
+            }
+
+            $buffet_subscription = $this->buffet_subscription->where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+            if($buffet_subscription->expires_in < Carbon::now()) {
+                return redirect()->back()->withErrors(['buffet'=> "Este buffet não está mais ativo."])->withInput();
+            }
+
+
+            $foods = [];
+            if(isset($value['foods'])) {
+                foreach($value['foods'] as $food) {
+                    $fd = $this->food->where('slug', $food['slug'])->get()->first();
+                    if(!$fd) {
+                        $fd = $this->food->create([
+                            "name_food"=>$food['name_food'],
+                            "food_description"=>$food['food_description'],
+                            "beverages_description"=>$food['beverages_description'],
+                            "status"=>$food['status'],
+                            "price"=>$food['price'],
+                            "slug"=>$food['slug'],
+                            "buffet_id"=>$buffet->id
+                        ]);
+                        array_push($foods, $fd);
+                    }
+                }
+            }
+
+            $decorations = [];
+            if(isset($value['decorations'])) {
+                foreach($value['decorations'] as $decoration) {
+                    $dec = $this->decoration->where('slug', $decoration['slug'])->get()->first();
+                    if(!$dec) {
+                        $dec = $this->decoration->create([
+                            "main_theme"=>$decoration['main_theme'],
+                            "slug"=>$decoration['slug'],
+                            "description"=>$decoration['description'],
+                            "price"=>$decoration['price'],
+                            "status"=>$decoration['status'],
+                            "buffet_id"=>$buffet->id
+                        ]);
+                        array_push($decorations, $dec);
+                    }
+                }
+            }
+
+            $schedules = [];
+            if(isset($value['schedules'])) {
+                foreach($value['schedules'] as $schedule) {
+                    $sch = $this->schedule->where('day_week', $schedule['day_week'])->where('start_time', $schedule['start_time'])->where('duration', $schedule['duration'])->get()->first();
+                    if(!$sch) {
+                        $sch = $this->schedule->create([
+                            'day_week'=>$schedule['day_week'],
+                            'start_time'=>$schedule['start_time'],
+                            'duration'=>$schedule['duration'],
+                            "buffet_id"=>$buffet->id,
+                            "status"=>$schedule['status']
+                        ]);
+                        array_push($schedules, $sch);
+                    }
+                }
+            }
+
+            $users = [];
+            if(isset($value['users'])) {
+                foreach($value['users'] as $user) {
+                    $usr = $this->user->where('email', $user['user']['email'])->where('document', $user['user']['document'])->where('status', UserStatus::ACTIVE->name)->get()->first();
+                    if(!$usr) {
+                        $usr = $this->user->create([
+                            "name"=>$user['user']['name'],
+                            "email"=>$user['user']['email'],
+                            "document"=>$user['user']['document'],
+                            "document_type"=>$user['user']['document_type'],
+                            "email_verified_at"=>now(),
+                            "status"=>$user['user']['status'],
+                            "password"=>Hash::make($user['user']['password']),
+                            "buffet_id"=>$buffet->id,
+                        ]);
+                        if(isset($user['address']) && count($user['address']) !== 0) {
+                            $usr_address = $this->address->create([
+                                "zipcode"=>$user['address']['zipcode'],
+                                "street"=>$user['address']['street'],
+                                "number"=>$user['address']['number'],
+                                "complement"=>$user['address']['complement'],
+                                "neighborhood"=>$user['address']['neighborhood'],
+                                "state"=>$user['address']['state'],
+                                "city"=>$user['address']['city'],
+                                "country"=>$user['address']['country'],
+                            ]);
+                            $usr->update(['address'=>$usr_address->id]);
+                        }
+    
+                        if(isset($user['phones'])) {
+                            $user_phones = [];
+                            foreach($user['phones'] as $key=>$phone) {
+                                $user_phone = $this->phone->create(['number'=>$phone['number']]);
+                                array_push($user_phones, $user_phone);
+                            }
+                            if(isset($user_phones[0])){
+                                $usr->update(['phone1'=>$user_phones[0]->id]);
+                            }
+                            if(isset($user_phones[1])){
+                                $usr->update(['phone2'=>$user_phones[1]->id]);
+                            }
+                        }
+    
+                        $usr->assignRole($buffet_subscription->subscription->slug.'.'.$user['user']['role']);
+                        array_push($users, $usr);
+                    }
+                }
+            }
+
+            $recommendations = [];
+            if(isset($value['recommendations'])) {
+                foreach($value['recommendations'] as $recommendation) {
+                    $recomm = $this->recommendation->where('content', $recommendation['content'])->where('status', $recommendation['status'])->get()->first();
+                    if(!$recomm) {
+                        $recomm = $this->recommendation->create([
+                            'content'=>$recommendation['content'],
+                            'status'=>$recommendation['status'],
+                            "buffet_id"=>$buffet->id
+                        ]);
+                        array_push($recommendations, $recomm);
+                    }
+                }
+            }
+
+            $survey_questions = [];
+            if(isset($value['survey_questions'])) {
+                foreach($value['survey_questions'] as $question) {
+                    $ques = $this->survey->where('question', $question['question'])->where('status', $question['status'])->where('question_type', $question['question_type'])->get()->first();
+                    if(!$ques) {
+                        $ques = $this->survey->create([
+                            "question"=>$question['question'],
+                            "status"=>$question['status'],
+                            "answers"=>$question['answers'],
+                            "question_type"=>$question['question_type'],
+                            "buffet_id"=>$buffet->id
+                        ]);
+                        array_push($survey_questions, $ques);
+                    }
+                }
+            }
+
+            $bookings = [];
+            if(isset($value['bookings']) && count($foods) !== 0 && count($decorations) !== 0 && count($schedules) !== 0 && count($users) !== 0) {
+                foreach($value['bookings'] as $booking) {
+                    $bk = $this->booking
+                                ->where('buffet_id', $buffet->id)
+                                ->where('name_birthdayperson', $booking['name_birthdayperson'])
+                                ->where('years_birthdayperson', $booking['years_birthdayperson'])
+                                ->where('num_guests', $booking['num_guests'])
+                                ->where('party_day', $booking['party_day'])
+                                ->where('schedule_id', $schedules[$booking['schedule_id']]['id'])
+                                ->get()
+                                ->first();
+                    if(!$bk) {
+                        $bk = $this->booking->create([
+                            'name_birthdayperson'=>$booking['name_birthdayperson'],
+                            'years_birthdayperson'=>$booking['years_birthdayperson'],
+                            'num_guests'=>$booking['num_guests'],
+                            'party_day'=>$booking['party_day'],
+                            'food_id'=>$foods[$booking['food_id']]['id'],
+                            'price_food'=>$booking['price_food'],
+                            'decoration_id'=>$decorations[$booking['decoration_id']]['id'],
+                            'price_decoration'=>$booking['price_decoration'],
+                            'schedule_id'=>$schedules[$booking['schedule_id']]['id'],
+                            'price_schedule'=>$booking['price_schedule'],
+                            'discount'=>$booking['discount'],
+                            'status'=>$booking['status'],
+                            'user_id'=>$users[$booking['user_id']]['id'],
+                            "buffet_id"=>$buffet->id
+                        ]);
+                        array_push($bookings, $bk);
+                    }
+                    $answers = [];
+                    if(isset($booking['survey_answers']) && isset($value['survey_questions']) && $bk->status == "FINISHED") {
+                        foreach($booking['survey_answers'] as $answer) {
+                            $ans = $this->answer->where('question_id', $survey_questions[$answer['question_id']]['id'])->where('booking_id', $bk->id)->get()->first();
+                            if(!$ans) {
+                                $ans = $this->answer->create([
+                                    "question_id"=>$survey_questions[$answer['question_id']]['id'],
+                                    "answer"=>$answer['answer'],
+                                    "booking_id"=>$bk->id
+                                ]);
+                            }
+                            array_push($answers, $ans);
+                        }
+                    }
+                }
+            }
+
+        }
+        return response()->json(['data'=>$data]);
     }
 }

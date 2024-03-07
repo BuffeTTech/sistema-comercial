@@ -45,24 +45,23 @@
         </div>
         @include('layouts.footers.auth.footer')
     </div> 
+    <script>
+        const form = document.querySelector("#form")
+    
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault()
+            const userConfirmed = await confirm(`Deseja atualizar esta pergunta?`)
+    
+            if (userConfirmed) {
+                this.submit();
+            } else {
+                error("Ocorreu um erro!")
+            }
+        })
+        ClassicEditor
+            .create( document.querySelector('#question') )
+            .catch( error => {
+                console.error( error );
+            } );
+    </script> 
 @endsection
-
-<script>
-    const form = document.querySelector("#form")
-
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault()
-        const userConfirmed = await confirm(`Deseja atualizar esta pergunta?`)
-
-        if (userConfirmed) {
-            this.submit();
-        } else {
-            error("Ocorreu um erro!")
-        }
-    })
-    ClassicEditor
-        .create( document.querySelector('#question') )
-        .catch( error => {
-            console.error( error );
-        } );
-</script> 

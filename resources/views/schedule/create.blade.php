@@ -14,7 +14,7 @@
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive px-4">
-                            <form method="POST" action="{{ route('schedule.store', ['buffet'=>$buffet->slug]) }}">
+                            <form method="POST" action="{{ route('schedule.store', ['buffet'=>$buffet->slug]) }}" id="form">
                                 @csrf
                                 <div class="form-group">
                                     <label for="day_week" class="form-control-label">Dia da semana</label>
@@ -45,19 +45,18 @@
         </div>
         @include('layouts.footers.auth.footer')
     </div> 
+    <script>
+        const form = document.querySelector("#form")
+    
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault()
+            const userConfirmed = await confirm(`Deseja criar este horário?`)
+    
+            if (userConfirmed) {
+                this.submit();
+            } else {
+                error("Ocorreu um erro!")
+            }
+        })
+    </script> 
 @endsection
-
-<script>
-    const form = document.querySelector("#form")
-
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault()
-        const userConfirmed = await confirm(`Deseja criar este horário?`)
-
-        if (userConfirmed) {
-            this.submit();
-        } else {
-            error("Ocorreu um erro!")
-        }
-    })
-</script> 
