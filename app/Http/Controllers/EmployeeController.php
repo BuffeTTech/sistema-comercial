@@ -70,7 +70,7 @@ class EmployeeController extends Controller
         $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
         $roles = $this->role->where('name', 'like', $buffet_subscription->subscription->slug.'.%')->get();
 
-        $total = $this->user->where('buffet_id',$buffet->id)->where('status', UserStatus::ACTIVE->name)->get();
+        $total = $this->user->where('buffet_id',$buffet->id)->withoutRole($buffet_subscription->subscription->slug.'.user')->where('status', UserStatus::ACTIVE->name)->get();
 
         return view('employee.index', ['buffet'=>$buffet, 'employees'=>$employees, 'configurations'=>$configurations, 'total'=>count($total), 'buffet_subscription'=>$buffet_subscription, 'roles'=>$roles]); 
     }

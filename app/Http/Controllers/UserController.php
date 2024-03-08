@@ -62,7 +62,7 @@ class UserController extends Controller
 
         $configurations = $this->subscription_configuration->where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
 
-        $total = $this->user->where('buffet_id',$buffet->id)->where('status', UserStatus::ACTIVE->name)->get();
+        $total = $this->user->where('buffet_id',$buffet->id)->role($buffet_subscription->subscription->slug.'.user')->where('status', UserStatus::ACTIVE->name)->get();
         
         $roles = $this->role->where('name', 'like', $buffet_subscription->subscription->slug.'.%')->get();
 
@@ -118,7 +118,7 @@ class UserController extends Controller
         }
         $this->authorize('changeUserRole', [User::class, $user, $buffet]);
 
-        $total = $this->user->where('buffet_id',$buffet->id)->where('status', UserStatus::ACTIVE->name)->get();
+        $total = $this->user->where('buffet_id',$buffet->id)->withoutRole($buffet_subscription->subscription->slug.'.user')->where('status', UserStatus::ACTIVE->name)->get();
 
         $configurations = $this->subscription_configuration->where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
 

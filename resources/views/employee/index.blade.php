@@ -8,9 +8,11 @@
                 <div class="card mb-4">
                     <div class="card-header pb-0 d-flex justify-content-between">
                         <h6>Listagem dos Funcionários</h6>
+                        @can('create employee')
                         @if($total < $configurations['max_employees'])
                             <a href="{{ route('employee.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Adicionar Funcionário">Adicionar Funcionário</a>                                        
                         @endif
+                        @endcan
                     </div>
                     <div id="alert">
                         @include('components.alert')

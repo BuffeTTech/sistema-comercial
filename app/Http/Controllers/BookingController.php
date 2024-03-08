@@ -53,6 +53,7 @@ class BookingController extends Controller
                 $query->orderBy('start_time', 'asc');
             }, 'food','decoration', 'user'])
             ->where('status', BookingStatus::APPROVED->name)
+            // ->where('buffet_id', $buffet->id)
             ->where('party_day', '>=', date('Y-m-d'))
             ->get();
 
@@ -122,7 +123,7 @@ class BookingController extends Controller
         if($format == 'pendent') {
             $bookings = $this->booking->with(['schedule'=>function ($query) {
                 $query->orderBy('start_time', 'asc');
-            }, 'food','decoration', 'user'])->where('status', $status)->where('party_day', '>=', date('Y-m-d'))->orderBy('party_day', 'asc')->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
+            }, 'food','decoration', 'user'])->where('status', $status)->where('buffet_id', $buffet->id)->where('party_day', '>=', date('Y-m-d'))->orderBy('party_day', 'asc')->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
             $this->authorize('viewPendentBookings', [Booking::class, $buffet]);
         } else {
             $format = 'all';
@@ -147,7 +148,7 @@ class BookingController extends Controller
         // Lista de somente as próximas reservas 
         $bookings = $this->booking->with(['schedule'=>function ($query) {
             $query->orderBy('start_time', 'asc');
-        }, 'food','decoration', 'user'])->where('status', BookingStatus::APPROVED->name)->where('party_day', '>=', date('Y-m-d'))->orderBy('party_day', 'asc')->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
+        }, 'food','decoration', 'user'])->where('status', BookingStatus::APPROVED->name)->where('buffet_id', $buffet->id)->where('party_day', '>=', date('Y-m-d'))->orderBy('party_day', 'asc')->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
 
         $this->authorize('viewNextBookings', [Booking::class, $buffet]);
         $current_party = $this->current_party();
