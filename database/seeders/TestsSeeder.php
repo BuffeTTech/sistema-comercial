@@ -243,7 +243,7 @@ class TestsSeeder extends Seeder
         ]);
         $user_alegria1 = User::create([
             'name' => "Maria",
-            'email' => "maria@teste.com",
+            'email' => "maria@user.com",
             'email_verified_at' => now(),
             'password' => Hash::make('password'),
             'document' => "269.803.080-11",
@@ -259,7 +259,7 @@ class TestsSeeder extends Seeder
         ]);
         $user_alegria2 = User::create([
             'name' => "Paula",
-            'email' => "paula@teste.com",
+            'email' => "paula@user.com",
             'email_verified_at' => now(),
             'password' => Hash::make('password'),
             'document' => "317.573.220-86",
@@ -276,7 +276,7 @@ class TestsSeeder extends Seeder
         ]);
         $adm_alegria = User::create([
             'name' => "Guilherme",
-            'email' => "guilherme@teste.com",
+            'email' => "guilherme@adm.com",
             'email_verified_at' => now(),
             'password' => Hash::make('password'),
             'document' => "321.537.920-10",
@@ -292,7 +292,7 @@ class TestsSeeder extends Seeder
         ]);
         $com_alegria = User::create([
             'name' => "Luigi",
-            'email' => "luigi@teste.com",
+            'email' => "luigi@com.com",
             'email_verified_at' => now(),
             'password' => Hash::make('password'),
             'document' => "356.279.200-09",
@@ -308,7 +308,7 @@ class TestsSeeder extends Seeder
         ]);
         $ope_alegria = User::create([
             'name' => "Taynara",
-            'email' => "=taynara@teste.com",
+            'email' => "taynara@ope.com",
             'email_verified_at' => now(),
             'password' => Hash::make('password'),
             'document' => "828.244.150-37",
@@ -393,18 +393,26 @@ class TestsSeeder extends Seeder
         ]);
         
             FoodPhoto::create([
-                'file_name'=>'dadsadasd.jpg',
-                'file_path'=>'/dadsadasd.jpg',
-                'file_extension'=>'jpg',
+                'file_name'=>'batata1,2,3.jpeg',
+                'file_path'=>'/batata1,2,3.jpeg',
+                'file_extension'=>'jpeg',
                 'mime_type'=>'image/jpeg',
                 'file_size'=>'40847',
                 'food_id'=>$food_alegria1->id
             ]);
             FoodPhoto::create([
-                'file_name'=>'ddasdasdas.jpg',
-                'file_path'=>'/ddasdasdas.jpg',
-                'file_extension'=>'jpg',
-                'mime_type'=>'image/jpeg',
+                'file_name'=>'bolo123.webp',
+                'file_path'=>'/bolo123.webp',
+                'file_extension'=>'webp',
+                'mime_type'=>'image/webp',
+                'file_size'=>'31904',
+                'food_id'=>$food_alegria1->id
+            ]);
+            FoodPhoto::create([
+                'file_name'=>'bolo123.webp',
+                'file_path'=>'/bolo123.webp',
+                'file_extension'=>'webp',
+                'mime_type'=>'image/webp',
                 'file_size'=>'31904',
                 'food_id'=>$food_alegria1->id
             ]);
@@ -420,18 +428,26 @@ class TestsSeeder extends Seeder
             ]);
             
             FoodPhoto::create([
-                'file_name'=>'dadsadasd.jpg',
-                'file_path'=>'/dadsadasd.jpg',
-                'file_extension'=>'jpg',
+                'file_name'=>'batata1,2,3.jpeg',
+                'file_path'=>'/batata1,2,3.jpeg',
+                'file_extension'=>'jpeg',
                 'mime_type'=>'image/jpeg',
                 'file_size'=>'40847',
                 'food_id'=>$food_alegria2->id
             ]);
             FoodPhoto::create([
-                'file_name'=>'ddasdasdas.jpg',
-                'file_path'=>'/ddasdasdas.jpg',
-                'file_extension'=>'jpg',
+                'file_name'=>'bolinha de queijo2.jpeg',
+                'file_path'=>'/bolinha de queijo2.jpeg',
+                'file_extension'=>'jpeg',
                 'mime_type'=>'image/jpeg',
+                'file_size'=>'31904',
+                'food_id'=>$food_alegria2->id
+            ]);
+            FoodPhoto::create([
+                'file_name'=>'bolo123.webp',
+                'file_path'=>'/bolo123.webp',
+                'file_extension'=>'webp',
+                'mime_type'=>'image/webp',
                 'file_size'=>'31904',
                 'food_id'=>$food_alegria2->id
             ]);
@@ -447,18 +463,26 @@ class TestsSeeder extends Seeder
             ]);
             
             FoodPhoto::create([
-                'file_name'=>'dadsadasd.jpg',
-                'file_path'=>'/dadsadasd.jpg',
-                'file_extension'=>'jpg',
+                'file_name'=>'batata1,2,3.jpeg',
+                'file_path'=>'/batata1,2,3.jpeg',
+                'file_extension'=>'jpeg',
                 'mime_type'=>'image/jpeg',
                 'file_size'=>'40847',
                 'food_id'=>$food_alegria3->id
             ]);
             FoodPhoto::create([
-                'file_name'=>'ddasdasdas.jpg',
-                'file_path'=>'/ddasdasdas.jpg',
-                'file_extension'=>'jpg',
+                'file_name'=>'mesafrios3.jpeg',
+                'file_path'=>'/mesafrios3.jpeg',
+                'file_extension'=>'jpeg',
                 'mime_type'=>'image/jpeg',
+                'file_size'=>'31904',
+                'food_id'=>$food_alegria3->id
+            ]);
+            FoodPhoto::create([
+                'file_name'=>'bolo123.webp',
+                'file_path'=>'/bolo123.webp',
+                'file_extension'=>'webp',
+                'mime_type'=>'image/webp',
                 'file_size'=>'31904',
                 'food_id'=>$food_alegria3->id
             ]);
@@ -473,18 +497,26 @@ class TestsSeeder extends Seeder
             'buffet_id'=>$buffet_alegria->id
         ]);
             DecorationPhotos::create([
-                'file_name'=>'0_qdHImq1G588SB9Ii.jpg',
-                'file_path'=>'/0_qdhimq1g588sb9ii.170554830898-.jpg',
-                'file_extension'=>'jpg',
+                'file_name'=>'marvel1.jpeg',
+                'file_path'=>'/marvel1.jpeg',
+                'file_extension'=>'jpeg',
                 'mime_type'=>'image/jpeg',
                 'file_size'=>'191250',
                 'decorations_id'=>$decoration_alegria1->id
             ]);
             DecorationPhotos::create([
-                'file_name'=>'ordem-marvel-e1606754420868.jpg',
-                'file_path'=>'/ordem-marvel-e1606754420868.17055483086-.jpg',
-                'file_extension'=>'jpg',
-                'mime_type'=>'image/jpeg',
+                'file_name'=>'marvel2.webp',
+                'file_path'=>'/marvel2.webp',
+                'file_extension'=>'webp',
+                'mime_type'=>'image/webp',
+                'file_size'=>'113155',
+                'decorations_id'=>$decoration_alegria1->id
+            ]);
+            DecorationPhotos::create([
+                'file_name'=>'marvel3.webp',
+                'file_path'=>'/marvel3.webp',
+                'file_extension'=>'webp',
+                'mime_type'=>'image/webp',
                 'file_size'=>'113155',
                 'decorations_id'=>$decoration_alegria1->id
             ]);
@@ -498,22 +530,29 @@ class TestsSeeder extends Seeder
                         'buffet_id'=>$buffet_alegria->id
                     ]);
                     DecorationPhotos::create([
-                        'file_name'=>'0_qdHImq1G588SB9Ii.jpg',
-                        'file_path'=>'/0_qdhimq1g588sb9ii.170554830898-.jpg',
-                        'file_extension'=>'jpg',
-                        'mime_type'=>'image/jpeg',
+                        'file_name'=>'minnie1.webp',
+                        'file_path'=>'/minnie1.webp',
+                        'file_extension'=>'webp',
+                        'mime_type'=>'image/webp',
                         'file_size'=>'191250',
                         'decorations_id'=>$decoration_alegria2->id
                     ]);
                     DecorationPhotos::create([
-                        'file_name'=>'ordem-marvel-e1606754420868.jpg',
-                        'file_path'=>'/ordem-marvel-e1606754420868.17055483086-.jpg',
-                        'file_extension'=>'jpg',
+                        'file_name'=>'minnie2.webp',
+                        'file_path'=>'/minnie2.webp',
+                        'file_extension'=>'webp',
+                        'mime_type'=>'image/webp',
+                        'file_size'=>'113155',
+                        'decorations_id'=>$decoration_alegria2->id
+                    ]);
+                    DecorationPhotos::create([
+                        'file_name'=>'minnie 3.jpeg',
+                        'file_path'=>'/minnie 3.jpeg',
+                        'file_extension'=>'jpeg',
                         'mime_type'=>'image/jpeg',
                         'file_size'=>'113155',
                         'decorations_id'=>$decoration_alegria2->id
                     ]);
-
         $decoration_alegria3 = Decoration::create([
                         'main_theme'=>'Moana',
                         'slug'=>'moana',
@@ -523,17 +562,25 @@ class TestsSeeder extends Seeder
                         'buffet_id'=>$buffet_alegria->id
                     ]);
                     DecorationPhotos::create([
-                        'file_name'=>'0_qdHImq1G588SB9Ii.jpg',
-                        'file_path'=>'/0_qdhimq1g588sb9ii.170554830898-.jpg',
-                        'file_extension'=>'jpg',
+                        'file_name'=>'moana.jpeg',
+                        'file_path'=>'/moana.jpeg',
+                        'file_extension'=>'jpeg',
                         'mime_type'=>'image/jpeg',
                         'file_size'=>'191250',
                         'decorations_id'=>$decoration_alegria3->id
                     ]);
                     DecorationPhotos::create([
-                        'file_name'=>'ordem-marvel-e1606754420868.jpg',
-                        'file_path'=>'/ordem-marvel-e1606754420868.17055483086-.jpg',
-                        'file_extension'=>'jpg',
+                        'file_name'=>'moana2.jpeg',
+                        'file_path'=>'/moana2.jpeg',
+                        'file_extension'=>'jpeg',
+                        'mime_type'=>'image/jpeg',
+                        'file_size'=>'113155',
+                        'decorations_id'=>$decoration_alegria3->id
+                    ]);
+                    DecorationPhotos::create([
+                        'file_name'=>'moana3.jpeg',
+                        'file_path'=>'/moana3.jpeg',
+                        'file_extension'=>'jpeg',
                         'mime_type'=>'image/jpeg',
                         'file_size'=>'113155',
                         'decorations_id'=>$decoration_alegria3->id
@@ -541,7 +588,74 @@ class TestsSeeder extends Seeder
             
         // reservas 
         $booking_alegria1 = Booking::create([
+            'name_birthdayperson'=>'Tasso',
+            'years_birthdayperson'=>15,
+            'num_guests'=>50,
+            'party_day'=>'2024-02-26',
+            'buffet_id'=>$buffet_alegria->id,
+            'food_id'=>$food_alegria1->id,
+            'price_food'=>$food_alegria1->price,
+            'decoration_id'=>$decoration_alegria1->id,
+            'price_decoration'=>$decoration_alegria1->price,
+            'schedule_id'=>$schedule2->id,
+            'price_schedule'=>0,
+            'discount'=>0,
+            'status'=>BookingStatus::FINISHED->name,
+            'user_id'=>$user_alegria2->id
+        ]);
+        $booking_alegria2 = Booking::create([
+            'name_birthdayperson'=>'Luiza',
+            'years_birthdayperson'=>6,
+            'num_guests'=>100,
+            'party_day'=>'2024-03-23',
+            'buffet_id'=>$buffet_alegria->id,
+            'food_id'=>$food_alegria3->id,
+            'price_food'=>$food_alegria3->price,
+            'decoration_id'=>$decoration_alegria3->id,
+            'price_decoration'=>$decoration_alegria3->price,
+            'schedule_id'=>$schedule9->id,
+            'price_schedule'=>0,
+            'discount'=>0,
+            'status'=>BookingStatus::PENDENT->name,
+            'user_id'=>$user_alegria1->id
+        ]);
+        
+        $booking_alegria3 = Booking::create([
+            'name_birthdayperson'=>'Silvia',
+            'years_birthdayperson'=>10,
+            'num_guests'=>70,
+            'party_day'=>'2024-03-23',
+            'buffet_id'=>$buffet_alegria->id,
+            'food_id'=>$food_alegria2->id,
+            'price_food'=>$food_alegria2->price,
+            'decoration_id'=>$decoration_alegria2->id,
+            'price_decoration'=>$decoration_alegria2->price,
+            'schedule_id'=>$schedule9->id,
+            'price_schedule'=>0,
+            'discount'=>0,
+            'status'=>BookingStatus::APPROVED->name,
+            'user_id'=>$user_alegria2->id
+        ]);
+
+        $booking_alegria4 = Booking::create([
             'name_birthdayperson'=>'André',
+            'years_birthdayperson'=>15,
+            'num_guests'=>50,
+            'party_day'=>'2024-03-12',
+            'buffet_id'=>$buffet_alegria->id,
+            'food_id'=>$food_alegria1->id,
+            'price_food'=>$food_alegria1->price,
+            'decoration_id'=>$decoration_alegria1->id,
+            'price_decoration'=>$decoration_alegria1->price,
+            'schedule_id'=>$schedule4->id,
+            'price_schedule'=>0,
+            'discount'=>0,
+            'status'=>BookingStatus::APPROVED->name,
+            'user_id'=>$user_alegria1->id
+        ]);
+
+        $booking_alegria5 = Booking::create([
+            'name_birthdayperson'=>'Yuri',
             'years_birthdayperson'=>15,
             'num_guests'=>50,
             'party_day'=>'2024-04-26',
@@ -553,49 +667,16 @@ class TestsSeeder extends Seeder
             'schedule_id'=>$schedule7->id,
             'price_schedule'=>0,
             'discount'=>0,
-            'status'=>BookingStatus::PENDENT->name,
-            'user_id'=>$user_alegria1->id
-        ]);
-        $booking_alegria2 = Booking::create([
-            'name_birthdayperson'=>'Luiza',
-            'years_birthdayperson'=>6,
-            'num_guests'=>100,
-            'party_day'=>'2024-02-20',
-            'buffet_id'=>$buffet_alegria->id,
-            'food_id'=>$food_alegria3->id,
-            'price_food'=>$food_alegria3->price,
-            'decoration_id'=>$decoration_alegria3->id,
-            'price_decoration'=>$decoration_alegria3->price,
-            'schedule_id'=>$schedule7->id,
-            'price_schedule'=>0,
-            'discount'=>0,
-            'status'=>BookingStatus::PENDENT->name,
-            'user_id'=>$user_alegria2->id
-        ]);
-        
-        $booking_alegria3 = Booking::create([
-            'name_birthdayperson'=>'Silvia',
-            'years_birthdayperson'=>10,
-            'num_guests'=>70,
-            'party_day'=>'2024-02-20',
-            'buffet_id'=>$buffet_alegria->id,
-            'food_id'=>$food_alegria2->id,
-            'price_food'=>$food_alegria2->price,
-            'decoration_id'=>$decoration_alegria2->id,
-            'price_decoration'=>$decoration_alegria2->price,
-            'schedule_id'=>$schedule4->id,
-            'price_schedule'=>0,
-            'discount'=>0,
             'status'=>BookingStatus::APPROVED->name,
             'user_id'=>$user_alegria2->id
         ]);
 
-        //convidados silvia 
+        //convidados yuri 
         Guest::create([
             'name'=> 'João',
             'document'=>'292.795.610-30',
             'age'=> 32,
-            'booking_id'=>$booking_alegria3->id,
+            'booking_id'=>$booking_alegria5->id,
             'buffet_id'=>$buffet_alegria->id,
             'status'=>GuestStatus::CONFIRMED->name
         ]);
@@ -604,7 +685,7 @@ class TestsSeeder extends Seeder
             'name'=> 'Hamilton',
             'document'=>'280.244.380-11',
             'age'=> 55,
-            'booking_id'=>$booking_alegria3->id,
+            'booking_id'=>$booking_alegria5->id,
             'buffet_id'=>$buffet_alegria->id,
             'status'=>GuestStatus::PRESENT->name
         ]);
@@ -613,7 +694,7 @@ class TestsSeeder extends Seeder
             'name'=> 'Maria Flor',
             'document'=>'000.841.410-69',
             'age'=> 6,
-            'booking_id'=>$booking_alegria3->id,
+            'booking_id'=>$booking_alegria5->id,
             'buffet_id'=>$buffet_alegria->id,
             'status'=>GuestStatus::ABSENT->name
         ]);
@@ -622,7 +703,7 @@ class TestsSeeder extends Seeder
             'name'=> 'Robson',
             'document'=>'030.410.060-90',
             'age'=> 40,
-            'booking_id'=>$booking_alegria3->id,
+            'booking_id'=>$booking_alegria5->id,
             'buffet_id'=>$buffet_alegria->id,
             'status'=>GuestStatus::BLOCKED->name
         ]);
@@ -631,7 +712,7 @@ class TestsSeeder extends Seeder
             'name'=> 'Fernanda',
             'document'=>'195.544.410-29',
             'age'=> 20,
-            'booking_id'=>$booking_alegria3->id,
+            'booking_id'=>$booking_alegria5->id,
             'buffet_id'=>$buffet_alegria->id,
             'status'=>GuestStatus::CONFIRMED->name
         ]);
@@ -640,7 +721,7 @@ class TestsSeeder extends Seeder
             'name'=> 'Prado',
             'document'=>'425.114.870-39',
             'age'=> 18,
-            'booking_id'=>$booking_alegria3->id,
+            'booking_id'=>$booking_alegria5->id,
             'buffet_id'=>$buffet_alegria->id,
             'status'=>GuestStatus::PENDENT->name
         ]);
