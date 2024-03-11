@@ -39,10 +39,19 @@
                                     </div>
                                 </div>
                             </div>
+ 
                             
-                        @foreach($decoration_photos as $key=>$photo)
-                            <img {{ $key == 0 ? 'active' : ''}}" src="{{ asset('storage/decorations'. $photo->file_path) }}" alt="{{ $photo->file_name }}"> 
-                        @endforeach
+                        @if(count($decoration_photos) === 0)
+                            <h3>Nenhuma foto encontrada.</h3>
+                        @else
+                            <div class="d-flex">
+                                @foreach($decoration_photos as $key=>$photo)
+                                    <div>
+                                        <img {{ $key == 0 ? 'active' : ''}}" src="{{ asset('storage/decorations'. $photo->file_path) }}" alt="{{ $photo->file_name }}" style="height: 400px; width: 400px"> 
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
                         <br>
                         <br>
                         @can('update decoration')

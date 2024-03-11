@@ -8,7 +8,9 @@ use App\Models\Booking;
 use App\Models\Buffet;
 use App\Models\BuffetSubscription;
 use App\Models\Decoration;
+use App\Models\DecorationPhotos;
 use App\Models\Food;
+use App\Models\FoodPhoto;
 use App\Models\Guest;
 use App\Models\Phone;
 use App\Models\Recommendation;
@@ -30,6 +32,8 @@ class SiteController extends Controller
         protected Booking $booking,
         protected Food $food,
         protected Decoration $decoration,
+        protected FoodPhoto $food_photo,
+        protected DecorationPhotos $decoration_photo,
         protected Guest $guest,
         protected Recommendation $recommendation,
         protected Address $address,
@@ -147,6 +151,19 @@ class SiteController extends Controller
                         ]);
                         array_push($foods, $fd);
                     }
+                    $photos = [];
+                    foreach($food['photos'] as $photo) {
+                        $ph = $this->food_photo->create([
+                            'file_name'=>$photo['file_name'],
+                            'file_path'=>$photo['file_path'],
+                            'file_extension'=>$photo['file_extension'],
+                            'mime_type'=>$photo['mime_type'],
+                            'file_size'=>$photo['file_size'],
+                            'food_id'=>$fd->id
+                        ]);
+                        array_push($photos, $ph);
+                    }
+                    // array_push($fd, $photos);
                 }
             }
 
@@ -164,6 +181,18 @@ class SiteController extends Controller
                             "buffet_id"=>$buffet->id
                         ]);
                         array_push($decorations, $dec);
+                    }
+                    $photos = [];
+                    foreach($decoration['photos'] as $photo) {
+                        $ph = $this->decoration_photo->create([
+                            'file_name'=>$photo['file_name'],
+                            'file_path'=>$photo['file_path'],
+                            'file_extension'=>$photo['file_extension'],
+                            'mime_type'=>$photo['mime_type'],
+                            'file_size'=>$photo['file_size'],
+                            'decorations_id'=>$dec->id
+                        ]);
+                        array_push($photos, $ph);
                     }
                 }
             }

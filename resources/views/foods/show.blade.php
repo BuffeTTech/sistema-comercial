@@ -55,7 +55,7 @@
                             </div>
                             
                         @foreach($foods_photo as $key=>$photo)
-                            <img {{ $key == 0 ? 'active' : ''}} src="{{ asset('storage/foods'. $photo->file_path) }}" alt="{{ $photo->file_name }}"> 
+                            <img {{ $key == 0 ? 'active' : ''}} src="{{ asset('storage/foods'. $photo->file_path) }}" alt="{{ $photo->file_name }}" style="height: 400px; width: 400px"> 
                         @endforeach
                         <br>
                         <br>
