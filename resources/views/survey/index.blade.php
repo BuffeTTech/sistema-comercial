@@ -9,7 +9,7 @@
                     <div class="card-header pb-0 d-flex justify-content-between">
                         <h6>Perguntas</h6>
                         @can('create survey question')
-                            @if($total < $configurations['max_survey_questions'])
+                            @if($total < $configurations['max_survey_questions'] || $configurations['max_survey_questions'] == null)
                                 <a href="{{ route('survey.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar recomendação">Criar Pesquisa</a>                                        
                             @endif
                         @endcan
@@ -22,7 +22,7 @@
                             <table class="table align-items-center mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                             Pergunta</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                             Respostas</th>
@@ -46,7 +46,7 @@
                                         @foreach($surveys as $value)
                                         <tr>
                                             <td class="text-center">
-                                                <div class="d-flex px-2 py-1">
+                                                <div>
                                                     <div class="d-flex flex-column justify-content-center text-xxs">
                                                         <h6 class="mb-0 text-sm">{!! mb_strimwidth($value['question'], 0, $limite_char, " ...") !!}</h6>
                                                     </div>

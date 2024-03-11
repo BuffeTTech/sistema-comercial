@@ -93,9 +93,8 @@ class EmployeeController extends Controller
             ->where('buffet_id', $buffet->id)
             ->withoutRole($buffet_subscription->subscription->slug.'.user')
             ->get();
-        
-        if(count($employees) >= $configurations['max_employees']) {
-            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais funcionarios neste plano.'])->withInput();
+        if(count($employees) >= $configurations['max_employees'] && $configurations['max_employees'] !== null) {
+            return redirect()->route('employee.index', ['buffet'=>$buffet->slug])->withErrors(['generic_error'=> 'Não é permitido cadastrar mais funcionarios neste plano.'])->withInput();
         }
 
         $roles = $this->role->where('name', 'like', $buffet_subscription->subscription->slug.'.%')->get();
@@ -127,7 +126,7 @@ class EmployeeController extends Controller
             ->withoutRole($buffet_subscription->subscription->slug.'.user')
             ->get();
         
-        if(count($employees) >= $configurations['max_employees']) {
+        if(count($employees) >= $configurations['max_employees'] && $configurations['max_employees'] !== null) {
             return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais funcionarios neste plano.'])->withInput();
         }
         

@@ -50,9 +50,6 @@ class SatisfactionSurveyController extends Controller
         }
         $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
 
-        if(count($surveys) >= $configurations['max_survey_questions']) {
-            return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais perguntas neste plano.'])->withInput();
-        }
         $total = $this->survey->where('buffet_id',$buffet->id)->where('status', true)->get();
 
         return view('survey.index',['buffet'=>$buffet, 'surveys'=>$surveys, 'total'=>count($total), 'configurations'=>$configurations]); 
@@ -77,7 +74,7 @@ class SatisfactionSurveyController extends Controller
         }
         $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
 
-        if(count($surveys) >= $configurations['max_survey_questions']) {
+        if(count($surveys) >= $configurations['max_survey_questions'] && $configurations['max_survey_questions'] !== null) {
             return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais perguntas neste plano.'])->withInput();
         }
 
@@ -102,7 +99,7 @@ class SatisfactionSurveyController extends Controller
         }
         $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
 
-        if(count($surveys) >= $configurations['max_survey_questions']) {
+        if(count($surveys) >= $configurations['max_survey_questions'] && $configurations['max_survey_questions'] !== null) {
             return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais perguntas neste plano.'])->withInput();
         }
 
@@ -113,7 +110,7 @@ class SatisfactionSurveyController extends Controller
             "buffet_id"=>$buffet->id
         ]);
 
-        return redirect()->back()->with(['success'=>'Pergunta criada com sucesso!']);
+        return redirect()->route('survey.show', ['buffet'=>$buffet->slug, 'survey'=>$survey->hashed_id])->with(['success'=>'Pergunta criada com sucesso!']);
     }
 
     public function show(Request $request){

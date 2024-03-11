@@ -98,7 +98,7 @@ class FoodController extends Controller
             return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
         }
         $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
-        if(!isset($request->foods_photo) || count($request->foods_photo) != $configurations['max_food_photos']) {
+        if((!isset($request->foods_photo) || count($request->foods_photo) != $configurations['max_food_photos']) && $configurations['max_food_photos'] !== null) {
             return redirect()->back()->withErrors(['photo'=> 'Não existem '.$configurations['max_food_photos'].' fotos na requisição'])->withInput();
         }
         

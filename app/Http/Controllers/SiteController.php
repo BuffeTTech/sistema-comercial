@@ -134,7 +134,7 @@ class SiteController extends Controller
             $foods = [];
             if(isset($value['foods'])) {
                 foreach($value['foods'] as $food) {
-                    $fd = $this->food->where('slug', $food['slug'])->get()->first();
+                    $fd = $this->food->where('slug', $food['slug'])->where('buffet_id', $buffet->id)->get()->first();
                     if(!$fd) {
                         $fd = $this->food->create([
                             "name_food"=>$food['name_food'],
@@ -153,7 +153,7 @@ class SiteController extends Controller
             $decorations = [];
             if(isset($value['decorations'])) {
                 foreach($value['decorations'] as $decoration) {
-                    $dec = $this->decoration->where('slug', $decoration['slug'])->get()->first();
+                    $dec = $this->decoration->where('slug', $decoration['slug'])->where('buffet_id', $buffet->id)->get()->first();
                     if(!$dec) {
                         $dec = $this->decoration->create([
                             "main_theme"=>$decoration['main_theme'],
@@ -171,7 +171,7 @@ class SiteController extends Controller
             $schedules = [];
             if(isset($value['schedules'])) {
                 foreach($value['schedules'] as $schedule) {
-                    $sch = $this->schedule->where('day_week', $schedule['day_week'])->where('start_time', $schedule['start_time'])->where('duration', $schedule['duration'])->get()->first();
+                    $sch = $this->schedule->where('day_week', $schedule['day_week'])->where('start_time', $schedule['start_time'])->where('duration', $schedule['duration'])->where('buffet_id', $buffet->id)->get()->first();
                     if(!$sch) {
                         $sch = $this->schedule->create([
                             'day_week'=>$schedule['day_week'],
@@ -188,7 +188,7 @@ class SiteController extends Controller
             $users = [];
             if(isset($value['users'])) {
                 foreach($value['users'] as $user) {
-                    $usr = $this->user->where('email', $user['user']['email'])->where('document', $user['user']['document'])->where('status', UserStatus::ACTIVE->name)->get()->first();
+                    $usr = $this->user->where('email', $user['user']['email'])->where('document', $user['user']['document'])->where('status', UserStatus::ACTIVE->name)->where('buffet_id', $buffet->id)->get()->first();
                     if(!$usr) {
                         $usr = $this->user->create([
                             "name"=>$user['user']['name'],
@@ -237,7 +237,7 @@ class SiteController extends Controller
             $recommendations = [];
             if(isset($value['recommendations'])) {
                 foreach($value['recommendations'] as $recommendation) {
-                    $recomm = $this->recommendation->where('content', $recommendation['content'])->where('status', $recommendation['status'])->get()->first();
+                    $recomm = $this->recommendation->where('content', $recommendation['content'])->where('status', $recommendation['status'])->where('buffet_id', $buffet->id)->get()->first();
                     if(!$recomm) {
                         $recomm = $this->recommendation->create([
                             'content'=>$recommendation['content'],
@@ -252,7 +252,7 @@ class SiteController extends Controller
             $survey_questions = [];
             if(isset($value['survey_questions'])) {
                 foreach($value['survey_questions'] as $question) {
-                    $ques = $this->survey->where('question', $question['question'])->where('status', $question['status'])->where('question_type', $question['question_type'])->get()->first();
+                    $ques = $this->survey->where('question', $question['question'])->where('status', $question['status'])->where('question_type', $question['question_type'])->where('buffet_id', $buffet->id)->get()->first();
                     if(!$ques) {
                         $ques = $this->survey->create([
                             "question"=>$question['question'],
@@ -297,6 +297,24 @@ class SiteController extends Controller
                         ]);
                         array_push($bookings, $bk);
                     }
+                    $guests = [];
+                    if(isset($booking['guests'])){
+                        foreach($booking['guests'] as $guest) {
+                            $gues = $this->guest->where('document', $guest['document'])->where('status', $guest['status'])->where('booking_id', $bk->id)->get()->first();
+                            if(!$gues) {
+                                $gues = $this->guest->create([
+                                    "name"=>$guest['name'],
+                                    "document"=>$guest['document'],
+                                    "age"=>$guest['age'],
+                                    "booking_id"=>$bk->id,
+                                    "buffet_id"=>$buffet->id,
+                                    "status"=>$guest['status'],
+                                ]);
+                            }
+                            array_push($guests, $gues);
+                        }
+                    }
+
                     $answers = [];
                     if(isset($booking['survey_answers']) && isset($value['survey_questions']) && $bk->status == "FINISHED") {
                         foreach($booking['survey_answers'] as $answer) {

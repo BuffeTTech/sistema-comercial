@@ -19,7 +19,7 @@
                                 @method('put')
                                 <div class="form-group">
                                     <label for="question" class="form-control-label">Pergunta</label>
-                                    <textarea class="form-control" id="question" rows="3" name="question" required>{{old('question') ?? $survey->question}}</textarea>
+                                    <textarea class="form-control" id="question" rows="3" name="question" >{{old('question') ?? $survey->question}}</textarea>
                                     <x-input-error :messages="$errors->get('question')" class="mt-2" />
                                 </div>
                                 <div class="flex flex-wrap -mx-3 mb-6 form-group">
@@ -45,17 +45,16 @@
         </div>
         @include('layouts.footers.auth.footer')
     </div> 
+    <script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
     <script>
         const form = document.querySelector("#form")
     
         form.addEventListener('submit', async function(e) {
             e.preventDefault()
-            const userConfirmed = await confirm(`Deseja atualizar esta pergunta?`)
+            const userConfirmed = await confirm(`Deseja criar esta pergunta?`)
     
             if (userConfirmed) {
                 this.submit();
-            } else {
-                error("Ocorreu um erro!")
             }
         })
         ClassicEditor
@@ -63,5 +62,5 @@
             .catch( error => {
                 console.error( error );
             } );
-    </script> 
+    </script>  
 @endsection

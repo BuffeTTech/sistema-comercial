@@ -8,7 +8,7 @@
                 <div class="card mb-4">
                     <div class="card-header pb-0 d-flex justify-content-between">
                         <h6>Recomendações de festas</h6>
-                        @if($total < $configurations['max_recommendations'])
+                        @if($total < $configurations['max_recommendations'] || $configurations['max_recommendations'] == null)
                             <a href="{{ route('recommendation.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar recomendação">Criar Recomendação</a>                                        
                         @endif
                     </div>
@@ -40,7 +40,7 @@
                                         @foreach($recommendations as $value)
                                         <tr>
                                             <td>
-                                                <div class="d-flex px-2 py-1">
+                                                <div class="d-flex px-4 py-1">
                                                     <div class="d-flex flex-column justify-content-center text-xxs">
                                                         <p class="text-sm mb-0">{{ mb_strimwidth($value['content'], 0, $limite_char, " ...") }}</p>
                                                     </div>

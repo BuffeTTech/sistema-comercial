@@ -35,9 +35,7 @@ class BookingClosedNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                     ->subject('Festa Finalizada em '.$this->booking->buffet->trading_name)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+                    ->line('Obrigado por realizar sua festa em nosso buffet!');
     }
 
     /**

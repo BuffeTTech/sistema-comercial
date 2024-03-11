@@ -35,6 +35,7 @@ class BookingCreatedNotification extends Notification implements ShouldQueue
     {
         $url = url($this->booking->buffet->slug.'/booking/'.$this->booking->hashed_id);
         return (new MailMessage)
+                    ->subject('Festa criada em '.$this->booking->buffet->trading_name)
                     ->greeting('Boa tarde, '.$notifiable->name.'!')
                     ->line('Seu pedido para festa no buffet '.$this->booking->buffet->trading_name.' foi solicitado.')
                     ->line('Em breve retornaremos o status de sua solicitação!')

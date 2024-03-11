@@ -59,7 +59,7 @@
                                 </div>
 
                                 <div style="position: relative;">
-                                    <x-input-label :value="__('Pacote de comidas')"/>
+                                    <label for="num_guests" class="form-control-label">Pacote de comidas</label>
                                     {{-- <x-text-input id="food_id" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" type="date" name="food_id" :value="old('food_id')" required autofocus placeholder="Dia da festa" /> --}}
                                     <div class="food_slider">
                                         <!-- Additional required wrapper -->
@@ -99,7 +99,7 @@
                                 </div>
 
                                 <div style="position: relative">
-                                    <x-input-label :value="__('Pacote de decoração')" class="dark:text-slate-800"/>
+                                    <label for="num_guests" class="form-control-label">Pacote de decoração</label>
                                     {{-- <x-text-input id="decoration_id" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" type="date" name="decoration_id" :value="old('decoration_id')" required autofocus placeholder="Dia da festa" /> --}}
                                     <div class="decoration_slider">
                                         <!-- Additional required wrapper -->
@@ -229,7 +229,6 @@
                         ${food.data.food_description}
                         <p><b>Bebidas:</b></p>
                         ${food.data.beverages_description}
-                        <br><br>
                         <p><b>Fotos:</b></p>
                         ${food.data.photos.map(photo=>{
                             return `
@@ -265,12 +264,9 @@
                     title: decoration.data.main_theme,
                     content: `
                         <p><b>Por apenas R$ ${decoration.data.price}</b></p>
-                        <br>
                         <p><b>Descrição do pacote:</b></p>
-                        <br>
                         <p><b>Comidas:</b></p>
                         ${decoration.data.description}
-                        <br><br>
                         ${decoration.data.photos.map(photo=>{
                             return `
                             <img class="w-full" src="{{asset('storage/decorations/${photo.file_path}')}}">

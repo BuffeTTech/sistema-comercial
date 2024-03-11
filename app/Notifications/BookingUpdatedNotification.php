@@ -35,6 +35,7 @@ class BookingUpdatedNotification extends Notification implements ShouldQueue
     {
         $url = url($this->booking->buffet->slug.'/booking/'.$this->booking->hashed_id);
         return (new MailMessage)
+                    ->subject('Festa atualizada em '.$this->booking->buffet->trading_name)
                     ->greeting('Boa tarde, '.$notifiable->name.'!')
                     ->line('Seu pedido para festa no buffet '.$this->booking->buffet->trading_name.' foi alterado.')
                     ->line('Clique no botão abaixo para ver as alterações em sua reserva.')

@@ -15,7 +15,10 @@
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="px-4">
                             <h3>{{ $survey->main_theme }}</h3>
-                            <p class="text-md mb-0"><strong>Pergunta: </strong> {{ $survey->question }}</p>
+                            <p class="text-md mb-0"><strong>Pergunta: </strong></p>
+                            <div>
+                                {!! $survey->question !!}
+                            </div>
                             <p class="text-lg mb-0"><strong>Status: </strong> </strong><x-status.survey_status :status="$survey->status" /></p>
                             <p class="text-lg mb-0"><strong>Formato: </strong>{{ App\Enums\QuestionType::fromValue($survey->question_type) }}</p>
                             <p class="text-lg mb-0"><strong>Respostas: </strong> {{ $survey->answers }}</p>

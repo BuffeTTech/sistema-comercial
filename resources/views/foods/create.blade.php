@@ -52,12 +52,23 @@
 
                                 <h6>Selecione as imagens</h6>
                                 <x-input-error :messages="$errors->get('photo')" class="mt-2" />
-                                @for($i=0; $i<$configurations->max_food_photos; $i++)
-                                    
-                                    <div class="form-group">
-                                        <input type="file" class="form-control" id="foods_photo{{ $i+1 }}" name="foods_photo[]" accept="image/*">
+                                @if($configurations['max_food_photos'] !== null)
+                                    @for($i=0; $i<$configurations->max_food_photos; $i++)
+                                        <div class="form-group">
+                                            <input type="file" class="form-control" id="foods_photo{{ $i+1 }}" name="foods_photo[]" accept="image/*">
+                                        </div>
+                                    @endfor
+                                @else
+                                    <div>
+                                        <div id="photos_wrapper">
+                                            <div class="form-group photo_row">
+                                                {{-- <label for="foods_photo1"></label> --}}
+                                                <input type="file" class="form-control" id="foods_photo1" name="foods_photo[]" accept="image/*">
+                                            </div>
+                                        </div>
+                                        <button id="more-photos" class="btn btn-success">+</button>
                                     </div>
-                                @endfor
+                                @endif
 
                                 <button class="btn btn-primary" type="submit">Cadastrar Pacote</button>
                             </form>
@@ -93,6 +104,33 @@
                         console.error(error);
                     });
             });
+
+            let contadorCampos = 1;
+            const more = document.querySelector("#more-photos")
+            if(more) {
+                const container = document.querySelector("#photos_wrapper")
+                more.addEventListener('click', (e)=>{
+                    contadorCampos++;
+                    e.preventDefault();
+                    const camposOriginais = document.querySelector(".photo_row")
+                    const novoCampos = camposOriginais.cloneNode(true);
+        
+                    novoCampos.querySelectorAll('input').forEach((input) => {
+                        input.id = input.id.replace(/\d+/, contadorCampos);
+                        input.name = input.name.replace(/\d+/, contadorCampos);
+                        input.value = '';
+                    });
+        
+                    novoCampos.querySelectorAll('label').forEach((label) => {
+                        const novoFor = label.getAttribute('for').replace(/\d+/, contadorCampos);
+                        label.setAttribute('for', novoFor);
+                    });
+
+                    novoCampos.id = novoCampos.id.replace(/\d+/, contadorCampos)
+        
+                    container.appendChild(novoCampos);
+                })
+            }
         });
     </script>
 @endsection

@@ -64,7 +64,7 @@ class RecommendationController extends Controller
         }
         $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
 
-        if(count($recommendations) >= $configurations['max_recommendations']) {
+        if(count($recommendations) >= $configurations['max_recommendations'] && $configurations['max_recommendations'] !== null) {
             return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais recomendações neste plano.'])->withInput();
         }
 
@@ -89,7 +89,7 @@ class RecommendationController extends Controller
         }
         $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
 
-        if(count($recommendations) >= $configurations['max_recommendations']) {
+        if(count($recommendations) >= $configurations['max_recommendations'] && $configurations['max_recommendations'] !== null) {
             return redirect()->back()->withErrors(['generic_error'=> 'Não é permitido cadastrar mais recomendações neste plano.'])->withInput();
         }
         

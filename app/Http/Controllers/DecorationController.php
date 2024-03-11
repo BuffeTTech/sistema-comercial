@@ -112,7 +112,7 @@ class DecorationController extends Controller
             return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
         }
         $configurations = SubscriptionConfiguration::where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
-        if(!isset($request->decoration_photos) || count($request->decoration_photos) != $configurations['max_decoration_photos']) {
+        if((!isset($request->decoration_photos) || count($request->decoration_photos) != $configurations['max_decoration_photos']) && $configurations['max_decoration_photos'] !== null) {
             return redirect()->back()->withErrors(['photo'=> 'Não existem '.$configurations['max_decoration_photos'].' fotos na requisição'])->withInput();
         }
 

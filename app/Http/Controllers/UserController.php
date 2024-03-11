@@ -60,6 +60,7 @@ class UserController extends Controller
             return redirect()->back()->withErrors(['buffet'=> "Buffet is not active"])->withInput();
         }
 
+
         $configurations = $this->subscription_configuration->where('subscription_id', $buffet_subscription->subscription_id)->get()->first();
 
         $total = $this->user->where('buffet_id',$buffet->id)->role($buffet_subscription->subscription->slug.'.user')->where('status', UserStatus::ACTIVE->name)->get();
@@ -126,7 +127,7 @@ class UserController extends Controller
             return redirect()->back()->withErrors(['error'=>"Este usuário já possui esta permissão"]);
         }
 
-        if(count($total) >= $configurations['max_employees']) {
+        if($request->role !== $buffet_subscription->subscription->slug.'.user' && (count($total) >= $configurations['max_employees'] && $configurations['max_employees'] !== null)) {
             return redirect()->back()->withErrors(['error'=>"Este buffet ja possui o limite de funcionários cadastrados"]);
         }
 

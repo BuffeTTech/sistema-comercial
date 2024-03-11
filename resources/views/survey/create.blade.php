@@ -18,14 +18,14 @@
                                 @csrf
                                 <div class="form-group">
                                     <label for="question" class="form-control-label">Pergunta</label>
-                                    <textarea class="form-control" id="question" rows="3" name="question" required>{{old('question')}}</textarea>
+                                    <textarea class="form-control" id="question" rows="3" name="question">{{old('question')}}</textarea>
                                     <x-input-error :messages="$errors->get('question')" class="mt-2" />
                                 </div>
                                 <div class="flex flex-wrap -mx-3 mb-6 form-group">
                                     <label class="form-control-label">Tipo de pergunta</label>
                                     <div class="w-full px-3 mb-6 md:mb-0">  
                                         <div>
-                                            @foreach( App\Enums\QuestionType::array() as $key => $value )
+                                            @foreach(App\Enums\QuestionType::array() as $key => $value)
                                             <div class="form-check">
                                                 <input required class="form-check-input" type="radio" name="question_type" id="{{ $value }}" value="{{ $value }}" {{old('question') == $value ? 'checked' : ''}}>
                                                 <label class="custom-control-label" for="{{ $value }}">{{ $key }}</label>
@@ -43,25 +43,23 @@
             </div>
         </div>
         @include('layouts.footers.auth.footer')
-    </div> 
+    </div>
+    <script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
+    <script>
+        const form = document.querySelector("#form")
+    
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault()
+            const userConfirmed = await confirm(`Deseja criar esta pergunta?`)
+    
+            if (userConfirmed) {
+                this.submit();
+            }
+        })
+        ClassicEditor
+            .create( document.querySelector('#question') )
+            .catch( error => {
+                console.error( error );
+            } );
+    </script>  
 @endsection
-
-<script>
-    const form = document.querySelector("#form")
-
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault()
-        const userConfirmed = await confirm(`Deseja criar esta pergunta?`)
-
-        if (userConfirmed) {
-            this.submit();
-        } else {
-            error("Ocorreu um erro!")
-        }
-    })
-    ClassicEditor
-        .create( document.querySelector('#question') )
-        .catch( error => {
-            console.error( error );
-        } );
-</script> 

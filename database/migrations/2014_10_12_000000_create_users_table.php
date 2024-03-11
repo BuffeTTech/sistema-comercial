@@ -19,7 +19,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('document')->unique();
+            $table->string('document');
             $table->enum('document_type', array_column(DocumentType::cases(), 'name'));
             $table->timestamp('email_verified_at')->nullable();
             $table->enum('status', array_column(UserStatus::cases(), 'name'));

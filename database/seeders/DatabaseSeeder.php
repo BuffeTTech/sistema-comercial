@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
              BuffetSeeder::class,
              UserSeeder::class,
              FoodSeeder::class,
-             TestsSeeder::class
+            //  TestsSeeder::class
          ]);
     }
 }
