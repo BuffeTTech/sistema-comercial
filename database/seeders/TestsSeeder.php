@@ -81,57 +81,143 @@ class TestsSeeder extends Seeder
         ]);
 
 
-        // permissoes usuarios 
-        $user_role = Role::create(['name' => $pacote_basico->slug.'.user']);
-        $commercial_role = Role::create(['name' => $pacote_basico->slug.'.commercial']);
-        $operational_role = Role::create(['name' => $pacote_basico->slug.'.operational']);
-        $administrative_role = Role::create(['name' => $pacote_basico->slug.'.administrative']);
-        $administrative = Role::create(['name' => 'Commercial-Admin']);
+        $name_roles = [
+            'basico'=>[
+                'user'=>$pacote_basico->slug.'.user',
+                'operational'=>$pacote_basico->slug.'.operational',
+                'commercial'=>$pacote_basico->slug.'.commercial',
+                'administrative'=>$pacote_basico->slug.'.administrative',
+            ],
+            'avancado'=>[
+                'user'=>$pacote_luxo->slug.'.user',
+                'operational'=>$pacote_luxo->slug.'.operational',
+                'commercial'=>$pacote_luxo->slug.'.commercial',
+                'administrative'=>$pacote_luxo->slug.'.administrative',
+            ],
+        ];
 
-        $p1 = Permission::create(['name'=>'show party mode']);
-        $p2 = Permission::create(['name'=>'view pendent bookings']);
-        $p3 = Permission::create(['name'=>'view next bookings']);
-        $p4 = Permission::create(['name'=>'list booking']);
-        $p5 = Permission::create(['name'=>'show booking']);
-        $p6 = Permission::create(['name'=>'create booking']);
-        $p7 = Permission::create(['name'=>'update booking']);
-        $p8 = Permission::create(['name'=>'cancel booking']);
-        $p9 = Permission::create(['name'=>'change booking status']);
-        // $p10 = Permission::create(['name'=>'create guest']);
-        $p11 = Permission::create(['name'=>'change guest status']);
-        $p12 = Permission::create(['name'=>'show guest']);
+        // Permissions
+        $permissionsWithRole = [
+            [
+            'group'=>"food",
+            'permissions'=>[
+                'list food' => [$name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+                'view food' => [$name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+                'create food' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'update food' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'delete food' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'change food status' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+            ]],
+            [
+            'group'=>"schedule",
+            'permissions'=>[
+                'list schedule' => [$name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+                'create schedule' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'update schedule' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'delete schedule' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'change schedule status' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+            ]],
+            [
+            'group'=>"guest",
+            'permissions'=>[
+                'create guest' => [$name_roles['basico']['user'], $name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+                'change guest status' => [$name_roles['basico']['user'], $name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+                'list booking guests' => [$name_roles['basico']['user'], $name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+            ]],
+            [
+            'group'=>"decoration",
+            'permissions'=>[
+                'list decoration' => [$name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+                'view decoration' => [$name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+                'create decoration' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'update decoration' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'delete decoration' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'change decoration status' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+            ]],
+            [
+            'group'=>"booking",
+            'permissions'=>[
+                'create booking' => [$name_roles['basico']['user'], $name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+                'list bookings' => [$name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+                'view next bookings' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'list my bookings' => [$name_roles['basico']['user'], $name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+                'list user bookings' => [$name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+                'show party mode' => [$name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+                'view pendent bookings' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'view booking' => [$name_roles['basico']['user'], $name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+                'update booking' => [$name_roles['basico']['user'], $name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+                'cancel booking' => [$name_roles['basico']['user'], $name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+                'change booking status' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'view booking recommendations' => [$name_roles['basico']['user'], $name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+            ]],
+            [
+            'group'=>"recommendation",
+            'permissions'=>[
+                'list recommendation' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'view recommendation' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'create recommendation' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'update recommendation' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'delete recommendation' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'change recommendation status' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+            ]],
+            [
+            'group'=>"satisfaction survey",
+            'permissions'=>[
+                'list all survey question' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'list all buffet survey question' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'view survey question' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'create survey question' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'update survey question' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'delete survey question' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'answer survey question' => [$name_roles['basico']['user'], $name_roles['basico']['commercial'], $name_roles['basico']['operational'], $name_roles['basico']['administrative']],
+                'change survey question status' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+            ]],
+            [
+            'group'=>"employee",
+            'permissions'=>[
+                'list employee' => [$name_roles['basico']['administrative']],
+                'view employee' => [$name_roles['basico']['administrative']],
+                'create employee' => [$name_roles['basico']['administrative']],
+                'update employee' => [$name_roles['basico']['administrative']],
+                'change buffet user role' => [$name_roles['basico']['administrative']],
+                'delete employee' => [$name_roles['basico']['administrative']],
+            ]],
+            [
+            'group'=>"user",
+            'permissions'=>[
+                'list buffet user' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'view buffet user' => [$name_roles['basico']['commercial'], $name_roles['basico']['administrative']],
+                'create buffet user' => [$name_roles['basico']['administrative']],
+                'update buffet user' => [$name_roles['basico']['administrative']],
+                'delete buffet user' => [$name_roles['basico']['administrative']],
+            ]],
+            [
+            'group'=>"buffet",
+            'permissions'=>[
+                'update buffet commercial' => [$name_roles['basico']['administrative']],
+            ]],
+        ];
 
-        $user_role->givePermissionTo($p3->name);
-        $user_role->givePermissionTo($p6->name);
-        $user_role->givePermissionTo($p2->name);
-
-        $administrative_role->givePermissionTo($p1->name);
-        $administrative_role->givePermissionTo($p2->name);
-        $administrative_role->givePermissionTo($p3->name);
-        $administrative_role->givePermissionTo($p4->name);
-        $administrative_role->givePermissionTo($p5->name);
-        $administrative_role->givePermissionTo($p6->name);
-        $administrative_role->givePermissionTo($p7->name);
-        $administrative_role->givePermissionTo($p8->name);
-        $administrative_role->givePermissionTo($p9->name);
-        // $administrative_role->givePermissionTo($p10->name);
-        $administrative_role->givePermissionTo($p11->name);
-        $administrative_role->givePermissionTo($p12->name);
-
-
-        $create_survey = Permission::create(['name'=>'create survey question']);
-        $show_survey = Permission::create(['name'=>'show survey question']);
-        $update_survey = Permission::create(['name'=>'update survey question']);
-        $delete_survey = Permission::create(['name'=>'delete survey question']);
-        $list_all_survey = Permission::create(['name'=>'list all survey question']);
-        $list_all_buffet_survey = Permission::create(['name'=>'list all buffet survey question']);
-
-        $administrative_role->givePermissionTo($create_survey->id);
-        $administrative_role->givePermissionTo($show_survey->id);
-        $administrative_role->givePermissionTo($update_survey->id);
-        $administrative_role->givePermissionTo($delete_survey->id);
-        $administrative_role->givePermissionTo($list_all_survey->id);
-        $administrative_role->givePermissionTo($list_all_buffet_survey->id);
+        foreach ($name_roles as $group) {
+            foreach($group as $role) {
+                Role::create(['name' => $role]);
+            }
+        }
+        foreach ($permissionsWithRole as $group) {
+            foreach($group['permissions'] as $permission => $roles_permission) {
+                $createdPermission = Permission::create(['name' => $permission]);
+                
+                $valid_roles = [];
+                foreach ($roles_permission as $roleName) {
+                    $role = Role::findByName($roleName);
+            
+                    if ($role) {
+                        array_push($valid_roles, $role);
+                        $role->givePermissionTo($createdPermission);
+                    }
+                }
+            }
+        }
 
         //dono dos buffets 
         $user = User::create([
@@ -144,9 +230,7 @@ class TestsSeeder extends Seeder
             'status' => UserStatus::ACTIVE->name,
             'buffet_id' => null,
         ]);
-        $user->assignRole($administrative_role->name);
-        $user->assignRole($administrative->name);
-
+        $user->assignRole($name_roles['basico']['administrative']);
 
         // dados buffet alegria 
         $buffet_alegria_address = Address::create([
@@ -252,7 +336,7 @@ class TestsSeeder extends Seeder
             'buffet_id' => $buffet_alegria->id,
             'phone1'=>$user_alegria_phone1->id
         ]);
-        $user_alegria1->assignRole($user_role->name);
+        $user_alegria1->assignRole($name_roles['basico']['user']);
 
         $user_alegria_phone2 = Phone::create([
             'number'=>'(19) 89999-9988'
@@ -268,7 +352,7 @@ class TestsSeeder extends Seeder
             'buffet_id' => $buffet_alegria->id,
             'phone1'=>$user_alegria_phone2->id
         ]);
-        $user_alegria2->assignRole($user_role->name);
+        $user_alegria2->assignRole($name_roles['basico']['user']);
 
         // funcionarios buffet alegria 
         $adm_alegria_phone = Phone::create([
@@ -285,7 +369,7 @@ class TestsSeeder extends Seeder
             'buffet_id' => $buffet_alegria->id,
             'phone1'=>$adm_alegria_phone->id
         ]);
-        $adm_alegria->assignRole($administrative_role->name);
+        $adm_alegria->assignRole($name_roles['basico']['administrative']);
 
         $com_alegria_phone = Phone::create([
             'number'=>'(19) 99999-8888'
@@ -301,7 +385,7 @@ class TestsSeeder extends Seeder
             'buffet_id' => $buffet_alegria->id,
             'phone1'=>$com_alegria_phone->id
         ]);
-        $com_alegria->assignRole($commercial_role->name);
+        $com_alegria->assignRole($name_roles['basico']['commercial']);
 
         $ope_alegria_phone = Phone::create([
             'number'=>'(19) 99998-8888'
@@ -317,7 +401,7 @@ class TestsSeeder extends Seeder
             'buffet_id' => $buffet_alegria->id,
             'phone1'=>$ope_alegria_phone->id
         ]);
-        $ope_alegria->assignRole($operational_role->name);
+        $ope_alegria->assignRole($name_roles['basico']['operational']);
 
         //horarios disponiveis 
         $schedule1 = Schedule::create([
@@ -393,24 +477,24 @@ class TestsSeeder extends Seeder
         ]);
         
             FoodPhoto::create([
-                'file_name'=>'batata1,2,3.jpeg',
-                'file_path'=>'/batata1,2,3.jpeg',
+                'file_name'=>'batata1.jpeg',
+                'file_path'=>'/batata1.jpeg',
                 'file_extension'=>'jpeg',
                 'mime_type'=>'image/jpeg',
                 'file_size'=>'40847',
                 'food_id'=>$food_alegria1->id
             ]);
             FoodPhoto::create([
-                'file_name'=>'bolo123.webp',
-                'file_path'=>'/bolo123.webp',
+                'file_name'=>'bolo1.webp',
+                'file_path'=>'/bolo1.webp',
                 'file_extension'=>'webp',
                 'mime_type'=>'image/webp',
                 'file_size'=>'31904',
                 'food_id'=>$food_alegria1->id
             ]);
             FoodPhoto::create([
-                'file_name'=>'bolo123.webp',
-                'file_path'=>'/bolo123.webp',
+                'file_name'=>'suco1.avif',
+                'file_path'=>'/suco1.avif',
                 'file_extension'=>'webp',
                 'mime_type'=>'image/webp',
                 'file_size'=>'31904',
@@ -428,8 +512,8 @@ class TestsSeeder extends Seeder
             ]);
             
             FoodPhoto::create([
-                'file_name'=>'batata1,2,3.jpeg',
-                'file_path'=>'/batata1,2,3.jpeg',
+                'file_name'=>'batata2.jpeg',
+                'file_path'=>'/batata2.jpeg',
                 'file_extension'=>'jpeg',
                 'mime_type'=>'image/jpeg',
                 'file_size'=>'40847',
@@ -444,8 +528,8 @@ class TestsSeeder extends Seeder
                 'food_id'=>$food_alegria2->id
             ]);
             FoodPhoto::create([
-                'file_name'=>'bolo123.webp',
-                'file_path'=>'/bolo123.webp',
+                'file_name'=>'bolo2.webp',
+                'file_path'=>'/bolo2.webp',
                 'file_extension'=>'webp',
                 'mime_type'=>'image/webp',
                 'file_size'=>'31904',
@@ -463,8 +547,8 @@ class TestsSeeder extends Seeder
             ]);
             
             FoodPhoto::create([
-                'file_name'=>'batata1,2,3.jpeg',
-                'file_path'=>'/batata1,2,3.jpeg',
+                'file_name'=>'batata3.jpeg',
+                'file_path'=>'/batata3.jpeg',
                 'file_extension'=>'jpeg',
                 'mime_type'=>'image/jpeg',
                 'file_size'=>'40847',
@@ -479,8 +563,8 @@ class TestsSeeder extends Seeder
                 'food_id'=>$food_alegria3->id
             ]);
             FoodPhoto::create([
-                'file_name'=>'bolo123.webp',
-                'file_path'=>'/bolo123.webp',
+                'file_name'=>'bolo3.webp',
+                'file_path'=>'/bolo3.webp',
                 'file_extension'=>'webp',
                 'mime_type'=>'image/webp',
                 'file_size'=>'31904',

@@ -21,7 +21,7 @@ class SendMailBookingStatusListener
 
     public function handle(ChangeBookingStatusEvent $event): void
     {
-        $user = auth()->user();
+        $user = $event->booking->user;
         switch($event->booking->status) {
             case BookingStatus::PENDENT->name:
                 break;

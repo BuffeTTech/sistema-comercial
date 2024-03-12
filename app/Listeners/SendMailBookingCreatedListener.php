@@ -22,7 +22,7 @@ class SendMailBookingCreatedListener
      */
     public function handle(BookingCreatedEvent $event): void
     {
-        $user = auth()->user();
+        $user = $event->booking->user;
         Notification::send($user, new BookingCreatedNotification($event->booking));
     }
 }

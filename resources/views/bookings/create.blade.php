@@ -232,7 +232,7 @@
                         <p><b>Fotos:</b></p>
                         ${food.data.photos.map(photo=>{
                             return `
-                            <img class="w-full" src="{{asset('storage/foods/${photo.file_path}')}}">
+                            <img style="width: 400px; height: 300px" src="{{asset('storage/foods/${photo.file_path}')}}">
                             `
                         }).join('<br>')}
                         `
@@ -269,7 +269,7 @@
                         ${decoration.data.description}
                         ${decoration.data.photos.map(photo=>{
                             return `
-                            <img class="w-full" src="{{asset('storage/decorations/${photo.file_path}')}}">
+                            <img style="width: 400px; height: 300px" src="{{asset('storage/decorations/${photo.file_path}')}}">
                             `
                         }).join('<br>')}
                     `
