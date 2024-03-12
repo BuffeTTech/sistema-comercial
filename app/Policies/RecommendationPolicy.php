@@ -37,7 +37,7 @@ class RecommendationPolicy
 
         return false;
     }
-    public function change_status(User $user, Buffet $buffet): bool
+    public function change_status(User $user, Recommendation $recommendation, Buffet $buffet): bool
     {
         if($user == null) {
             return false;
