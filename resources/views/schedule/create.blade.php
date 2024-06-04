@@ -1,13 +1,13 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
 @section('content')
-    @include('layouts.navbars.auth.topnav', ['title' => 'Perguntas', 'subtitle'=>'Criar Pergunta'])
+    @include('layouts.navbars.auth.topnav', ['title' => 'Horários', 'subtitle'=>'Criar horário'])
     <div class="container-fluid py-4">
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4">
                     <div class="card-header pb-0">
-                        <h6>Pesquisa de satisfação</h6>
+                        <h6>Horários</h6>
                     </div>
                     <div id="alert">
                         @include('components.alert')
