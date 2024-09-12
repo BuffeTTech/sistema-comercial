@@ -30,6 +30,10 @@ window.confirm = function (message="Deseja confirmar esta ação?") {
     });
 }
 
+window.close_modal = function() {
+    return Swal.close()
+}
+
 window.error = function (message="Ocorreu um erro ao processar esta solicitação") {
     return Swal.fire({
         icon: "error",

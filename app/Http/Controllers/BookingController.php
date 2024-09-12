@@ -717,4 +717,183 @@ class BookingController extends Controller
 
         return view('bookings.party_mode',['booking'=>$current_party,'buffet'=>$buffet, 'guests'=>$guests, 'guest_counter'=>$guest_counter]);
     }
+
+    public function api_get_schedules_by_day(Request $request) {
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+
+        if(!$buffet || !$buffet_slug) {
+            return response()->json(['message' => 'Buffet not found'], 422);
+        }
+
+        $date = new DateTime($request->day);
+        $dayOfWeek = strtoupper($date->format('l'));
+
+        if(!DayWeek::is_in_name($dayOfWeek)) {
+            return response()->json(['message' => 'Day not found'], 422);
+        }
+
+        $schedules = $this->schedule
+                ->orderBy('schedules.start_time', 'asc')
+                ->where('schedules.status', ScheduleStatus::ACTIVE->name)
+                ->where('schedules.buffet_id', $buffet->id)
+                ->where('schedules.day_week', $dayOfWeek)
+                ->select('schedules.*')
+                ->groupBy('schedules.id') // Agrupa pelo campo id
+                ->get();
+
+
+        return response()->json(['day'=>$date, 'day_week'=>$dayOfWeek, 'schedules'=>$schedules], 200);
+
+    }
+
+    public function api_get_disponibility_by_day(Request $request) {
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+    
+        if (!$buffet || !$buffet_slug) {
+            return response()->json(['message' => 'Buffet not found'], 422);
+        }
+    
+        // Data e dia da semana
+        $date = new DateTime($request->day);
+        $dayOfWeek = strtoupper($date->format('l')); // Dia da semana em texto (ex: THURSDAY)
+    
+        if (!DayWeek::is_in_name($dayOfWeek)) {
+            return response()->json(['message' => 'Day not found'], 422);
+        }
+    
+        // Buscar o schedule que corresponde ao ID e ao dia da semana
+        $schedule = $this->schedule
+                         ->where('id', $request->time)
+                         ->where('buffet_id', $buffet->id)
+                         ->where('day_week', $dayOfWeek) // Verificar se o dia da semana bate
+                         ->first();
+    
+        if (!$schedule) {
+            return response()->json(['message' => 'Schedule not found'], 422);
+        }
+    
+        if ($schedule->status !== ScheduleStatus::ACTIVE->name) {
+            return response()->json(['message' => 'Schedule is not active'], 422);
+        }
+    
+        // Verificar se há reserva para o horário
+        $booking_exists_in_time = $this->booking
+            ->where('buffet_id', $buffet->id)
+            ->where('party_day', $date)
+            ->where('schedule_id', $schedule->id)
+            ->where('status', BookingStatus::APPROVED->name)
+            ->first();
+    
+        if (!$booking_exists_in_time) {
+            return response()->json(['message' => 'Horário Disponível!'], 200);
+        }
+    
+        // Lógica para horários alternativos
+        $alternativas = [];
+    
+        // 1. Buscar o mesmo horário nas semanas anterior e seguinte (para o mesmo dia da semana)
+        $semanaAnterior = (clone $date)->modify('-7 days');
+        $semanaSeguinte = (clone $date)->modify('+7 days');
+    
+        $horariosAlternativos = $this->buscarHorariosAlternativos($buffet->id, $schedule, [$semanaAnterior, $semanaSeguinte], $dayOfWeek);
+    
+        // 2. Buscar o mesmo horário em dias próximos (7 dias antes e 7 dias depois, sem restrição de dia da semana)
+        $diasAntes = 7;
+        $diasDepois = 7;
+    
+        for ($i = 1; $i <= $diasAntes; $i++) {
+            $diaAnterior = (clone $date)->modify("-{$i} days");
+            $alternativas[] = $this->buscarHorariosAlternativos($buffet->id, $schedule, [$diaAnterior], null); // Sem filtro de dia da semana
+        }
+    
+        for ($i = 1; $i <= $diasDepois; $i++) {
+            $diaPosterior = (clone $date)->modify("+{$i} days");
+            $alternativas[] = $this->buscarHorariosAlternativos($buffet->id, $schedule, [$diaPosterior], null); // Sem filtro de dia da semana
+        }
+    
+        // 3. Buscar outros horários no mesmo dia
+        $outrosHorarios = $this->buscarHorariosNoMesmoDia($buffet->id, $date, $schedule, $dayOfWeek);
+        if (!empty($outrosHorarios)) {
+            $alternativas = array_merge($alternativas, $outrosHorarios);
+        }
+    
+        // Retornar alternativas, removendo nulos e consolidando resultados
+        $alternativas = array_filter($alternativas);
+    
+        if (!empty($alternativas)) {
+            return response()->json([
+                'message' => 'Horário Indisponível!',
+                'alternativas' => $alternativas
+            ], 422);
+        }
+    
+        return response()->json(['message' => 'Horário Indisponível e sem alternativas!'], 422);
+    }
+    
+    // Função para buscar horários alternativos em dias diferentes, para o mesmo dia da semana ou intervalo de dias
+    private function buscarHorariosAlternativos($buffetId, $schedule, $datas, $dayOfWeek = null) {
+        foreach ($datas as $data) {
+            if ($dayOfWeek && strtoupper($data->format('l')) !== $dayOfWeek) {
+                continue; // Se for necessário filtrar pelo dia da semana, ignorar dias diferentes
+            }
+    
+            $bookingExists = $this->booking
+                ->where('buffet_id', $buffetId)
+                ->where('party_day', $data)
+                ->where('schedule_id', $schedule->id)
+                ->where('status', BookingStatus::APPROVED->name)
+                ->first();
+    
+            if (!$bookingExists) {
+                return [
+                    'data' => $data->format('Y-m-d'),
+                    'horario' => [
+                        'id'=> $schedule->id,
+                        'comeco' => $schedule->start_time,
+                        'duracao' => $schedule->duration
+                    ] // Detalhes do horário
+                ];
+            }
+        }
+        return null;
+    }
+    
+    // Função para buscar outros horários disponíveis no mesmo dia, mas para o mesmo dia da semana
+    private function buscarHorariosNoMesmoDia($buffetId, $date, $scheduleAtual, $dayOfWeek) {
+        $horariosAlternativos = [];
+    
+        $horarios = $this->schedule
+            ->where('buffet_id', $buffetId)
+            ->where('status', ScheduleStatus::ACTIVE->name)
+            ->where('day_week', $dayOfWeek) // Apenas horários do mesmo dia da semana
+            ->where('id', '!=', $scheduleAtual->id) // Excluir o horário atual
+            ->get();
+    
+        foreach ($horarios as $horario) {
+            $bookingExists = $this->booking
+                ->where('buffet_id', $buffetId)
+                ->where('party_day', $date)
+                ->where('schedule_id', $horario->id)
+                ->where('status', BookingStatus::APPROVED->name)
+                ->first();
+    
+            if (!$bookingExists) {
+                $horariosAlternativos[] = [
+                    'data' => $date->format('Y-m-d'),
+                    'horario' => [
+                        'id'=> $horario->id,
+                        'comeco' => $horario->start_time,
+                        'duracao' => $horario->duration
+                        ]// Detalhes do horário
+                ];
+            }
+        }
+    
+        return $horariosAlternativos;
+    }
+    
+    
+
 }

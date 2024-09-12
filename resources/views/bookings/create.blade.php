@@ -38,7 +38,7 @@
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive px-4">
-                            <form method="POST" action="{{ route('booking.store', ['buffet'=>$buffet->slug]) }}">
+                            <form method="POST" action="{{ route('booking.store', ['buffet'=>$buffet->slug]) }}" id="form">
                                 @csrf
                                 <div class="form-group">
                                     <label for="name_birthdayperson" class="form-control-label">Nome do Aniversariante</label>
@@ -136,21 +136,35 @@
                                     <x-input-error :messages="$errors->get('decoration_id')" class="mt-2" />
                                 </div>
 
-                                <div class="form-group">
-                                    <label for="party_day" class="form-control-label">Data</label>
-                                    <input required class="form-control" type="date" id="party_day" name="party_day">
-                                    <x-input-error :messages="$errors->get('party_day')" class="mt-2" />
+                                <div>
+                                    <div class="row">
+                                        <div class="form-group col-md-4">
+                                            <label for="party_day" class="form-control-label">Data</label>
+                                            <input required class="form-control" type="date" id="party_day" name="party_day">
+                                            <x-input-error :messages="$errors->get('party_day')" class="mt-2" />
+                                        </div>
+    
+                                        <div class="form-group col-md-4">
+                                            <label for="schedule_id" class="form-control-label">Horários disponíveis</label>
+                                            <select required name="schedule_id" id="schedule_id" class="form-control">
+                                                <option value="invalid" selected disabled>Selecione um horário disponível</option>
+                                            </select>
+                                            <x-input-error :messages="$errors->get('schedule_id')" class="mt-2" />
+                                        </div>
+    
+                                        <div class="col-md-4 d-flex align-items-end">
+                                            <button class="btn btn-primary w-100" type="button" id="verify-disponibility">Buscar Disponibilidade</button>
+                                        </div>
+                                    </div>
+                                    <x-input-helper :value="'A data escolhida aqui pode ou não estar disponivel, basta clicar no botão ao lado para confirmar!'" />
                                 </div>
-
-                                <div class="form-group">
-                                    <label for="schedule_id" class="form-control-label">Horários disponíveis</label>
-                                    <select required name="schedule_id" id="schedule_id" class="form-control" >
-                                        <option value="invalid" selected disabled>Selecione um horario disponível</option>
-                                    </select>
-                                    <x-input-error :messages="$errors->get('schedule_id')" class="mt-2" />
+                                <div>
+                                    <p>Preço: </p>
                                 </div>
-
-                                <button class="btn btn-primary" type="submit">Cadastrar Reserva</button>
+                                <div>
+                                    <button class="btn btn-primary button_submit_booking" type="submit" disabled id="button_pre_booking">Fazer Pré Reserva</button>
+                                    <button class="btn btn-primary button_submit_booking" type="submit" disabled id="button_pre_booking_visit">Fazer Pré Reserva e Agendar Visita</button>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -161,6 +175,10 @@
     </div>
     
 <script>
+    let can_create_booking = false;
+    const submit_buttons = document.querySelectorAll(".button_submit_booking")
+    const form = document.querySelector("#form")
+
     const SITEURL = "{{ url('/') }}";
     const csrf = document.querySelector('meta[name="csrf-token"]').content
     const food = new Swiper('.food_slider', {
@@ -282,14 +300,12 @@
         })
 
 
-
+        const party_day = document.querySelector("#party_day")
+        const party_time = document.querySelector("#schedule_id")
 
     document.addEventListener('DOMContentLoaded', (event) => {
         const SITEURL = "{{ url('/') }}";
         const csrf = document.querySelector('meta[name="csrf-token"]').content
-        
-        const party_day = document.querySelector("#party_day")
-        const party_time = document.querySelector("#schedule_id")
     
         party_day.addEventListener('change', async function() {
             const agora = new Date();
@@ -309,8 +325,31 @@
             printDates(dates)
 
         });
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault()
+            const userConfirmed = await confirm(`Deseja cadastrar uma festa ?`)
 
-        async function getDates(day) {
+            try {
+                const party_day = document.querySelector("#party_day")
+                const party_time = document.querySelector("#schedule_id")
+
+                alert("Verificando datas...")
+                await verifyDisponibility(party_day.value, party_time.value)
+
+                if (userConfirmed) {
+                    this.submit();
+                } else {
+                    error("Ocorreu um erro!")
+                }
+            }catch(e) {
+                error("Horario indisponivel!")
+            }
+
+            
+        })
+    })
+
+    async function getDates(day) {
             const csrf = document.querySelector('meta[name="csrf-token"]').content
             const data = await axios.get(SITEURL + '/api/{{$buffet->slug}}/booking/schedule/' + day, {
                 headers: {
@@ -340,7 +379,107 @@
                 party_time.appendChild(option);
             }
         }
+
+
+    async function verifyDisponibility(day, time) {
+    try {
+        const csrf = document.querySelector('meta[name="csrf-token"]').content;
+        const data = await axios.get(SITEURL + '/api/{{$buffet->slug}}/booking/schedule/' + day + '/' + time + '/disponibility', {
+            headers: {
+                'X-CSRF-TOKEN': csrf
+            }
+        });
+
+        const html_data = {
+            title: "Horario da festa",
+            content: `
+                <h3>Horario Disponivel!</h3>
+            `
+        };
+
+        html(html_data);
+
+        submit_buttons.forEach(button => {
+            button.disabled = false;
+        });
+    } catch(e) {
+        console.log(e);
+        submit_buttons.forEach(button => {
+            button.disabled = true;
+        });
+
+        const html_data = {
+            title: "Horario da festa",
+            content: `
+                <h4>Infelizmente o horário escolhido se encontra indisponível!</h4>
+                <h5>Aqui se encontra uma lista de possíveis outros horários para escolha:</h5>
+                ${e.response.data.alternativas.map(date => {
+                    const horarioFinal = formatarHora(date.horario.comeco, date.horario.duracao);
+                    return `<button class="btn button_indisponible_date" value="${date.data}//${date.horario.id}">${date.data} das ${date.horario.comeco} até ${horarioFinal}</button>`;
+                }).join('')}
+                <button class="btn btn-primary">Contatar um funcionário para garantir o melhor horario</button>
+            `
+        };
+
+        html(html_data);
+
+        // Chame a função para adicionar os event listeners após a inserção do HTML
+        const buttons = document.querySelectorAll(".button_indisponible_date");
+        console.log(buttons); // Verifica se os botões estão sendo encontrados
+        buttons.forEach(button => {
+            button.addEventListener('click', async e => {
+                e.preventDefault();
+                console.log(button); // Verifica se o clique está sendo capturado
+                const party_day = document.querySelector("#party_day");
+                const party_time = document.querySelector("#schedule_id");
+
+                const [date, time] = button.value.split("//");
+
+                const dates = await getDates(date)
+
+                printDates(dates)
+
+                party_day.value = date;
+                party_time.value = time;
+
+                submit_buttons.forEach(button => {
+                    button.disabled = false;
+                });
+
+                close_modal()
+            });
+        });
+    }
+}   
+
+    const verifyDisponibilityButton = document.querySelector("#verify-disponibility")
+    verifyDisponibilityButton.addEventListener("click", async e => {
+        e.preventDefault();
+
+        const party_day = document.querySelector("#party_day")
+        const party_time = document.querySelector("#schedule_id")
+
+        alert("Verificando datas...")
+        await verifyDisponibility(party_day.value, party_time.value)
+
     })
+
+    const formatarHora = (horario, duracao) => {
+        // Divide o horário em horas, minutos e segundos
+        const [hora, minuto, segundo] = horario.split(':').map(Number);
+        
+        // Converte tudo para minutos e soma a duração
+        const totalSegundos = (hora * 3600) + (minuto * 60) + segundo + (duracao * 60);
+        
+        // Calcula as novas horas, minutos e segundos
+        const novasHoras = Math.floor(totalSegundos / 3600);
+        const novosMinutos = Math.floor((totalSegundos % 3600) / 60);
+        const novosSegundos = totalSegundos % 60;
+        
+        // Formata os valores para 'HH:MM:SS'
+        return `${novasHoras.toString().padStart(2, '0')}:${novosMinutos.toString().padStart(2, '0')}:${novosSegundos.toString().padStart(2, '0')}`;
+    };
+
 
 </script>
 @endsection
