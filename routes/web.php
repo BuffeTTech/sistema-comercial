@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BuffetController;
+use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\FoodController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SiteController;
@@ -90,6 +91,8 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     
     Route::resource('{buffet}/user',UserController::class);
     Route::patch('/{buffet}/user/{user}/change_role', [UserController::class,'change_role'])->name('user.change_role');
+
+    Route::get('{buffet}/configurations', [ConfigurationController::class, 'index'])->name('configuration.index');
 });
             
 

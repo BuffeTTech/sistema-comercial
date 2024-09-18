@@ -153,7 +153,18 @@
                             class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="ni ni-settings text-primary text-sm opacity-10"></i>
                         </div>
-                        <span class="nav-link-text ms-1">Usuários</span>
+                        <span class="nav-link-text ms-1">Clientes</span>
+                    </a>
+                @endcan
+            </li>
+            <li class="nav-item">
+                @can('list buffet configs')
+                    <a class="nav-link {{ Str::startsWith(Route::currentRouteName(), 'configurations.') ? 'active' : '' }}" href="{{ route('configurations.index', ['buffet'=>$buffet->slug]) }}">
+                        <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-settings text-primary text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Configuraçoes</span>
                     </a>
                 @endcan
             </li>
