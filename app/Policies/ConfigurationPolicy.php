@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Configuration;
 use App\Models\User;
+use App\Models\Buffet;
 use Illuminate\Auth\Access\Response;
 
 class ConfigurationPolicy
@@ -11,9 +12,23 @@ class ConfigurationPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(User $user, Buffet $buffet): bool
     {
-        //
+        if($user == null) {
+            return false;
+        }
+
+        // Verifica se o usuário é cadastrado no buffet
+        if($user->buffet_id == $buffet->id) {
+            return $user->can('list buffet configs');
+        }
+
+        // Verifica se usuário é o dono do buffet
+        if($user->id == $buffet->owner_id) {
+            return $user->can('list buffet configs');
+        }
+
+        return false;
     }
 
     /**

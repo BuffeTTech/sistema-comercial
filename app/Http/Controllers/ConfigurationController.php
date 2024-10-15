@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreConfigurationRequest;
-use App\Http\Requests\UpdateConfigurationRequest;
+use App\Http\Requests\Configuration\UpdateConfigurationRequest;
 use App\Models\Configuration;
 use Illuminate\Http\Request;
 use App\Models\Buffet;
@@ -12,6 +11,7 @@ class ConfigurationController extends Controller
 {
     public function __construct(
         protected Buffet $buffet,
+        protected Configuration $configuration,
         // protected Schedule $schedule,
         // protected Booking $booking,
         // protected Food $food,
@@ -33,56 +33,36 @@ class ConfigurationController extends Controller
         if(!$buffet || !$buffet_slug) {
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
-        
 
-        return view("configs.index", ['buffet' => $buffet,]);
-    }
+        $configuration = $this->configuration->where('buffet_id', $buffet->id)->first();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        // momentaneamente o index tem o mesmo conteudo do edit, dps faz uma tabelinha com as coisas
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreConfigurationRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Configuration $configuration)
-    {
-        //
+        return view("configurations.index", ['buffet' => $buffet,'configuration'=>$configuration]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Configuration $configuration)
+    public function edit(Request $request)
     {
-        //
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+        
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+
+        $configuration = $this->configuration->where('buffet_id', $buffet->id)->first();
+
+        return view("configurations.index", ['buffet' => $buffet,'configuration'=>$configuration]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateConfigurationRequest $request, Configuration $configuration)
+    public function update(UpdateConfigurationRequest $request)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Configuration $configuration)
-    {
-        //
+        dd($request);
     }
 }

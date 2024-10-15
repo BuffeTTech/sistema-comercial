@@ -92,7 +92,9 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     Route::resource('{buffet}/user',UserController::class);
     Route::patch('/{buffet}/user/{user}/change_role', [UserController::class,'change_role'])->name('user.change_role');
 
-    Route::get('{buffet}/configurations', [ConfigurationController::class, 'index'])->name('configuration.index');
+    Route::get('{buffet}/configurations', [ConfigurationController::class, 'index'])->name('configurations.index');
+    // Route::get('{buffet}/configurations', [ConfigurationController::class, 'edit'])->name('configurations.edit');
+    Route::post('{buffet}/configurations', [ConfigurationController::class, 'update'])->name('configurations.update');
 });
             
 

@@ -6,28 +6,29 @@
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4">
-                    <div class="card-header pb-0 d-flex justify-content-between">
-                        <h6>Reservas</h6>
-                        <div>
+                    <div class="card-header pb-0 d-flex flex-wrap align-items-center justify-content-between">
+                        <h6 class="mb-0">Reservas</h6>
+                        <div class="d-flex flex-wrap justify-content-end">
                             @can('create booking')
-                                <a href="{{ route('booking.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar Reserva">Criar Reserva</a> 
+                                <a href="{{ route('booking.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip m-1" title="Criar Reserva">Criar Reserva</a> 
                             @endcan      
                             @can('list bookings')
-                                <a href="{{ route('booking.list', ['buffet'=>$buffet->slug, 'format'=>'all']) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Listar Reservas">Listar Reservas</a> 
+                                <a href="{{ route('booking.list', ['buffet'=>$buffet->slug, 'format'=>'all']) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip m-1" title="Listar Reservas">Listar Reservas</a> 
                             @endcan  
                             @can('view next bookings')
-                                <a href="{{ route('booking.list', ['buffet'=>$buffet->slug, 'format'=>'pendent']) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Listar Reservas Pendentes">Listar Reservas Pendentes</a> 
+                                <a href="{{ route('booking.list', ['buffet'=>$buffet->slug, 'format'=>'pendent']) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip m-1" title="Listar Reservas Pendentes">Listar Reservas Pendentes</a> 
                             @endcan  
                             @can('list my bookings')
-                                <a href="{{ route('booking.my_bookings', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Listar minhas reservas">Listar minhas reservas</a> 
+                                <a href="{{ route('booking.my_bookings', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip m-1" title="Listar minhas reservas">Listar minhas reservas</a> 
                             @endcan  
                             @can('show party mode') 
                                 @if($current_party)
-                                    <a href="{{ route('booking.party_mode', ['buffet'=>$buffet->slug])}}" class="btn btn-info btn-sm fs-6 btn-tooltip" title="Acessar festa em andamento">Acessar Festa em Andamento!</a>
+                                    <a href="{{ route('booking.party_mode', ['buffet'=>$buffet->slug]) }}" class="btn btn-info btn-sm fs-6 btn-tooltip m-1" title="Acessar festa em andamento">Festa em Andamento!</a>
                                 @endif     
                             @endcan                  
                         </div>
                     </div>
+                    
                     <div id="alert">
                         @include('components.alert')
                     </div>

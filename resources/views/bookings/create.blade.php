@@ -42,7 +42,7 @@
                                 @csrf
                                 <div class="form-group">
                                     <label for="name_birthdayperson" class="form-control-label">Nome do Aniversariante</label>
-                                    <input  class="form-control" type="text" placeholder="Guilherme" id="name_birthdayperson" name="name_birthdayperson" value="{{ old('name_birthdayperson') }}">
+                                    <input  class="form-control" type="text" placeholder="Guilherme" id="name_birthdayperson" name="name_birthdayperson" value="{{ old('name_birthdayperson') }}" required>
                                     <x-input-error :messages="$errors->get('name_birthdayperson')" class="mt-2" />
                                 </div>
 
@@ -333,8 +333,7 @@
                 const party_day = document.querySelector("#party_day")
                 const party_time = document.querySelector("#schedule_id")
 
-                alert("Verificando datas...")
-                await verifyDisponibility(party_day.value, party_time.value)
+                await verifyDisponibility(party_day.value, party_time.value, false)
 
                 if (userConfirmed) {
                     this.submit();
@@ -381,7 +380,15 @@
         }
 
 
-    async function verifyDisponibility(day, time) {
+    async function verifyDisponibility(day, time, print) {
+    if(print) {
+        basic("Verificando disponibilidade...")
+    }
+    setTimeout(async () => {
+        if(!day || !time) {
+        error("Valores incompletos.")
+        return;
+    }
     try {
         const csrf = document.querySelector('meta[name="csrf-token"]').content;
         const data = await axios.get(SITEURL + '/api/{{$buffet->slug}}/booking/schedule/' + day + '/' + time + '/disponibility', {
@@ -450,6 +457,8 @@
             });
         });
     }
+    }, 1500);
+    
 }   
 
     const verifyDisponibilityButton = document.querySelector("#verify-disponibility")
@@ -459,8 +468,7 @@
         const party_day = document.querySelector("#party_day")
         const party_time = document.querySelector("#schedule_id")
 
-        alert("Verificando datas...")
-        await verifyDisponibility(party_day.value, party_time.value)
+        await verifyDisponibility(party_day.value, party_time.value, true)
 
     })
 
