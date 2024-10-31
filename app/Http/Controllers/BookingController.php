@@ -16,6 +16,7 @@ use App\Http\Requests\Bookings\StoreBookingRequest;
 use App\Http\Requests\Bookings\UpdateBookingRequest;
 use App\Models\Booking;
 use App\Models\Buffet;
+use App\Models\Configuration;
 use App\Models\Decoration;
 use App\Models\Food;
 use App\Models\Guest;
@@ -38,14 +39,16 @@ class BookingController extends Controller
         protected Food $food,
         protected Decoration $decoration,
         protected Guest $guest,
-        protected Recommendation $recommendation
+        protected Recommendation $recommendation,
+        protected Configuration $configuration
     )
     {
         $this->hashids = new Hashids(config('app.name'));
     }
 
 
-    private static int $min_days = 5;
+    private static int $min_days = 30;
+    private static int $max_days_update_booking = 10;
 
     private function current_party(Buffet $buffet){
         // Lista de somente as próximas reservas 
@@ -118,6 +121,11 @@ class BookingController extends Controller
         if(!$buffet || !$buffet_slug) {
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();;
         }
+        $configuration = $this->configuration->where('buffet_id', $buffet->id)->first();
+        $max_days_update_booking = self::$max_days_update_booking;
+        if($configuration) {
+            $min_days = $configuration->max_days_update_booking;
+        }
 
         $format = $request->get('format', 'all');
         $status = BookingStatus::PENDENT->name; 
@@ -132,8 +140,7 @@ class BookingController extends Controller
             $this->authorize('viewAllBookings', [Booking::class, $buffet]);
         }
 
-        $min_days = self::$min_days; 
-        return view('bookings.list', ['bookings'=>$bookings,'buffet' => $buffet, 'min_days'=>$min_days, 'format'=>$format]);
+        return view('bookings.list', ['bookings'=>$bookings,'buffet' => $buffet, 'max_days_update_booking'=>$max_days_update_booking, 'format'=>$format]);
     }
     
      
@@ -192,10 +199,16 @@ class BookingController extends Controller
         }
         $this->authorize('create', [Booking::class, $buffet]);
 
+        $configuration = $this->configuration->where('buffet_id', $buffet->id)->first();
+        $min_days = self::$min_days;
+        if($configuration) {
+            $min_days = $configuration->min_days_booking;
+        }
+
         $foods = $this->food->where('buffet_id', $buffet->id)->where('status', FoodStatus::ACTIVE->name)->get();
         $decorations = $this->decoration->where('buffet_id', $buffet->id)->where('status', DecorationStatus::ACTIVE->name)->get();
 
-        return view('bookings.create', ['buffet'=>$buffet, 'foods'=>$foods, 'decorations'=>$decorations])->with(['success'=>'Reserva criada com sucesso!']);
+        return view('bookings.create', ['buffet'=>$buffet, 'foods'=>$foods, 'decorations'=>$decorations, 'min_days'=>$min_days])->with(['success'=>'Reserva criada com sucesso!']);
     }
 
     /**
@@ -211,6 +224,12 @@ class BookingController extends Controller
         }
 
         $this->authorize('create', [Booking::class, $buffet]);
+
+        $configuration = $this->configuration->where('buffet_id', $buffet->id)->first();
+        $min_days = self::$min_days;
+        if($configuration) {
+            $min_days = $configuration->min_days_booking;
+        }
         
         // valida a hora
         $schedule = $this->schedule->where('id', $request->schedule_id)->where('buffet_id', $buffet->id)->get()->first();
@@ -229,10 +248,10 @@ class BookingController extends Controller
         $today_date = date('Y-m-d');
         $party_start = date("Y-m-d H:i",strtotime(Carbon::parse($party_day)->setHours($schedule['start_time'])));
         $party_end = date("Y-m-d H:i",strtotime(Carbon::parse($party_day)->setHours($schedule['start_time'])->addMinutes($schedule['duration'])));
-        $max_date = Carbon::parse($today_date)->addDays(self::$min_days);
+        $max_date = Carbon::parse($today_date)->addDays($min_days);
 
         if($max_date > $party_start) {
-            return redirect()->back()->withErrors(['party_day'=>"Party should be scheduled with a minimum of ".self::$min_days." days"])->withInput();
+            return redirect()->back()->withErrors(['party_day'=>"Party should be scheduled with a minimum of ".$min_days." days"])->withInput();
         }
         if($party_end < $party_start) {
             return redirect()->back()->withErrors(['party_day'=>"Party can not end before start"])->withInput();
@@ -380,6 +399,27 @@ class BookingController extends Controller
             return redirect()->back()->withErrors(['errors'=>'Esta reserva não pode mais ser editada.'])->withInput();
         }
 
+        $configuration = $this->configuration->where('buffet_id', $buffet->id)->first();
+        $max_days_update_booking = self::$max_days_update_booking;
+        if($configuration) {
+            $max_days_update_booking = $configuration->max_days_update_booking;
+        }
+
+        $schedule = $this->schedule->where('id', $booking->schedule_id)->where('buffet_id', $buffet->id)->get()->first();
+        if(!$schedule) {
+            return redirect()->back()->withErrors(['schedule_id'=>'Horário não encontrado.'])->withInput();
+        }
+
+        $party_day = $request->party_day;
+
+        $today_date = date('Y-m-d');
+        $party_start = date("Y-m-d H:i",strtotime(Carbon::parse($party_day)->setHours($schedule['start_time'])));
+        $max_date = Carbon::parse($today_date)->addDays($max_days_update_booking);
+
+        if($max_date > $party_start) {
+            return redirect()->back()->withErrors(['party_day'=>"Uma festa só pode ser agendada ou editada com ".$max_days_update_booking." dias de antecedencia."])->withInput();
+        }
+
         $foods = $this->food->where('buffet_id', $buffet->id)->where('status', FoodStatus::ACTIVE->name)->get();
         $decorations = $this->decoration->where('buffet_id', $buffet->id)->where('status', DecorationStatus::ACTIVE->name)->get();
 
@@ -413,6 +453,12 @@ class BookingController extends Controller
         
         $this->authorize('update', [Booking::class, $booking, $buffet]);
 
+        $configuration = $this->configuration->where('buffet_id', $buffet->id)->first();
+        $max_days_update_booking = self::$max_days_update_booking;
+        if($configuration) {
+            $max_days_update_booking = $configuration->max_days_update_booking;
+        }
+
         if($booking['status'] !== BookingStatus::APPROVED->name && $booking['status'] !== BookingStatus::PENDENT->name) {
             return redirect()->back()->withErrors(['errors'=>'Esta reserva não pode mais ser editada.'])->withInput();
         }
@@ -434,10 +480,10 @@ class BookingController extends Controller
         $today_date = date('Y-m-d');
         $party_start = date("Y-m-d H:i",strtotime(Carbon::parse($party_day)->setHours($schedule['start_time'])));
         $party_end = date("Y-m-d H:i",strtotime(Carbon::parse($party_day)->setHours($schedule['start_time'])->addMinutes($schedule['duration'])));
-        $max_date = Carbon::parse($today_date)->addDays(self::$min_days);
+        $max_date = Carbon::parse($today_date)->addDays($max_days_update_booking);
 
         if($max_date > $party_start) {
-            return redirect()->back()->withErrors(['party_day'=>"Uma festa só pode ser agendada ou editada com ".self::$min_days." dias de antecedencia."])->withInput();
+            return redirect()->back()->withErrors(['party_day'=>"Uma festa só pode ser agendada ou editada com ".$max_days_update_booking." dias de antecedencia."])->withInput();
         }
         if($party_end < $party_start) {
             return redirect()->back()->withErrors(['party_day'=>"Uma festa não pode finalizar antes de começar."])->withInput();

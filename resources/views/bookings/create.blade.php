@@ -313,11 +313,12 @@
             while (party_time.options.length > 1) {
                 party_time.remove(1); // Remova a segunda opção em diante (índice 1)
             }
-            agora.setDate(agora.getDate() + 5);
+            const min_days = {{ $min_days }}
+            agora.setDate(agora.getDate() + min_days);
             if (escolhida < agora) {
                 const data = agora.toISOString().split('T')[0]
                 this.value = data;
-                error(`Você só pode marcar festas após 5 dias contados a partir da data de hoje (${data}).`)
+                error(`Você só pode marcar festas após ${min_days} dias contados a partir da data de hoje (${data}).`)
             }
 
             const dates = await getDates(this.value)

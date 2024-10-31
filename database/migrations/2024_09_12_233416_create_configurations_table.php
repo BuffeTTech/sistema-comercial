@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('configurations', function (Blueprint $table) {
             $table->id();
             $table->unsignedTinyInteger('min_days_booking')->default(30);
+            $table->unsignedTinyInteger('min_days_update_booking')->default(30);
             $table->unsignedTinyInteger('max_days_unavaiable_booking')->default(7);
             $table->string('buffet_instagram')->nullable();
             $table->string('buffet_linkedin')->nullable();
