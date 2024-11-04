@@ -208,7 +208,7 @@ class BookingController extends Controller
         $foods = $this->food->where('buffet_id', $buffet->id)->where('status', FoodStatus::ACTIVE->name)->get();
         $decorations = $this->decoration->where('buffet_id', $buffet->id)->where('status', DecorationStatus::ACTIVE->name)->get();
 
-        return view('bookings.create', ['buffet'=>$buffet, 'foods'=>$foods, 'decorations'=>$decorations, 'min_days'=>$min_days])->with(['success'=>'Reserva criada com sucesso!']);
+        return view('bookings.create', ['buffet'=>$buffet, 'foods'=>$foods, 'decorations'=>$decorations, 'min_days'=>$min_days, 'configuration'=>$configuration])->with(['success'=>'Reserva criada com sucesso!']);
     }
 
     /**
@@ -224,6 +224,8 @@ class BookingController extends Controller
         }
 
         $this->authorize('create', [Booking::class, $buffet]);
+
+        dd($request);
 
         $configuration = $this->configuration->where('buffet_id', $buffet->id)->first();
         $min_days = self::$min_days;

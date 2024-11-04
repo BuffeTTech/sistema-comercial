@@ -12,4 +12,7 @@ enum BookingStatus: string {
     case CANCELED = "Cancelado";
     case FINISHED = "Finalizado";
     case CLOSED = "Encerrado";
+    case PAID = "Pago";
+    case LATE = "Atrasado";
+    case PAY_LATER = "Pagar depois";
 }
