@@ -18,7 +18,7 @@ Route::get('/{buffet}/booking/schedule/{day}/edit', [BookingController::class, '
 Route::get('/{buffet}/booking/schedule/{day}', [BookingController::class, 'api_get_schedules_by_day'])->name('api.bookings.get_schedules_by_day');
 Route::get('/{buffet}/booking/schedule/{day}/{time}/disponibility', [BookingController::class, 'api_get_disponibility_by_day'])->name('api.bookings.get_disponibility_by_day');
 
-
+Route::get('/{buffet}/booking/schedule/{birthday}/birthday', [BookingController::class, 'api_get_schedules_by_birthday_date'])->name('api.bookings.get_schedules_by_birthday_date');
 
 Route::get('/{buffet}/food/{food}', [FoodController::class,'api_get_food'])->name('api.food.show');
 Route::get('/{buffet}/decoration/{decoration}', [DecorationController::class,'api_get_decoration'])->name('api.decoration.show');

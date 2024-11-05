@@ -38,7 +38,7 @@
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="progress mb-4 h-30">
-                            <div class="progress-bar" id="progressBar" role="progressbar" style="width: 33%;" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">Etapa 1 de 3</div>
+                            <div class="progress-bar" id="progressBar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">Etapa 1 de 4</div>
                         </div>
                         <div class="table-responsive px-4">
                             <form id="form" method="POST" action="{{ route('booking.store', ['buffet'=>$buffet->slug]) }}">
@@ -57,9 +57,9 @@
                                         <x-input-error :messages="$errors->get('years_birthdayperson')" class="mt-2" />
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label for="party_day" class="form-control-label">Data de Nascimento</label>
-                                        <input required class="form-control" type="date" id="party_day" name="party_day">
-                                        <x-input-error :messages="$errors->get('party_day')" class="mt-2" />
+                                        <label for="birthday_date" class="form-control-label">Data de Nascimento</label>
+                                        <input required class="form-control" type="date" id="birthday_date" name="birthday_date">
+                                        <x-input-error :messages="$errors->get('birthday_date')" class="mt-2" />
                                     </div>
                                   <button type="button" class="btn btn-primary" onclick="nextStep()">Próximo</button>
                                 </div>
@@ -171,8 +171,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="daytime_preference" class="form-control-label">Prefêrencia de Horário</label>
-                                        <select class="form-select" multiple aria-label="multiple select example">
-                                            <option selected>Open this select menu</option>
+                                        <select class="form-select" multiple aria-label="multiple select example" name="daytime_preference" id="daytime_preference" required>
                                             @foreach(App\Enums\DayTimePreference::array() as $value => $name)
                                                 <option value="{{ $name }}" 
                                                     {{ (is_array(old('daytime_preference')) && in_array($value, old('daytime_preference'))) ? 'selected' : '' }}>
@@ -194,23 +193,27 @@
                           
                                 <!-- Passo 3 -->
                                 <div class="step-content" id="step-3">
-                                  <h5>Confirmação da festa</h5>
+                                  <h5>Horário</h5>
                                   <p>Com base nas informações fornecidas, temos as seguintes opções de horário:</p>
+                                  <div id="dates-wrapper"></div> <!-- printar as datas -->
                                   <div>
-                                    <button>a</button>
-                                    <button>b</button>
-                                    <button>c</button>
+                                      <p>Nenhuma data convém?</p>
+                                      <button id="find_date_button" class="btn btn-secondary">Buscar data específica</button>
+                                      @if($configuration->buffet_whatsapp)
+                                        <a class="btn btn-secondary" href="{{ $configuration->buffet_whatsapp }}?text=Gostaria%20de%20agendar%20uma%20festa%20e%20nenhum%20horario%20me%20convem" target="_blank">Falar com atendente</a>
+                                      @endif
                                   </div>
-                                  <p>Nenhuma data convém?</p>
-                                  <button id="find_date_button" class="btn btn-secondary">Buscar data específica</button>
-                                  @if($configuration->buffet_whatsapp)
-                                    <a class="btn btn-secondary" href="{{ $configuration->buffet_whatsapp }}?text=Gostaria%20de%20agendar%20uma%20festa%20e%20nenhum%20horario%20me%20convem" target="_blank">Falar com atendente</a>
-                                  @endif
+                                  <div>
+                                        <button type="button" class="btn btn-secondary" onclick="previousStep()">Anterior</button>
+                                        <button type="button" class="btn btn-primary" onclick="nextStep()">Próximo</button>
+                                  </div>
+                                </div>
+                                <div class="step-content" id="step-4">
+                                  <h5>Confirmação da festa</h5>
                                   <p>Por favor, revise suas informações antes de enviar.</p>
-                                  <!-- Aqui você pode listar os dados inseridos para revisão -->
-                                  <button type="button" class="btn btn-secondary" onclick="previousStep()">Anterior</button>
-                                  <button type="submit" class="btn btn-success">Fazer pré reserva</button>
-                                  <button type="submit" class="btn btn-success">Fazer pré reserva e agendar visita</button>
+                                    <button type="button" class="btn btn-secondary" onclick="previousStep()">Anterior</button>
+                                    <button type="submit" class="btn btn-success">Fazer pré reserva</button>
+                                    <button type="submit" class="btn btn-success">Fazer pré reserva e agendar visita</button>
                                 </div>
                               </form>
                         </div>
@@ -230,6 +233,9 @@
         const decoration_id = document.querySelectorAll('input[name=decoration_id]')
         const num_guests = document.querySelector('input[name=num_guests]')
         const find_date_button = document.querySelector("#find_date_button")
+        const daytime_preference = document.querySelector("#daytime_preference")
+        const birthday_date = document.querySelector("#birthday_date")
+        const dates_wrapper = document.querySelector("#dates-wrapper")
 
         let decorationSelected = null;
         let foodSelected = null;
@@ -242,7 +248,7 @@
     <script>
         let currentStep = 1;
 
-        const steps = ["Informações da festa", "Detalhes do evento", "Confirmação e Agendamento"]
+        const steps = ["Informações da festa", "Detalhes do evento", "Agendamento", "Confirmação"]
         document.getElementById("progressBar").innerText = steps[0];
     
         function showStep(step) {
@@ -252,34 +258,60 @@
           document.getElementById(`step-${step}`).classList.add("active");
     
           // Atualiza a barra de progresso
-          const progress = (step / 3) * 100;
+          const progress = (step / 4) * 100;
           document.getElementById("progressBar").style.width = `${progress}%`;
           document.getElementById("progressBar").innerText = steps[step - 1];
         //   document.getElementById("progressBar").innerText = `Etapa ${step} de 3`;
         }
     
-        function nextStep() {
+        async function nextStep() {
             // Seleciona todos os campos de entrada obrigatórios na etapa atual
-            const currentStepContent = document.getElementById(`step-${currentStep}`);
-            const inputs = currentStepContent.querySelectorAll("input[required]");
+            const currentStepElement = document.getElementById(`step-${currentStep}`);
+            const inputs = currentStepElement.querySelectorAll('input[required], select[required]');
+            let allValid = true;
 
-            // Verifica se todos os campos obrigatórios estão preenchidos
-            let allFilled = true;
             inputs.forEach(input => {
-                if (!input.value.trim()) { // trim() remove espaços em branco
-                allFilled = false;
-                input.classList.add("is-invalid"); // Adiciona uma classe para indicar erro
-                } else {
-                input.classList.remove("is-invalid"); // Remove o erro se preenchido
+                // Verificação para campos de texto, email, número, etc.
+                if (input.type === "text" || input.type === "number" || input.type === "email") {
+                    if (input.value.trim() === "") {
+                        allValid = false;
+                        input.classList.add("is-invalid"); // Adiciona uma classe para indicar erro
+                    } else {
+                        input.classList.remove("is-invalid");
+                    }
+                }
+                // Verificação para campos de rádio
+                else if (input.type === "radio") {
+                    const radioGroup = currentStepElement.querySelectorAll(`input[name="${input.name}"]`);
+                    const isRadioChecked = Array.from(radioGroup).some(radio => radio.checked);
+                    if (!isRadioChecked) {
+                        allValid = false;
+                        radioGroup.forEach(radio => radio.classList.add("is-invalid"));
+                    } else {
+                        radioGroup.forEach(radio => radio.classList.remove("is-invalid"));
+                    }
+                }
+                // Verificação para campos <select multiple>
+                else if (input.tagName === "SELECT" && input.multiple) {
+                    const selectedOptions = Array.from(input.selectedOptions);
+                    if (selectedOptions.length === 0) {
+                        allValid = false;
+                        input.classList.add("is-invalid");
+                    } else {
+                        input.classList.remove("is-invalid");
+                    }
                 }
             });
 
-            // Se todos os campos estiverem preenchidos, passa para o próximo passo
-            if (allFilled) {
+            // Se todos os campos estiverem válidos, passa para o próximo passo
+            if (allValid) {
+                if(currentStep + 1 == 3) {
+                    await generateSchedule()
+                }
                 currentStep++;
-                showStep(currentStep);
+                showStep(currentStep)
             } else {
-                alert("Por favor, preencha todos os campos obrigatórios antes de prosseguir.");
+                error("Por favor, preencha todos os campos obrigatórios antes de continuar.");
             }
         }
 
@@ -294,8 +326,6 @@
             const userConfirmed = await confirm(`Deseja cadastrar uma festa ?`)
 
             try {
-
-
                 if (userConfirmed) {
                     this.submit();
                 } else {
@@ -475,6 +505,50 @@
             }
             html(data)
         })
+
+        async function get_schedule_by_birthday_date(birthday_date, daytime_preferences) {
+            const csrf = document.querySelector('meta[name="csrf-token"]').content
+            const data = await axios.get(SITEURL + '/api/{{ $buffet->slug }}/booking/schedule/' + birthday_date+'/birthday?daytime_preference='+daytime_preferences.join(','), {
+                headers: {
+                    'X-CSRF-TOKEN': csrf
+                }
+            })
+
+            return data.data;
+        }
+
+        async function generateSchedule() {
+            const daytime_preferences = Array.from(daytime_preference.selectedOptions).map(option => option.value);
+            const { dates } = await get_schedule_by_birthday_date(birthday_date.value, daytime_preferences)
+            dates_wrapper.innerHTML = ''
+            
+            dates.forEach(date=>{
+                console.log(dates_wrapper)
+                const horarioFinal = formatarHora(date.horario.comeco, date.horario.duracao);
+                dates_wrapper.innerHTML += `
+                    <div>
+                        <label for="party_day">${date.data} das ${date.horario.comeco} até ${horarioFinal}</label>
+                        <input type="radio" name="party_day" id="party_day" required>
+                    </div>
+                `
+            })
+        }
+
+        const formatarHora = (horario, duracao) => {
+            // Divide o horário em horas, minutos e segundos
+            const [hora, minuto, segundo] = horario.split(':').map(Number);
+            
+            // Converte tudo para minutos e soma a duração
+            const totalSegundos = (hora * 3600) + (minuto * 60) + segundo + (duracao * 60);
+            
+            // Calcula as novas horas, minutos e segundos
+            const novasHoras = Math.floor(totalSegundos / 3600);
+            const novosMinutos = Math.floor((totalSegundos % 3600) / 60);
+            const novosSegundos = totalSegundos % 60;
+            
+            // Formata os valores para 'HH:MM:SS'
+            return `${novasHoras.toString().padStart(2, '0')}:${novosMinutos.toString().padStart(2, '0')}:${novosSegundos.toString().padStart(2, '0')}`;
+        };
 
     </script>
 @endsection

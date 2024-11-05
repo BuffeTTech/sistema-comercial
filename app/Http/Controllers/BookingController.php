@@ -862,7 +862,7 @@ class BookingController extends Controller
         }
     
         // 3. Buscar outros horários no mesmo dia
-        $outrosHorarios = $this->buscarHorariosNoMesmoDia($buffet->id, $date, $schedule, $dayOfWeek);
+        $outrosHorarios = $this->buscarHorariosNoMesmoDia($buffet->id, $date, $dayOfWeek, $schedule);
         if (!empty($outrosHorarios)) {
             $alternativas = array_merge($alternativas, $outrosHorarios);
         }
@@ -909,14 +909,14 @@ class BookingController extends Controller
     }
     
     // Função para buscar outros horários disponíveis no mesmo dia, mas para o mesmo dia da semana
-    private function buscarHorariosNoMesmoDia($buffetId, $date, $scheduleAtual, $dayOfWeek) {
+    private function buscarHorariosNoMesmoDia($buffetId, $date, $dayOfWeek, $scheduleAtual) {
         $horariosAlternativos = [];
     
         $horarios = $this->schedule
             ->where('buffet_id', $buffetId)
             ->where('status', ScheduleStatus::ACTIVE->name)
             ->where('day_week', $dayOfWeek) // Apenas horários do mesmo dia da semana
-            ->where('id', '!=', $scheduleAtual->id) // Excluir o horário atual
+            ->where('id', '!=', $scheduleAtual->id ?? null) // Excluir o horário atual
             ->get();
     
         foreach ($horarios as $horario) {
@@ -941,7 +941,47 @@ class BookingController extends Controller
     
         return $horariosAlternativos;
     }
+
+    private function ajustarAnoParaProximoOuAtual(DateTime $dataInserida): DateTime {
+        // Pega a data atual
+        $hoje = new DateTime();
+    
+        // Clona a data inserida para evitar modificá-la diretamente
+        $dataAjustada = clone $dataInserida;
+    
+        // Atualiza o ano da data inserida para o ano atual
+        $dataAjustada->setDate($hoje->format('Y'), $dataInserida->format('m'), $dataInserida->format('d'));
+    
+        // Se a data ajustada (com o ano atual) já tiver passado em relação a hoje,
+        // então definimos o ano para o próximo ano
+        if ($dataAjustada < $hoje) {
+            $dataAjustada->modify('+1 year');
+        }
+    
+        return $dataAjustada;
+    }
     
     
+    public function api_get_schedules_by_birthday_date(Request $request) {
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+    
+        if (!$buffet || !$buffet_slug) {
+            return response()->json(['message' => 'Buffet not found'], 422);
+        }
+    
+        // Data e dia da semana
+        $date = new DateTime($request->birthday);
+        $date = $this->ajustarAnoParaProximoOuAtual($date);
+        $dayOfWeek = strtoupper($date->format('l')); // Dia da semana em texto (ex: THURSDAY)
+    
+        if (!DayWeek::is_in_name($dayOfWeek)) {
+            return response()->json(['message' => 'Day not found'], 422);
+        }
+
+        $outrosHorarios = $this->buscarHorariosNoMesmoDia($buffet->id, $date, $dayOfWeek, null);
+
+        return response()->json(['message' => 'Horário Disponivel!', 'dates'=>$outrosHorarios], 200);
+    }
 
 }
