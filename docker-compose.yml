@@ -1,6 +1,6 @@
 services:
     application-app:
-        container_name: commercial-application-app
+        container_name: buffet-comercial-app
         build:
             context: .
             dockerfile: .docker/Dockerfile
@@ -8,7 +8,7 @@ services:
                 - APP_ENV=${APP_ENV}
         restart: unless-stopped
         ports:
-            - "${FORWARD_APP_PORT:-8081}:80"
+            - "${FORWARD_APP_PORT:-80}:80"
         volumes:
             - ".:/app"
         networks:
@@ -16,23 +16,23 @@ services:
         depends_on:
             - app-redis
             - app-mysql  
-    app-redis:
-        container_name: commercial-app-redis
-        restart: unless-stopped
-        image: 'redis:alpine'
-        ports:
-            - '${FORWARD_REDIS_PORT:-6380}:6379'
-        volumes:
-            - '.docker/local/data/redis:/data'
-        networks:
-            - src_default
-        healthcheck:
-            test: [ "CMD", "redis-cli", "ping" ]
-            retries: 3
-            timeout: 5s
+    # app-redis:
+    #     container_name: buffet-comercial-redis
+    #     restart: unless-stopped
+    #     image: 'redis:alpine'
+    #     ports:
+    #         - '${FORWARD_REDIS_PORT:-6379}:6379'
+    #     volumes:
+    #         - '.docker/local/data/redis:/data'
+    #     networks:
+    #         - src_default
+    #     healthcheck:
+    #         test: [ "CMD", "redis-cli", "ping" ]
+    #         retries: 3
+    #         timeout: 5s
 
     app-mysql:
-        container_name: commercial-app-mysql
+        container_name: buffet-comercial-mysql
         image: mysql:8.0
         restart: unless-stopped
         environment:
@@ -41,19 +41,19 @@ services:
             MYSQL_USER: ${DB_USERNAME}
             MYSQL_PASSWORD: ${DB_PASSWORD}
         ports:
-            - '${FORWARD_DB_PORT:-3307}:3306'
+            - '${FORWARD_DB_PORT:-3306}:3306'
         volumes:
             - '.docker/local/data/mysql:/var/lib/mysql'
         networks:
             - src_default
 
-    mailpit:
-        image: 'axllent/mailpit:latest'
-        ports:
-            - '${FORWARD_MAILPIT_PORT:-1025}:1025'
-            - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
-        networks:
-            - src_default
+    # mailpit:
+    #     image: 'axllent/mailpit:latest'
+    #     ports:
+    #         - '${FORWARD_MAILPIT_PORT:-1025}:1025'
+    #         - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+    #     networks:
+    #         - src_default
 
 networks:
     src_default:

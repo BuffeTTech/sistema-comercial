@@ -54,12 +54,24 @@ window.html = function (data) {
         showCloseButton: true,
         showCancelButton: false,
         focusConfirm: false,
-        confirmButtonText: `
-            Fechar!
-        `,
+        confirmButtonText: `Fechar!`,
+        confirmButtonAriaLabel: "Fechar!"
+    });
+};
+
+window.htmlFunction = function (data, fn) {
+    return Swal.fire({
+        title: data.title,
+        icon: "info",
+        html: data.content,
+        showCloseButton: true,
+        showCancelButton: false,
+        focusConfirm: false,
+        confirmButtonText: `Fechar!`,
         confirmButtonAriaLabel: "Fechar!",
-      });
-}
+        didOpen: fn
+    });
+};
 
 window.replaceCNPJ = function(value) {
     return value

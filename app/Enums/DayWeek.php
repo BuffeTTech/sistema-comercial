@@ -31,4 +31,9 @@ enum DayWeek: string
         return $translations[$dayOfWeek] ?? 'Desconhecido';
     }
 
+    public static function isWeekend(self $dayOfWeek): bool {
+        $weekendDays = [self::FRIDAY->name, self::SATURDAY, self::SUNDAY];
+        return in_array($dayOfWeek, $weekendDays, true);
+    }
+
 }

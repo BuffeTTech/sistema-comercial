@@ -26,6 +26,7 @@ use Carbon\Carbon;
 use DateTime;
 use Hashids\Hashids;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 
 class BookingController extends Controller
@@ -979,9 +980,89 @@ class BookingController extends Controller
             return response()->json(['message' => 'Day not found'], 422);
         }
 
+        // $isWeekend = DayWeek::isWeekend(DayWeek::getEnumByName($dayOfWeek));
+        // if(!$isWeekend){
+
+        //     $weekendDates = array_map(
+        //         fn($date) => $date->format('Y-m-d'),
+        //         $this->searchDaysNearbyWeekends($date)
+        //     );
+        //     $busca = $this->searchSchedulesNearbyWeekend($weekendDates, $buffet);
+        //     dd($busca);
+        //     return response()->json(['message' => 'Horário Disponivel!', 'dates'=>$this->searchSchedulesNearbyWeekend($weekends, $buffet)], 200);
+            
+        // }
+        // else {
+        //     $weekends = $this->getWeekend(DayWeek::getEnumByName($dayOfWeek), $date);
+        // }
         $outrosHorarios = $this->buscarHorariosNoMesmoDia($buffet->id, $date, $dayOfWeek, null);
 
         return response()->json(['message' => 'Horário Disponivel!', 'dates'=>$outrosHorarios], 200);
+    }
+
+    private function searchSchedulesNearbyWeekend(array $weekends, Buffet $buffet) {
+        $schedules = $this->schedule
+        ->leftJoin('bookings', function ($join) use ($weekends) {
+            $join->on('schedules.id', '=', 'bookings.schedule_id')
+                ->whereIn(DB::raw('DATE(bookings.party_day)'), $weekends);  // Compara apenas a data, não o nome do dia da semana
+        })
+        ->whereNull('bookings.schedule_id') // Apenas horários sem reservas
+        ->orderBy('schedules.start_time', 'asc')
+        ->where('schedules.buffet_id', $buffet->id) // Filtro pelo buffet
+        // ->where('schedules.day_week', $dayOfWeek)   // Filtro pelo dia da semana
+        ->where('schedules.status', ScheduleStatus::ACTIVE->name) // Apenas horários ativos
+        ->select('schedules.*')
+        ->groupBy('schedules.id') // Garante resultados únicos
+        ->get()
+        ->toArray(); // Converte para array
+
+
+        return $schedules;
+    }
+    
+    private function searchDaysNearbyWeekends(DateTime $date) {
+        $nextFriday = clone $date;
+        $nextSaturday = clone $date;
+        $nextSunday = clone $date;
+    
+        $prevFriday = clone $date;
+        $prevSaturday = clone $date;
+        $prevSunday = clone $date;
+    
+        // Calcula os dias seguintes
+        $nextFriday->modify('next friday');
+        $nextSaturday->modify('next saturday');
+        $nextSunday->modify('next sunday');
+    
+        // Calcula os dias anteriores
+        $prevFriday->modify('last friday');
+        $prevSaturday->modify('last saturday');
+        $prevSunday->modify('last sunday');
+
+        return [
+            $nextFriday,
+            $nextSaturday,
+            $nextSunday,
+            $prevFriday,
+            $prevSaturday,
+            $prevSunday,
+            $date
+        ];
+    }
+    
+    private function getWeekend(DayWeek $dayOfWeek, DateTime $date){
+        $friday = clone $date;
+        $saturday = clone $date;
+        $sunday = clone $date;
+
+        switch ($dayOfWeek){
+            case DayWeek::SUNDAY:
+                return [$friday->modify('last friday'), $saturday->modify('last saturday')];
+            case DayWeek::SATURDAY:
+                return [$friday->modify('last friday'), $sunday->modify('next sunday')];
+            default:
+                return [$friday->modify('next saturday'), $sunday->modify('next sunday')];
+        }
     }
 
 }

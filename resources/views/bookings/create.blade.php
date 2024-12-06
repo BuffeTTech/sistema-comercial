@@ -47,17 +47,17 @@
                                 <div class="step-content active" id="step-1">
                                     <h5>Informações da Festa - Dados do aniversariante</h5>
                                     <div class="form-group">
-                                        <label for="name_birthdayperson" class="form-control-label">Nome</label>
+                                        <label for="name_birthdayperson" class="form-control-label">Nome*</label>
                                         <input  class="form-control" type="text" placeholder="Guilherme" id="name_birthdayperson" name="name_birthdayperson" value="{{ old('name_birthdayperson') }}" required>
                                         <x-input-error :messages="$errors->get('name_birthdayperson')" class="mt-2" />
                                     </div>
                                     <div class="form-group">
-                                        <label for="years_birthdayperson" class="form-control-label">Idade</label>
+                                        <label for="years_birthdayperson" class="form-control-label">Idade*</label>
                                         <input required class="form-control" type="number" placeholder="20" id="years_birthdayperson" name="years_birthdayperson" value="{{ old('years_birthdayperson') }}">
                                         <x-input-error :messages="$errors->get('years_birthdayperson')" class="mt-2" />
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label for="birthday_date" class="form-control-label">Data de Nascimento</label>
+                                        <label for="birthday_date" class="form-control-label">Data de Nascimento*</label>
                                         <input required class="form-control" type="date" id="birthday_date" name="birthday_date">
                                         <x-input-error :messages="$errors->get('birthday_date')" class="mt-2" />
                                     </div>
@@ -68,7 +68,7 @@
                                 <div class="step-content" id="step-2">
                                     <h5>Informações da Festa - Detalhes do evento</h5>
                                     <div style="position: relative;">
-                                        <label for="food_id" class="form-control-label">Pacote de comidas</label>
+                                        <label for="food_id" class="form-control-label">Pacote de comidas*</label>
                                         <div class="food_slider">
                                             <!-- Additional required wrapper -->
                                             <div class="swiper-wrapper">
@@ -125,7 +125,7 @@
                                         <x-input-error :messages="$errors->get('external_food')" class="mt-2" />
                                     </div>
                                     <div style="position: relative">
-                                        <label for="decoration_id" class="form-control-label">Pacote de decoração</label>
+                                        <label for="decoration_id" class="form-control-label">Pacote de decoração*</label>
                                         {{-- <x-text-input id="decoration_id" class="block mt-1 w-full dark:bg-slate-100 dark:text-slate-500" type="date" name="decoration_id" :value="old('decoration_id')" required autofocus placeholder="Dia da festa" /> --}}
                                         <div class="decoration_slider">
                                             <!-- Additional required wrapper -->
@@ -165,12 +165,12 @@
                                     @endif
 
                                     <div class="form-group">
-                                        <label for="num_guests" class="form-control-label">Número de convidados</label>
+                                        <label for="num_guests" class="form-control-label">Número de convidados*</label>
                                         <input required class="form-control" type="number" placeholder="50" id="num_guests" name="num_guests" value="{{ old('num_guests') }}">
                                         <x-input-error :messages="$errors->get('num_guests')" class="mt-2" />
                                     </div>
                                     <div class="form-group">
-                                        <label for="daytime_preference" class="form-control-label">Prefêrencia de Horário</label>
+                                        <label for="daytime_preference" class="form-control-label">Prefêrencia de Horário*</label>
                                         <select class="form-select" multiple aria-label="multiple select example" name="daytime_preference" id="daytime_preference" required>
                                             @foreach(App\Enums\DayTimePreference::array() as $value => $name)
                                                 <option value="{{ $name }}" 
@@ -501,10 +501,67 @@
                 title: "Selecionar data",
                 content: `
                     <p>Buscar por datas</p>
+                    <input type="date" id="date_popup"/>
+                    <button id="select_date_popup">Selecionar opçoes</button>   
+
+                    <div id="hours_popup"></div>
                 `
             }
-            html(data)
+            const a = htmlFunction(data, async ()=>{
+                console.log("b")
+                const button = document.querySelector("#select_date_popup")
+                const input = document.querySelector("#date_popup")
+                const div = document.querySelector("#hours_popup")
+                button.addEventListener('click', async e=>{
+                    e.preventDefault()
+
+                    if(!input.value) {
+                        alert("Você precisa selecionar uma data.")
+                        return;
+                    }
+
+                    const dates = await get_specific_hours(input.value)
+
+                    div.innerHTML = dates.map((date, index)=>{
+                        console.log(date)
+                        const horarioFinal = formatarHora(date.horario.comeco, date.horario.duracao);
+                        return `
+                            <button class="button_date_popup" id="button_date_popup-${index}">${date.data} das ${date.horario.comeco} até ${horarioFinal}</button>
+                        `
+                    }).join("<br>")
+
+                    document.querySelectorAll(".button_date_popup").forEach(button=>{
+                        button.addEventListener('click', (e)=>{
+                            e.preventDefault()
+                            dates_wrapper.innerHTML += "teste " + button.id
+                        })
+                    })
+                })
+            })
+            console.log(a)
+            // .then(() => {
+            //     console.log("Modal foi aberto e .then() executado");
+            //     const popupContainer = Swal.getHtmlContainer();
+            //     if (popupContainer) {
+            //         console.log("dasd");
+            //     }
+
+            // }).catch((error) => {
+            //     console.error("Erro na execução da Promise:", error);
+            // });
+
         })
+
+
+        async function get_specific_hours(day) {
+            // const data = await axios.get(SITEURL + '/api/{{$buffet->slug}}/booking/schedule/' + day + '/' + time + '/disponibility', {
+            //     headers: {
+            //         'X-CSRF-TOKEN': csrf
+            //     }
+            // });
+            // return data.data
+            return [{data: "2025-07-01", horario: {comeco: "17:00:00", duracao: 120}}, {data: "2025-07-01", horario: {comeco: "20:00:00", duracao: 120}}]
+        }
 
         async function get_schedule_by_birthday_date(birthday_date, daytime_preferences) {
             const csrf = document.querySelector('meta[name="csrf-token"]').content
@@ -549,6 +606,13 @@
             // Formata os valores para 'HH:MM:SS'
             return `${novasHoras.toString().padStart(2, '0')}:${novosMinutos.toString().padStart(2, '0')}:${novosSegundos.toString().padStart(2, '0')}`;
         };
+        async function teste() {
+            const a = await get_specific_hours()
+            const b = a[0]
+            console.log(formatarHora(await b.horario.comeco,await b.horario.duracao))
+        }
+        teste()
+
 
     </script>
 @endsection

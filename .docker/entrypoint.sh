@@ -15,9 +15,13 @@ npm install
 php artisan optimize:clear
 find public -type l -delete # caso haja algum symlink será removido
 php artisan storage:link # refazendo o symlink
+php artisan migrate
 
 # Iniciar o Nginx
 nginx
 
-# Iniciar o PHP-FPM
+# Iniciar o PHP-FPM é 
 php-fpm
+
+# Realiza o build do NPM
+npm run build
