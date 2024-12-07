@@ -14,7 +14,7 @@ services:
         networks:
             - src_default
         depends_on:
-            - app-redis
+            # - app-redis
             - app-mysql  
     # app-redis:
     #     container_name: buffet-comercial-redis
