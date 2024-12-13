@@ -10,6 +10,7 @@ use App\Models\Address;
 use App\Models\Buffet;
 use App\Models\BuffetPhoto;
 use App\Models\BuffetSubscription;
+use App\Models\Configuration;
 use App\Models\Phone;
 use App\Models\Subscription;
 use App\Models\User;
@@ -27,6 +28,7 @@ class BuffetController extends Controller
         protected Subscription $subscription,
         protected BuffetSubscription $buffet_subscription,
         protected BuffetPhoto $buffet_photo,
+        protected Configuration $configuration
     )
     {
         
@@ -159,6 +161,8 @@ class BuffetController extends Controller
         ]);
 
         $owner->assignRole($buffet_subscription->subscription->slug.'.administrative');
+
+        $configurations = $this->configuration->create(['buffet_id'=>$buffet->id]);
 
         return response()->json(['data'=>[$request->buffet_subscription]], 201);
         return response()->json(['data'=>[$buffet, $buffet_subscription, $owner]], 201);

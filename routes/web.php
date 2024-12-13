@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BuffetController;
+use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\FoodController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SiteController;
@@ -17,8 +18,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserProfileController;
 use Illuminate\Support\Facades\Route;
 
+
 Route::get('/', function () {
-    return view('welcome');
+    return redirect(config('app.administrative_url'));
 })->name('home');
 // Route::get('/{buffet}', [SiteController::class,'buffetTest'])->name('buffetTest');
 Route::get('/buffet', [SiteController::class,'buffetAlegria'])->name('buffetTest');
@@ -90,6 +92,10 @@ Route::middleware(['buffet-exists', 'auth', 'verified'])->group(function () {
     
     Route::resource('{buffet}/user',UserController::class);
     Route::patch('/{buffet}/user/{user}/change_role', [UserController::class,'change_role'])->name('user.change_role');
+
+    Route::get('{buffet}/configurations', [ConfigurationController::class, 'index'])->name('configurations.index');
+    // Route::get('{buffet}/configurations', [ConfigurationController::class, 'edit'])->name('configurations.edit');
+    Route::post('{buffet}/configurations', [ConfigurationController::class, 'update'])->name('configurations.update');
 });
             
 
