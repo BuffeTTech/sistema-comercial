@@ -32,7 +32,7 @@ enum DayWeek: string
     }
 
     public static function isWeekend(self $dayOfWeek): bool {
-        $weekendDays = [self::FRIDAY->name, self::SATURDAY, self::SUNDAY];
+        $weekendDays = [self::FRIDAY, self::SATURDAY, self::SUNDAY];
         return in_array($dayOfWeek, $weekendDays, true);
     }
 

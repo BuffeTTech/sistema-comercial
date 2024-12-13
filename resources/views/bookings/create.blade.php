@@ -37,7 +37,7 @@
                         @include('components.alert')
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
-                        <div class="progress mb-4 h-30">
+                        <div class="progress mb-4 h-30 dont-copy">
                             <div class="progress-bar" id="progressBar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">Etapa 1 de 4</div>
                         </div>
                         <div class="table-responsive px-4">
@@ -224,6 +224,8 @@
         @include('layouts.footers.auth.footer')
     </div>
     <script>
+        console.log('adas')
+
         // constantes
         const SITEURL = "{{ url('/') }}";
         const csrf = document.querySelector('meta[name="csrf-token"]').content
@@ -263,12 +265,13 @@
           document.getElementById("progressBar").innerText = steps[step - 1];
         //   document.getElementById("progressBar").innerText = `Etapa ${step} de 3`;
         }
-    
+
         async function nextStep() {
             // Seleciona todos os campos de entrada obrigatórios na etapa atual
             const currentStepElement = document.getElementById(`step-${currentStep}`);
             const inputs = currentStepElement.querySelectorAll('input[required], select[required]');
             let allValid = true;
+
 
             inputs.forEach(input => {
                 // Verificação para campos de texto, email, número, etc.
@@ -579,15 +582,16 @@
             const { dates } = await get_schedule_by_birthday_date(birthday_date.value, daytime_preferences)
             dates_wrapper.innerHTML = ''
             
-            dates.forEach(date=>{
-                console.log(dates_wrapper)
-                const horarioFinal = formatarHora(date.horario.comeco, date.horario.duracao);
-                dates_wrapper.innerHTML += `
-                    <div>
-                        <label for="party_day">${date.data} das ${date.horario.comeco} até ${horarioFinal}</label>
-                        <input type="radio" name="party_day" id="party_day" required>
-                    </div>
-                `
+            dates.forEach((day, index1)=>{
+                day.schedules.forEach((schedule, index2)=>{
+                    const horarioFinal = formatarHora(schedule.start_time, schedule.duration);
+                    dates_wrapper.innerHTML += `
+                        <div>
+                            <label for="party_day_${index1}_${index2}">${day.day} das ${schedule.start_time} até ${horarioFinal}</label>
+                            <input type="radio" name="party_day" id="party_day_${index}_${index2}" required>
+                        </div>
+                    `
+                })
             })
         }
 
@@ -609,7 +613,6 @@
         async function teste() {
             const a = await get_specific_hours()
             const b = a[0]
-            console.log(formatarHora(await b.horario.comeco,await b.horario.duracao))
         }
         teste()
 

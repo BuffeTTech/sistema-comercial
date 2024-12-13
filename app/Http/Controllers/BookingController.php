@@ -980,44 +980,56 @@ class BookingController extends Controller
             return response()->json(['message' => 'Day not found'], 422);
         }
 
-        // $isWeekend = DayWeek::isWeekend(DayWeek::getEnumByName($dayOfWeek));
-        // if(!$isWeekend){
+        $isWeekend = DayWeek::isWeekend(DayWeek::getEnumByName($dayOfWeek));
+        if(!$isWeekend){
 
-        //     $weekendDates = array_map(
-        //         fn($date) => $date->format('Y-m-d'),
-        //         $this->searchDaysNearbyWeekends($date)
-        //     );
-        //     $busca = $this->searchSchedulesNearbyWeekend($weekendDates, $buffet);
-        //     dd($busca);
-        //     return response()->json(['message' => 'Horário Disponivel!', 'dates'=>$this->searchSchedulesNearbyWeekend($weekends, $buffet)], 200);
-            
-        // }
-        // else {
-        //     $weekends = $this->getWeekend(DayWeek::getEnumByName($dayOfWeek), $date);
-        // }
-        $outrosHorarios = $this->buscarHorariosNoMesmoDia($buffet->id, $date, $dayOfWeek, null);
+            // $weekendDates = array_map(
+            //     fn($date) => $date->format('Y-m-d'),
+            //     $this->searchDaysNearbyWeekends($date)
+            // );
+            // dd($this->searchDaysNearbyWeekends($date));
+            $days = $this->searchSchedulesNearbyWeekend($this->searchDaysNearbyWeekends($date), $buffet);
+            return response()->json(['message' => 'Horário Disponivel!', 'dates'=>$days], 200);
+        }
+        else {
+            $weekends = $this->getWeekend(DayWeek::getEnumByName($dayOfWeek), $date);
+            return response()->json(['message' => 'Horário Disponivel!', 'dates'=>$this->searchSchedulesNearbyWeekend($weekends, $buffet)], 200);
+        }
+        // $outrosHorarios = $this->buscarHorariosNoMesmoDia($buffet->id, $date, $dayOfWeek, null);
 
-        return response()->json(['message' => 'Horário Disponivel!', 'dates'=>$outrosHorarios], 200);
+        // return response()->json(['message' => 'Horário Disponivel!', ], 200);
+        // return response()->json(['message' => 'Horário Disponivel!', 'dates'=>$outrosHorarios], 200);
     }
 
-    private function searchSchedulesNearbyWeekend(array $weekends, Buffet $buffet) {
-        $schedules = $this->schedule
-        ->leftJoin('bookings', function ($join) use ($weekends) {
-            $join->on('schedules.id', '=', 'bookings.schedule_id')
-                ->whereIn(DB::raw('DATE(bookings.party_day)'), $weekends);  // Compara apenas a data, não o nome do dia da semana
-        })
-        ->whereNull('bookings.schedule_id') // Apenas horários sem reservas
-        ->orderBy('schedules.start_time', 'asc')
-        ->where('schedules.buffet_id', $buffet->id) // Filtro pelo buffet
-        // ->where('schedules.day_week', $dayOfWeek)   // Filtro pelo dia da semana
-        ->where('schedules.status', ScheduleStatus::ACTIVE->name) // Apenas horários ativos
-        ->select('schedules.*')
-        ->groupBy('schedules.id') // Garante resultados únicos
-        ->get()
-        ->toArray(); // Converte para array
+    private function searchSchedulesNearbyWeekend(array $dates, Buffet $buffet) {
+        $schedulesAvailable = [];
+        foreach($dates as $date) {
+            $dayOfWeek = strtoupper($date->format('l')); // Dia da semana em texto (ex: THURSDAY)
 
+            $schedules = $this->schedule
+            ->leftJoin('bookings', function ($join) use ($date) {
+                $join->on('schedules.id', '=', 'bookings.schedule_id')
+                    ->where('bookings.party_day', '=', $date);
+            })
+            ->where(function ($query) {
+                $query->whereNull('bookings.schedule_id')
+                    ->orWhereIn('bookings.status', [
+                        BookingStatus::PENDENT->name,
+                        BookingStatus::REJECTED->name,
+                        BookingStatus::CANCELED->name,
+                    ]);
+            })
+            ->orderBy('schedules.start_time', 'asc')
+            ->where('schedules.status', ScheduleStatus::ACTIVE->name)
+            ->where('schedules.buffet_id', $buffet->id)
+            ->where('schedules.day_week', $dayOfWeek)
+            ->select('schedules.*')
+            ->groupBy('schedules.id') // Agrupa pelo campo id
+            ->get();
 
-        return $schedules;
+            array_push($schedulesAvailable, ['day'=>$date->format('Y-m-d'), 'schedules'=>$schedules]);
+        }
+        return $schedulesAvailable;
     }
     
     private function searchDaysNearbyWeekends(DateTime $date) {
@@ -1051,17 +1063,98 @@ class BookingController extends Controller
     }
     
     private function getWeekend(DayWeek $dayOfWeek, DateTime $date){
-        $friday = clone $date;
-        $saturday = clone $date;
-        $sunday = clone $date;
+        // $friday = clone $date;
+        // $saturday = clone $date;
+        // $sunday = clone $date;
 
-        switch ($dayOfWeek){
-            case DayWeek::SUNDAY:
-                return [$friday->modify('last friday'), $saturday->modify('last saturday')];
-            case DayWeek::SATURDAY:
-                return [$friday->modify('last friday'), $sunday->modify('next sunday')];
-            default:
-                return [$friday->modify('next saturday'), $sunday->modify('next sunday')];
+    //     switch ($dayOfWeek){
+    //         case DayWeek::SUNDAY:
+    //             // RETORNAR -> !2 DIAS ANTERIORES! + !PRÓXIMA SEXTA(+2 PRÓXIMOS DIAS)! + !DOMINGO ANTERIOR(+2 DIAS ANTERIORES)! 
+    //             return [
+    //                 (clone $date)->modify('last friday - 1 week'),
+    //                 (clone $date)->modify('last saturday - 1 week'),
+    //                 (clone $date)->modify('last sunday'),
+    //                 $friday->modify('last friday'),
+    //                 $saturday->modify('last saturday'),
+    //                 $date,
+    //                 (clone $date)->modify('next friday'),
+    //                 (clone $date)->modify('next saturday'),
+    //                 (clone $date)->modify('next sunday'),
+    //             ];
+    //         case DayWeek::SATURDAY:
+    //             // RETORNAR -> !1 PRÓXIMO DIA! + !1 DIA ANTERIOR! + !PROXIMA SEXTA(+2 PRÓXIMOS DIAS)! + !DOMINGO ANTERO(+ 2D ANTERIORES)!
+    //             return [
+    //                 (clone $date)->modify('last friday - 1 week'),
+    //                 (clone $date)->modify('last saturday'),
+    //                 (clone $date)->modify('last sunday'),
+    //                 $friday->modify('last friday'),
+    //                 $date,
+    //                 $sunday->modify('next sunday'),
+    //                 (clone $date)->modify('next friday'),
+    //                 (clone $date)->modify('next saturday'),
+    //                 (clone $date)->modify('next sunday + 1 week'),
+    //             ];            
+    //         default:
+    //             // RETORNAR -> !2 PRÓXIMOS DIAS! + !PRÓXIMA SEXTA(+2 PRÓXIMOS DIAS)! + !DOMINGO ANTERIOR(+2 DIAS ANTERIORES)! 
+    //             return [
+    //                 (clone $date)->modify('last friday'),
+    //                 (clone $date)->modify('last saturday'),
+    //                 (clone $date)->modify('last sunday'),
+    //                 $date,
+    //                 $saturday->modify('next saturday'),
+    //                 $sunday->modify('next sunday'),
+    //                 (clone $date)->modify('next friday'),
+    //                 (clone $date)->modify('next saturday + 1 week'),
+    //                 (clone $date)->modify('next sunday + 1 week'),
+    //             ];       
+    //     }
+
+    $lastFriday = (clone $date)->modify('last friday');
+    $lastSaturday = (clone $date)->modify('last saturday');
+    $lastSunday = (clone $date)->modify('last sunday');
+    $nextFriday = (clone $date)->modify('next friday');
+    $nextSaturday = (clone $date)->modify('next saturday');
+    $nextSunday = (clone $date)->modify('next sunday');
+
+    switch ($dayOfWeek) {
+        case DayWeek::SUNDAY:
+            return [
+                (clone $lastFriday)->modify('-1 week'),
+                (clone $lastSaturday)->modify('-1 week'),
+                $lastSunday,
+                $lastFriday,
+                $lastSaturday,
+                $date,
+                $nextFriday,
+                $nextSaturday,
+                $nextSunday,
+            ];
+        
+        case DayWeek::SATURDAY:
+            return [
+                (clone $lastFriday)->modify('-1 week'),
+                $lastSaturday,
+                $lastSunday,
+                $lastFriday,
+                $date,
+                $nextSunday,
+                $nextFriday,
+                $nextSaturday,
+                (clone $nextSunday)->modify('+1 week'),
+            ];
+        
+        default:
+            return [
+                $lastFriday,
+                $lastSaturday,
+                $lastSunday,
+                $date,
+                $nextSaturday,
+                $nextSunday,
+                $nextFriday,
+                (clone $nextSaturday)->modify('+1 week'),
+                (clone $nextSunday)->modify('+1 week'),
+            ];
         }
     }
 
