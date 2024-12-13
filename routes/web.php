@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect(config('app.administrative_url'));
-})->name('landing_page');
+})->name('home');
 // Route::get('/{buffet}', [SiteController::class,'buffetTest'])->name('buffetTest');
 Route::get('/buffet', [SiteController::class,'buffetAlegria'])->name('buffetTest');
 
