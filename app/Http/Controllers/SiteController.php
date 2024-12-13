@@ -49,7 +49,8 @@ class SiteController extends Controller
         $user = auth()->user();
         if($user->isBuffet()) {
             $buffet = Buffet::find($user->buffet_id);
-            return redirect()->route('buffet.dashboard', ['buffet'=>$buffet->slug]);
+            return redirect()->route('booking.my_bookings', ['buffet'=>$buffet->slug]);
+            // return redirect()->route('buffet.dashboard', ['buffet'=>$buffet->slug]);
         }
         if($user->isOwner()) {
             $buffets = $this->buffet->where('owner_id', $user->id)->get();

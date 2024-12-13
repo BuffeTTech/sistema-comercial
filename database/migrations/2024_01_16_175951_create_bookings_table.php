@@ -58,6 +58,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained(
                 table: 'users', indexName: 'bookings_user_id'
             );
+
+            $table->float('price');
             $table->timestamps();
         });
     }

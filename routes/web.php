@@ -19,6 +19,8 @@ use App\Http\Controllers\UserProfileController;
 use Illuminate\Support\Facades\Route;
 
 
+Route::get('/login_api', [AuthenticatedSessionController::class, 'login_api'])->name('login_api');
+
 Route::get('/', function () {
     return redirect(config('app.administrative_url'));
 })->name('home');

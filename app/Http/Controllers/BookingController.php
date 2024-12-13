@@ -295,6 +295,8 @@ class BookingController extends Controller
         if(!$decoration) {
             return redirect()->back()->withErrors(['decoration_id'=>"Decoration not found"])->withInput();
         }
+
+        $price = $food->price * $request->num_guests + $decoration->price + $schedule->price;
             
         // Cria a reserva
         $booking = $this->booking->create([
@@ -319,6 +321,7 @@ class BookingController extends Controller
             // 'daytime_preference'=>$request->daytime_preference,
             'additional_food_observations'=>$request->additional_food_observations,
             'final_notes'=>$request->final_notes,
+            'price'=>$price,
             'status'=>BookingStatus::PENDENT->name
         ]);
 

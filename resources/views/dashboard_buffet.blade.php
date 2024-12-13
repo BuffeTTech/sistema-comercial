@@ -10,14 +10,14 @@
                         <div class="row">
                             <div class="col-8">
                                 <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Caixa de hoje</p>
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Novos Usuários</p>
                                     <h5 class="font-weight-bolder">
-                                        R$ 53.000,00
+                                        {{ $newUsers }}
                                     </h5>
-                                    <p class="mb-0">
+                                    {{-- <p class="mb-0">
                                         <span class="text-success text-sm font-weight-bolder">+55%</span>
                                         since yesterday
-                                    </p>
+                                    </p> --}}
                                 </div>
                             </div>
                             <div class="col-4 text-end">
@@ -35,14 +35,14 @@
                         <div class="row">
                             <div class="col-8">
                                 <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Usuários hoje</p>
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Festas Criadas Hoje</p>
                                     <h5 class="font-weight-bolder">
-                                        2.300
+                                        {{ $bookingsCreatedToday }}
                                     </h5>
-                                    <p class="mb-0">
+                                    {{-- <p class="mb-0">
                                         <span class="text-success text-sm font-weight-bolder">+3%</span>
                                         since last week
-                                    </p>
+                                    </p> --}}
                                 </div>
                             </div>
                             <div class="col-4 text-end">
@@ -60,14 +60,14 @@
                         <div class="row">
                             <div class="col-8">
                                 <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Novos Clientes</p>
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Festas Pendentes</p>
                                     <h5 class="font-weight-bolder">
-                                        +3.462
+                                        {{ $bookingsPendents }}
                                     </h5>
-                                    <p class="mb-0">
+                                    {{-- <p class="mb-0">
                                         <span class="text-danger text-sm font-weight-bolder">-2%</span>
                                         since last quarter
-                                    </p>
+                                    </p> --}}
                                 </div>
                             </div>
                             <div class="col-4 text-end">
@@ -87,11 +87,11 @@
                                 <div class="numbers">
                                     <p class="text-sm mb-0 text-uppercase font-weight-bold">Vendas</p>
                                     <h5 class="font-weight-bolder">
-                                        R$103.430,91
+                                        R$ {{ number_format((float) $sales, 2) }}
                                     </h5>
-                                    <p class="mb-0">
+                                    {{-- <p class="mb-0">
                                         <span class="text-success text-sm font-weight-bolder">+5%</span> than last month
-                                    </p>
+                                    </p> --}}
                                 </div>
                             </div>
                             <div class="col-4 text-end">
@@ -109,10 +109,10 @@
                 <div class="card z-index-2 h-100">
                     <div class="card-header pb-0 pt-3 bg-transparent">
                         <h6 class="text-capitalize">Resumo das vendas</h6>
-                        <p class="text-sm mb-0">
+                        {{-- <p class="text-sm mb-0">
                             <i class="fa fa-arrow-up text-success"></i>
                             <span class="font-weight-bold">4% more</span> in 2021
-                        </p>
+                        </p> --}}
                     </div>
                     <div class="card-body p-3">
                         <div class="chart">
@@ -177,6 +177,17 @@
 @push('js')
     <script src="{{ asset('assets/js/plugins/chartjs.min.js') }}"></script>
     <script>
+        var salesData = Object.values(@json($salesByMonth));
+
+        // Mapeia os meses e as vendas
+        var months = salesData.map(function(sale) {
+            return sale.month; // Nome do mês
+        });
+
+        var sales = salesData.map(function(sale) {
+            return sale.total_bookings; // Total de vendas do mês
+        });
+
         var ctx1 = document.getElementById("chart-line").getContext("2d");
 
         var gradientStroke1 = ctx1.createLinearGradient(0, 230, 0, 50);
@@ -187,7 +198,7 @@
         new Chart(ctx1, {
             type: "line",
             data: {
-                labels: ["Abril", "Maio", "Jun", "Jul.", "Ago.", "Set.", "Out.", "Nov.", "Dez."],
+                labels: months,
                 datasets: [{
                     label: "Festas",
                     tension: 0.4,
@@ -197,7 +208,7 @@
                     backgroundColor: gradientStroke1,
                     borderWidth: 3,
                     fill: true,
-                    data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
+                    data: sales,
                     maxBarThickness: 6
 
                 }],
