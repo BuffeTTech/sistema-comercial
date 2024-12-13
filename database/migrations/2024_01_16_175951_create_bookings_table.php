@@ -18,7 +18,7 @@ return new class extends Migration
 
             // etapa 1
             $table->string('name_birthdayperson', 255);
-            $table->string('years_birthdayperson', 255);
+            $table->integer('years_birthdayperson');
             $table->date('birthday_date', 0);
 
             // etapa 2
@@ -38,17 +38,18 @@ return new class extends Migration
             );
             $table->boolean('external_decoration')->default(false);
             $table->float('price_decoration'); 
+            $table->float('discount')->nullable();
+            $table->enum('status', array_column(BookingStatus::cases(), 'name'));
+            $table->json('daytime_preference')->nullable(); // temporariamente nullable
+            $table->text('additional_food_observations')->nullable();
+
+            $table->text('final_notes')->nullable();
             
+            // Etapa 3
             $table->foreignId('schedule_id')->constrained(
                 table: 'schedules', indexName: 'bookings_schedule_id'
             );
             $table->float('price_schedule'); 
-
-            $table->text('final_notes')->nullable();
-
-            $table->float('discount')->nullable();
-            $table->enum('status', array_column(BookingStatus::cases(), 'name'));
-            $table->json('daytime_preference');
 
             // Obrigatórios
             $table->foreignId('buffet_id')->constrained(
@@ -57,7 +58,6 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained(
                 table: 'users', indexName: 'bookings_user_id'
             );
-            $table->text('additional_food_observations');
             $table->timestamps();
         });
     }

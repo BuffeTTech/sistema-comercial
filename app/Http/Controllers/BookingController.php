@@ -226,16 +226,18 @@ class BookingController extends Controller
 
         $this->authorize('create', [Booking::class, $buffet]);
 
-        dd($request);
-
         $configuration = $this->configuration->where('buffet_id', $buffet->id)->first();
         $min_days = self::$min_days;
         if($configuration) {
             $min_days = $configuration->min_days_booking;
         }
+
+        $party_day = $request->party_day;
+        $schedule_id = explode(";;", $party_day)[1];
+        $party_day = explode(";;", $party_day)[0];
         
         // valida a hora
-        $schedule = $this->schedule->where('id', $request->schedule_id)->where('buffet_id', $buffet->id)->get()->first();
+        $schedule = $this->schedule->where('id', $schedule_id)->where('buffet_id', $buffet->id)->get()->first();
         
         if(!$schedule) {
             return redirect()->back()->withErrors(['schedule_id'=>'Schedule not found'])->withInput();
@@ -244,9 +246,6 @@ class BookingController extends Controller
         if($schedule->status !== ScheduleStatus::ACTIVE->name) {
             return redirect()->back()->withErrors(['schedule_id'=>'Schedule is not active'])->withInput();
         }
-        
-        // valida o dia
-        $party_day = $request->party_day;
         
         $today_date = date('Y-m-d');
         $party_start = date("Y-m-d H:i",strtotime(Carbon::parse($party_day)->setHours($schedule['start_time'])));
@@ -259,7 +258,7 @@ class BookingController extends Controller
         if($party_end < $party_start) {
             return redirect()->back()->withErrors(['party_day'=>"Party can not end before start"])->withInput();
         }
-        
+
         // Valida se existe alguma reserva neste horário
         $booking_exists_in_time = $this->booking
         ->where('buffet_id', $buffet->id)
@@ -301,6 +300,7 @@ class BookingController extends Controller
         $booking = $this->booking->create([
             'name_birthdayperson'=>$request->name_birthdayperson,
             'years_birthdayperson'=>$request->years_birthdayperson,
+            'birthday_date'=>$request->birthday_date,
             'num_guests'=>$request->num_guests,
             'party_day'=>$party_day,
             'buffet_id'=>$buffet->id,
@@ -312,8 +312,17 @@ class BookingController extends Controller
             'schedule_id'=>$schedule->id,
             'price_schedule'=>0,
             'discount'=>0,
+            'external_food'=>$request->external_food,
+            'dietary_restrictions'=>$request->dietary_restrictions, 
+            'external_decoration'=>$request->external_decoration,
+            'discount'=>$request->discount,
+            // 'daytime_preference'=>$request->daytime_preference,
+            'additional_food_observations'=>$request->additional_food_observations,
+            'final_notes'=>$request->final_notes,
             'status'=>BookingStatus::PENDENT->name
         ]);
+
+
 
         event(new BookingCreatedEvent($booking));
 
@@ -803,82 +812,55 @@ class BookingController extends Controller
         if (!$buffet || !$buffet_slug) {
             return response()->json(['message' => 'Buffet not found'], 422);
         }
-    
+        
+        $configuration = $this->configuration->where('buffet_id', $buffet->id)->first();
+        $min_days = self::$min_days;
+        if($configuration) {
+            $min_days = $configuration->min_days_booking;
+        }
+        
         // Data e dia da semana
         $date = new DateTime($request->day);
         $dayOfWeek = strtoupper($date->format('l')); // Dia da semana em texto (ex: THURSDAY)
-    
+        
         if (!DayWeek::is_in_name($dayOfWeek)) {
             return response()->json(['message' => 'Day not found'], 422);
         }
-    
-        // Buscar o schedule que corresponde ao ID e ao dia da semana
-        $schedule = $this->schedule
-                         ->where('id', $request->time)
-                         ->where('buffet_id', $buffet->id)
-                         ->where('day_week', $dayOfWeek) // Verificar se o dia da semana bate
-                         ->first();
-    
-        if (!$schedule) {
-            return response()->json(['message' => 'Schedule not found'], 422);
+
+        $today_date = date('Y-m-d');
+        $min_date = Carbon::parse($today_date)->addDays($min_days);
+
+
+        if($min_date > $date) {
+            return response()->json(['message' => 'Uma festa deve ser agendada no sistema com no minimo '.$min_days.'de antedecendencia. Caso deseje um dia antes contate o buffet'], 422);
         }
+
+        $schedules = $this->schedule
+            ->leftJoin('bookings', function ($join) use ($date) {
+                $join->on('schedules.id', '=', 'bookings.schedule_id')
+                    ->where('bookings.party_day', '=', $date);
+            })
+            ->where(function ($query) {
+                $query->whereNull('bookings.schedule_id')
+                    ->orWhereIn('bookings.status', [
+                        BookingStatus::PENDENT->name,
+                        BookingStatus::REJECTED->name,
+                        BookingStatus::CANCELED->name,
+                    ]);
+            })
+            ->orderBy('schedules.start_time', 'asc')
+            ->where('schedules.status', ScheduleStatus::ACTIVE->name)
+            ->where('schedules.buffet_id', $buffet->id)
+            ->where('schedules.day_week', $dayOfWeek)
+            ->select('schedules.*')
+            ->groupBy('schedules.id')
+            ->get();
     
-        if ($schedule->status !== ScheduleStatus::ACTIVE->name) {
-            return response()->json(['message' => 'Schedule is not active'], 422);
+        if (!$schedules) {
+            return response()->json(['message' => 'Nenhum horário disponivel! Fale com um atendente abaixo'], 422);
         }
-    
-        // Verificar se há reserva para o horário
-        $booking_exists_in_time = $this->booking
-            ->where('buffet_id', $buffet->id)
-            ->where('party_day', $date)
-            ->where('schedule_id', $schedule->id)
-            ->where('status', BookingStatus::APPROVED->name)
-            ->first();
-    
-        if (!$booking_exists_in_time) {
-            return response()->json(['message' => 'Horário Disponível!'], 200);
-        }
-    
-        // Lógica para horários alternativos
-        $alternativas = [];
-    
-        // 1. Buscar o mesmo horário nas semanas anterior e seguinte (para o mesmo dia da semana)
-        $semanaAnterior = (clone $date)->modify('-7 days');
-        $semanaSeguinte = (clone $date)->modify('+7 days');
-    
-        $horariosAlternativos = $this->buscarHorariosAlternativos($buffet->id, $schedule, [$semanaAnterior, $semanaSeguinte], $dayOfWeek);
-    
-        // 2. Buscar o mesmo horário em dias próximos (7 dias antes e 7 dias depois, sem restrição de dia da semana)
-        $diasAntes = 7;
-        $diasDepois = 7;
-    
-        for ($i = 1; $i <= $diasAntes; $i++) {
-            $diaAnterior = (clone $date)->modify("-{$i} days");
-            $alternativas[] = $this->buscarHorariosAlternativos($buffet->id, $schedule, [$diaAnterior], null); // Sem filtro de dia da semana
-        }
-    
-        for ($i = 1; $i <= $diasDepois; $i++) {
-            $diaPosterior = (clone $date)->modify("+{$i} days");
-            $alternativas[] = $this->buscarHorariosAlternativos($buffet->id, $schedule, [$diaPosterior], null); // Sem filtro de dia da semana
-        }
-    
-        // 3. Buscar outros horários no mesmo dia
-        $outrosHorarios = $this->buscarHorariosNoMesmoDia($buffet->id, $date, $dayOfWeek, $schedule);
-        if (!empty($outrosHorarios)) {
-            $alternativas = array_merge($alternativas, $outrosHorarios);
-        }
-    
-        // Retornar alternativas, removendo nulos e consolidando resultados
-        $alternativas = array_filter($alternativas);
-    
-        if (!empty($alternativas)) {
-            return response()->json([
-                'message' => 'Horário Indisponível!',
-                'alternativas' => $alternativas
-            ], 422);
-        }
-    
-        return response()->json(['message' => 'Horário Indisponível e sem alternativas!'], 422);
+        return response()->json(['dates' => $schedules], 200);
+
     }
     
     // Função para buscar horários alternativos em dias diferentes, para o mesmo dia da semana ou intervalo de dias
@@ -970,6 +952,12 @@ class BookingController extends Controller
         if (!$buffet || !$buffet_slug) {
             return response()->json(['message' => 'Buffet not found'], 422);
         }
+
+        $configuration = $this->configuration->where('buffet_id', $buffet->id)->first();
+        $min_days = self::$min_days;
+        if($configuration) {
+            $min_days = $configuration->min_days_booking;
+        }
     
         // Data e dia da semana
         $date = new DateTime($request->birthday);
@@ -981,24 +969,36 @@ class BookingController extends Controller
         }
 
         $isWeekend = DayWeek::isWeekend(DayWeek::getEnumByName($dayOfWeek));
+        $days = [];
         if(!$isWeekend){
-
             // $weekendDates = array_map(
             //     fn($date) => $date->format('Y-m-d'),
             //     $this->searchDaysNearbyWeekends($date)
             // );
             // dd($this->searchDaysNearbyWeekends($date));
             $days = $this->searchSchedulesNearbyWeekend($this->searchDaysNearbyWeekends($date), $buffet);
-            return response()->json(['message' => 'Horário Disponivel!', 'dates'=>$days], 200);
         }
         else {
-            $weekends = $this->getWeekend(DayWeek::getEnumByName($dayOfWeek), $date);
-            return response()->json(['message' => 'Horário Disponivel!', 'dates'=>$this->searchSchedulesNearbyWeekend($weekends, $buffet)], 200);
+            $days = $this->searchSchedulesNearbyWeekend($this->getWeekend(DayWeek::getEnumByName($dayOfWeek), $date), $buffet);
         }
-        // $outrosHorarios = $this->buscarHorariosNoMesmoDia($buffet->id, $date, $dayOfWeek, null);
 
-        // return response()->json(['message' => 'Horário Disponivel!', ], 200);
-        // return response()->json(['message' => 'Horário Disponivel!', 'dates'=>$outrosHorarios], 200);
+        $today_date = date('Y-m-d');
+        $max_date = Carbon::parse($today_date)->addDays($min_days);
+
+        // adicionar validacao aqui
+        $result = array_filter($days, function ($item) use ($max_date) {
+            return $item['day'] > $max_date;
+        });
+
+        if(count($result) == 0) {
+            return response()->json(['message'=>'As festas devem ser agendadas com '.$min_days.' de antecendencia'], 404);
+        }
+
+        if(count($result) !== $days) {
+            return response()->json(['message'=>'Algumas datas estavam fora do limite de agendamento. Caso queira uma especifica selecione abaixo ou contate um atendente.','dates'=>$days], 200);
+        }
+            
+        return response()->json(['dates'=>$days], 200);
     }
 
     private function searchSchedulesNearbyWeekend(array $dates, Buffet $buffet) {

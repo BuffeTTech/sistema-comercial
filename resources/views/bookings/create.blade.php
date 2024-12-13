@@ -58,7 +58,7 @@
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="birthday_date" class="form-control-label">Data de Nascimento*</label>
-                                        <input required class="form-control" type="date" id="birthday_date" name="birthday_date">
+                                        <input required class="form-control" type="date" id="birthday_date" name="birthday_date" value="{{ old('birthday_date') }}">
                                         <x-input-error :messages="$errors->get('birthday_date')" class="mt-2" />
                                     </div>
                                   <button type="button" class="btn btn-primary" onclick="nextStep()">Próximo</button>
@@ -110,11 +110,11 @@
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="dietary_restricions" name="dietary_restricions"
-                                                @if (old('dietary_restricions')) checked @endif>
-                                            <label class="form-check-label" for="dietary_restricions">Há restrição alimentar?</label>
+                                            <input class="form-check-input" type="checkbox" id="dietary_restrictions" name="dietary_restrictions"
+                                                @if (old('dietary_restrictions')) checked @endif>
+                                            <label class="form-check-label" for="dietary_restrictions">Há restrição alimentar?</label>
                                         </div>
-                                        <x-input-error :messages="$errors->get('dietary_restricions')" class="mt-2" />
+                                        <x-input-error :messages="$errors->get('dietary_restrictions')" class="mt-2" />
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-check form-switch">
@@ -169,7 +169,7 @@
                                         <input required class="form-control" type="number" placeholder="50" id="num_guests" name="num_guests" value="{{ old('num_guests') }}">
                                         <x-input-error :messages="$errors->get('num_guests')" class="mt-2" />
                                     </div>
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <label for="daytime_preference" class="form-control-label">Prefêrencia de Horário*</label>
                                         <select class="form-select" multiple aria-label="multiple select example" name="daytime_preference" id="daytime_preference" required>
                                             @foreach(App\Enums\DayTimePreference::array() as $value => $name)
@@ -180,7 +180,7 @@
                                             @endforeach
                                         </select>
                                         <x-input-error :messages="$errors->get('daytime_preference')" class="mt-2" />
-                                    </div>
+                                    </div> --}}
                                     <div class="form-group">
                                         <label for="price_preview" class="form-control-label">Prévia do Preço</label>
                                         <input class="form-control" type="text" id="price_preview" name="price_preview" value="{{ old('price_preview') ?? 0}}" readonly>
@@ -195,7 +195,7 @@
                                 <div class="step-content" id="step-3">
                                   <h5>Horário</h5>
                                   <p>Com base nas informações fornecidas, temos as seguintes opções de horário:</p>
-                                  <div id="dates-wrapper"></div> <!-- printar as datas -->
+                                  <div class="row row-cols-6 row-cols-md-4 row-cols-sm-2 " id="dates-wrapper"></div> <!-- printar as datas -->
                                   <div>
                                       <p>Nenhuma data convém?</p>
                                       <button id="find_date_button" class="btn btn-secondary">Buscar data específica</button>
@@ -203,6 +203,11 @@
                                         <a class="btn btn-secondary" href="{{ $configuration->buffet_whatsapp }}?text=Gostaria%20de%20agendar%20uma%20festa%20e%20nenhum%20horario%20me%20convem" target="_blank">Falar com atendente</a>
                                       @endif
                                   </div>
+                                    <div class="form-group">
+                                        <label for="final_notes" class="form-control-label">Observações finais</label>
+                                        <textarea class="form-control textarea-container" id="final_notes" rows="3" name="final_notes" placeholder="Descrição das comidas do pacote">{{ old('final_notes') }}</textarea>
+                                        <x-input-error :messages="$errors->get('final_notes')" class="mt-2" />
+                                    </div>
                                   <div>
                                         <button type="button" class="btn btn-secondary" onclick="previousStep()">Anterior</button>
                                         <button type="button" class="btn btn-primary" onclick="nextStep()">Próximo</button>
@@ -238,6 +243,8 @@
         const daytime_preference = document.querySelector("#daytime_preference")
         const birthday_date = document.querySelector("#birthday_date")
         const dates_wrapper = document.querySelector("#dates-wrapper")
+        
+        const daysOfWeek = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
 
         let decorationSelected = null;
         let foodSelected = null;
@@ -522,21 +529,33 @@
                         alert("Você precisa selecionar uma data.")
                         return;
                     }
-
-                    const dates = await get_specific_hours(input.value)
+                    let dates = null;
+                    try {
+                        const data = await get_specific_hours(input.value)
+                        dates = data.dates
+                    } catch (error) {
+                        div.innerHTML = error.response.data.message
+                        return                   
+                    }
 
                     div.innerHTML = dates.map((date, index)=>{
                         console.log(date)
-                        const horarioFinal = formatarHora(date.horario.comeco, date.horario.duracao);
+                        const horarioFinal = formatarHora(date.start_time, date.duration);
                         return `
-                            <button class="button_date_popup" id="button_date_popup-${index}">${date.data} das ${date.horario.comeco} até ${horarioFinal}</button>
+                            <button class="button_date_popup" id="button_date_popup-${index}" value="${input.value};;${date.id}">${input.value} das ${date.start_time} até ${horarioFinal}</button>
                         `
                     }).join("<br>")
 
                     document.querySelectorAll(".button_date_popup").forEach(button=>{
                         button.addEventListener('click', (e)=>{
                             e.preventDefault()
-                            dates_wrapper.innerHTML += "teste " + button.id
+                            console.log(button)
+                            dates_wrapper.innerHTML += `
+                                <div>
+                                    <input type="radio" class="btn-check" name="party_day" id="party_day_extra_${button.id}" autocomplete="off" value="${button.value}">
+                                    <label for="party_day_extra_${button.id}"class="btn btn-outline-primary">${button.innerHTML}</label>
+                                </div>
+                            `
                         })
                     })
                 })
@@ -557,13 +576,12 @@
 
 
         async function get_specific_hours(day) {
-            // const data = await axios.get(SITEURL + '/api/{{$buffet->slug}}/booking/schedule/' + day + '/' + time + '/disponibility', {
-            //     headers: {
-            //         'X-CSRF-TOKEN': csrf
-            //     }
-            // });
-            // return data.data
-            return [{data: "2025-07-01", horario: {comeco: "17:00:00", duracao: 120}}, {data: "2025-07-01", horario: {comeco: "20:00:00", duracao: 120}}]
+            const data = await axios.get(SITEURL + '/api/{{$buffet->slug}}/booking/schedule/' + day + '/disponibility', {
+                headers: {
+                    'X-CSRF-TOKEN': csrf
+                }
+            });
+            return data.data
         }
 
         async function get_schedule_by_birthday_date(birthday_date, daytime_preferences) {
@@ -578,17 +596,40 @@
         }
 
         async function generateSchedule() {
-            const daytime_preferences = Array.from(daytime_preference.selectedOptions).map(option => option.value);
-            const { dates } = await get_schedule_by_birthday_date(birthday_date.value, daytime_preferences)
+            // const daytime_preferences = Array.from(daytime_preference.selectedOptions).map(option => option.value);
+            const daytime_preferences = [];
+            const months = [
+                "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+                "Jul", "Ago", "Set", "Out", "Nov", "Dez"
+            ];
+            let dates = null;
+            try {
+                const data = await get_schedule_by_birthday_date(birthday_date.value, daytime_preferences)
+                dates = data.dates
+            } catch (error) {
+                dates_wrapper.innerHTML = error.response.data.message
+                return                   
+            }
+            
             dates_wrapper.innerHTML = ''
             
             dates.forEach((day, index1)=>{
-                day.schedules.forEach((schedule, index2)=>{
+                const dateFormat = new Date(`${day.day}T00:00:00Z`);
+                const dateDay = dateFormat.getUTCDate();
+                const dateMonth = months[dateFormat.getUTCMonth()];
+                const dateYear = dateFormat.getUTCFullYear();
+
+
+                const dayOfWeek = daysOfWeek[dateFormat.getUTCDay()];
+                 day.schedules.forEach((schedule, index2)=>{
                     const horarioFinal = formatarHora(schedule.start_time, schedule.duration);
+                    const startTimeFormat = schedule.start_time.slice(0, 5);
+                    const endTimeFormat = horarioFinal.slice(0, 5);
                     dates_wrapper.innerHTML += `
-                        <div>
-                            <label for="party_day_${index1}_${index2}">${day.day} das ${schedule.start_time} até ${horarioFinal}</label>
-                            <input type="radio" name="party_day" id="party_day_${index}_${index2}" required>
+
+                        <div class="col">
+                            <input type="radio" class="btn-check" name="party_day" id="party_day_${index1}_${index2}" autocomplete="off" value="${day.day};;${schedule.id}">
+                            <label for="party_day_${index1}_${index2}"class="btn btn-outline-primary">${dayOfWeek}<br> Dia ${dateDay} de ${dateMonth} de ${dateYear} <br> ${startTimeFormat}h até ${endTimeFormat}h</label>
                         </div>
                     `
                 })
@@ -610,11 +651,6 @@
             // Formata os valores para 'HH:MM:SS'
             return `${novasHoras.toString().padStart(2, '0')}:${novosMinutos.toString().padStart(2, '0')}:${novosSegundos.toString().padStart(2, '0')}`;
         };
-        async function teste() {
-            const a = await get_specific_hours()
-            const b = a[0]
-        }
-        teste()
 
 
     </script>

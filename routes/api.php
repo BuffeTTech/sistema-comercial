@@ -16,7 +16,7 @@ Route::get('/{buffet}/booking/calendar', [BookingController::class,'api_calendar
 Route::get('/{buffet}/booking/schedule/{day}/edit', [BookingController::class, 'api_get_open_schedules_by_day_and_buffet_update'])->name('api.bookings.get_schedules_by_day_buffet_update');
 
 Route::get('/{buffet}/booking/schedule/{day}', [BookingController::class, 'api_get_schedules_by_day'])->name('api.bookings.get_schedules_by_day');
-Route::get('/{buffet}/booking/schedule/{day}/{time}/disponibility', [BookingController::class, 'api_get_disponibility_by_day'])->name('api.bookings.get_disponibility_by_day');
+Route::get('/{buffet}/booking/schedule/{day}/disponibility', [BookingController::class, 'api_get_disponibility_by_day'])->name('api.bookings.get_disponibility_by_day');
 
 Route::get('/{buffet}/booking/schedule/{birthday}/birthday', [BookingController::class, 'api_get_schedules_by_birthday_date'])->name('api.bookings.get_schedules_by_birthday_date');
 
