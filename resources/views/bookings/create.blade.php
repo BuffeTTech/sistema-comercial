@@ -626,10 +626,9 @@
                     const startTimeFormat = schedule.start_time.slice(0, 5);
                     const endTimeFormat = horarioFinal.slice(0, 5);
                     dates_wrapper.innerHTML += `
-
                         <div class="col">
                             <input type="radio" class="btn-check" name="party_day" id="party_day_${index1}_${index2}" autocomplete="off" value="${day.day};;${schedule.id}">
-                            <label for="party_day_${index1}_${index2}"class="btn btn-outline-primary">${dayOfWeek}<br> Dia ${dateDay} de ${dateMonth} de ${dateYear} <br> ${startTimeFormat}h até ${endTimeFormat}h</label>
+                            <label for="party_day_${index1}_${index2}" class="btn btn-primary"><bold>${dayOfWeek}<bold><br> Dia ${dateDay} de ${dateMonth} de ${dateYear} <br> ${startTimeFormat}h até ${endTimeFormat}h</label>
                         </div>
                     `
                 })

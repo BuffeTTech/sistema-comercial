@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BookingStatus;
 use App\Enums\BuffetStatus;
 use App\Events\EditBuffetEvent;
 use App\Http\Requests\StoreBuffetRequest;
 use App\Http\Requests\UpdateBuffetRequest;
 use App\Models\Address;
+use App\Models\Booking;
 use App\Models\Buffet;
 use App\Models\BuffetPhoto;
 use App\Models\BuffetSubscription;
@@ -16,6 +18,7 @@ use App\Models\Subscription;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BuffetController extends Controller
 {
@@ -42,7 +45,44 @@ class BuffetController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
-        return view('dashboard_buffet', ['buffet'=>$buffet]);
+        $bookingsCreatedToday = Booking::where('buffet_id', $buffet->id)->whereDate('created_at', Carbon::today())->count();
+        $bookingsPendents = Booking::where('buffet_id', $buffet->id)->where('status', BookingStatus::PENDENT->name)->whereDate('created_at', Carbon::today())->count();
+        $sales = Booking::where('buffet_id', $buffet->id)->where('status', '!=', BookingStatus::CANCELED->name)->where('status', '!=', BookingStatus::REJECTED->name)->where('status', '!=', BookingStatus::PENDENT->name)->sum('price');
+        $newUsers = User::where('buffet_id', $buffet->id)->whereBetween('created_at', [Carbon::now()->subMonth(), Carbon::now()])->count();
+    
+        $salesByMonth = Booking::where('buffet_id', $buffet->id)
+        ->where('status', '!=', BookingStatus::CANCELED->name)
+        ->where('status', '!=', BookingStatus::REJECTED->name)
+        ->where('status', '!=', BookingStatus::PENDENT->name)
+        ->whereYear('created_at', Carbon::now()->year) // Filtra para o ano atual
+        ->selectRaw('MONTH(created_at) as month, COUNT(*) as total_bookings') // Contagem de festas por mês
+        ->groupBy(DB::raw('MONTH(created_at)'))
+        ->orderBy(DB::raw('MONTH(created_at)'))
+        ->get();
+    
+        // Inicializa o array de vendas com 0 para todos os meses
+        $salesData = [];
+        for ($month = 1; $month <= 12; $month++) {
+            $salesData[$month] = [
+                'month' => Carbon::create()->month($month)->locale('pt')->format('M'), // Nome do mês (Jan, Fev, etc.)
+                'total_bookings' => 0, // Inicializa a contagem de festas
+            ];
+        }
+        
+        // Preenche os meses com o número de festas
+        foreach ($salesByMonth as $sale) {
+            $salesData[$sale->month]['total_bookings'] = $sale->total_bookings;
+        }
+
+        // dd(User::where('buffet_id', $buffet->id)->whereBetween('created_at', [Carbon::now()->subMonth(), Carbon::now()])->get());
+        return view('dashboard_buffet', [
+            'buffet'=>$buffet,
+            'bookingsCreatedToday'=>$bookingsCreatedToday,
+            'bookingsPendents'=>$bookingsPendents,
+            'sales'=>$sales,
+            'newUsers'=>$newUsers,
+            'salesByMonth'=>$salesData
+        ]);
     }
 
     /**
