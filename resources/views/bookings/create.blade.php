@@ -21,7 +21,7 @@
         }
 
         .input-radio input[type=radio]:checked~label {
-            background-color: #FB6340;
+            background-color: #e0ba31;
             color: white;
         }
     </style>
@@ -245,7 +245,10 @@
         const dates_wrapper = document.querySelector("#dates-wrapper")
         
         const daysOfWeek = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-
+        const months = [
+                "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+                "Jul", "Ago", "Set", "Out", "Nov", "Dez"
+            ];
         let decorationSelected = null;
         let foodSelected = null;
 
@@ -538,29 +541,36 @@
                         return                   
                     }
 
+                    const dateFormat = new Date(`${input.value}T00:00:00Z`);
+                    const dateDay = dateFormat.getUTCDate();
+                    const dateMonth = months[dateFormat.getUTCMonth()];
+                    const dateYear = dateFormat.getUTCFullYear();
+
                     div.innerHTML = dates.map((date, index)=>{
-                        console.log(date)
+                        const dayOfWeek = daysOfWeek[dateFormat.getUTCDay()];
                         const horarioFinal = formatarHora(date.start_time, date.duration);
+                        const startTimeFormat = date.start_time.slice(0, 5);
+                        const endTimeFormat = horarioFinal.slice(0, 5);
+
                         return `
-                            <button class="button_date_popup" id="button_date_popup-${index}" value="${input.value};;${date.id}">${input.value} das ${date.start_time} até ${horarioFinal}</button>
+                            <button class="button_date_popup" id="button_date_popup-${index}" value="${input.value};;${date.id}"><bold>${dayOfWeek}<bold><br> Dia ${dateDay} de ${dateMonth} de ${dateYear} <br> ${startTimeFormat}h até ${endTimeFormat}h</button>
                         `
                     }).join("<br>")
 
                     document.querySelectorAll(".button_date_popup").forEach(button=>{
                         button.addEventListener('click', (e)=>{
                             e.preventDefault()
-                            console.log(button)
                             dates_wrapper.innerHTML += `
                                 <div>
                                     <input type="radio" class="btn-check" name="party_day" id="party_day_extra_${button.id}" autocomplete="off" value="${button.value}">
-                                    <label for="party_day_extra_${button.id}"class="btn btn-outline-primary">${button.innerHTML}</label>
+                                    <label for="party_day_extra_${button.id}"class="btn btn-primary">${button.innerHTML}</label>
                                 </div>
                             `
+                            a.close()
                         })
                     })
                 })
             })
-            console.log(a)
             // .then(() => {
             //     console.log("Modal foi aberto e .then() executado");
             //     const popupContainer = Swal.getHtmlContainer();
@@ -598,10 +608,6 @@
         async function generateSchedule() {
             // const daytime_preferences = Array.from(daytime_preference.selectedOptions).map(option => option.value);
             const daytime_preferences = [];
-            const months = [
-                "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
-                "Jul", "Ago", "Set", "Out", "Nov", "Dez"
-            ];
             let dates = null;
             try {
                 const data = await get_schedule_by_birthday_date(birthday_date.value, daytime_preferences)
