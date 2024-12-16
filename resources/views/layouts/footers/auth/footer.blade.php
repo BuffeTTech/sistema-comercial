@@ -20,7 +20,7 @@
                         <a href="https://github.com/BuffeTTech" class="nav-link text-muted" target="_blank">GitHub</a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-muted" target="_blank">Linkedin</a>
+                        <a href="https://www.linkedin.com/company/buffettech" class="nav-link text-muted" target="_blank">Linkedin</a>
                     </li>
                     {{-- <li class="nav-item">
                         <a href="#" class="nav-link text-muted" target="_blank">Instagram</a>
