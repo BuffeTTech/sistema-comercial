@@ -104,6 +104,8 @@
                     }
                     }
                 },
+                locale: 'pt-br'
+
                 });
             calendar.render();
             });

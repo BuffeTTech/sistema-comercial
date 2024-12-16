@@ -69,7 +69,7 @@
                                                     <div class="d-flex px-2 py-1">
                                                         <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
                                                             @if($value['start_block']=== null)
-                                                                <p class="text-sm mb-0">Não existe início do bloqueio</p>
+                                                                <p class="text-sm mb-0">Não existe</p>
                                                                 @else
                                                                 <p class="text-sm mb-0">{{$value['start_block'] }}</p>
                                                                 <td class="p-3 text-sm text-gray-700 whitespace-nowrap text-center"></td>
@@ -81,7 +81,7 @@
                                                     <div class="d-flex px-2 py-1">
                                                         <div class="d-flex flex-column justify-content-center text-xxs text-center w-100">
                                                             @if($value['start_block']=== null)
-                                                                <p class="text-sm mb-0">Não existe final do bloqueio</p>
+                                                                <p class="text-sm mb-0">Não existe</p>
                                                                 @else
                                                                 <p class="text-sm mb-0">{{$value['end_block'] }}</p>
                                                             @endif
