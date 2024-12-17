@@ -32,7 +32,7 @@
             </li> --}}
             <li class="nav-item mt-3 d-flex align-items-center">
                 <div class="ps-4">
-                    <i class="fab fa-laravel" style="color: #f4645f;"></i>
+                    <i class="fa-solid fa-folder" style="color: #e0ba31;"></i>
                 </div>
                 <h6 class="ms-2 text-uppercase text-xs font-weight-bolder opacity-6 mb-0">Páginas</h6>
             </li>
