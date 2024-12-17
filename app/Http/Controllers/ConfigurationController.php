@@ -70,10 +70,22 @@ class ConfigurationController extends Controller
             return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
         }
 
+        // adicionar autorizacao aqui
         $configuration = $this->configuration->where('buffet_id', $buffet->id)->first();
 
-        $configuration->buffet_whatsapp = "https://wa.me/1999999999";
+
+        if($request->buffet_whatsapp) {
+            $configuration->buffet_whatsapp = $request->buffet_whatsapp;
+        }
+
         $configuration->save();
+
+        // $configuration->update([
+        //     'content' => $request->content
+        // ]);
+
+        return redirect()->route('configurations.index', ['buffet'=>$buffet->slug])->with(['success'=>'Configuração atualizada com sucesso!']);
+
         dd($request);
     }
 }
