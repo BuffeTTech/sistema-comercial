@@ -1,8 +1,8 @@
 <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 dont-copy"
     id="sidenav-main">
     <div class="sidenav-header">
-        {{-- <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
-            aria-hidden="true" id="iconSidenav"></i> --}}
+        <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
+            aria-hidden="true" id="iconSidenav"></i>
         <a class="navbar-brand m-0" href="{{ route('buffet.dashboard', ['buffet'=>$buffet->slug]) }}"
             target="_blank">
             <img src="{{ asset('img/identidade-visual/buffettech_logo_icone.png') }}" class="navbar-brand-img h-100" alt="main_logo">
@@ -32,7 +32,7 @@
             </li> --}}
             <li class="nav-item mt-3 d-flex align-items-center">
                 <div class="ps-4">
-                    <i class="fa-solid fa-folder"></i>
+                    <i class="fa-solid fa-folder" style="color: #e0ba31;"></i>
                 </div>
                 <h6 class="ms-2 text-uppercase text-xs font-weight-bolder opacity-6 mb-0">Páginas</h6>
             </li>
