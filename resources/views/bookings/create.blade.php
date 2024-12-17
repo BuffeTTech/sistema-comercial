@@ -278,7 +278,7 @@
     <script>
         let currentStep = 1;
 
-        const steps = ["Informações da festa", "Detalhes do evento", "Agendamento", "Confirmação"]
+        const steps = ["Informações", "Detalhes", "Agendamento", "Confirmação"]
         document.getElementById("progressBar").innerText = steps[0];
     
         function showStep(step) {

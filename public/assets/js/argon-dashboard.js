@@ -2633,7 +2633,6 @@
   }
   
   function toggleSidenav() {
-    console.log(sidenav, iconSidenav)
     if (body.classList.contains(className)) {
       body.classList.remove(className);
       setTimeout(function () {
