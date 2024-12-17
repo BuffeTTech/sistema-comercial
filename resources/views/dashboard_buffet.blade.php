@@ -132,7 +132,7 @@
                                         <i class="ni ni-camera-compact text-dark opacity-10"></i>
                                     </div>
                                     <h5 class="text-white mb-1">Melhore seu buffet com a BuffeTTech</h5>
-                                    <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Iste cumque ipsum.</p>
+                                    <p>Automatize processos, reduza custos e encante seus clientes com a tecnologia certa para o seu buffet.</p>
                                 </div>
                             </div>
                             <div class="carousel-item h-100" style="background-image: url('{{ asset('img/carousel-2.jpg') }}');
@@ -142,7 +142,7 @@
                                         <i class="ni ni-bulb-61 text-dark opacity-10"></i>
                                     </div>
                                     <h5 class="text-white mb-1">A melhor versão do seu buffet.</h5>
-                                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis explicabo quaerat dolores..</p>
+                                    <p>Gestão eficiente, operação otimizada e resultados que impressionam.</p>
                                 </div>
                             </div>
                             <div class="carousel-item h-100" style="background-image: url('{{ asset('img/carousel-3.jpg') }}');
@@ -152,7 +152,7 @@
                                         <i class="ni ni-trophy text-dark opacity-10"></i>
                                     </div>
                                     <h5 class="text-white mb-1">Novas funcionalidades!</h5>
-                                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Incidunt facere, obcaecati omnis corrupti!.</p>
+                                    <p>Explore ferramentas inovadoras e leve seu buffet para o próximo nível.</p>
                                 </div>
                             </div>
                         </div>

@@ -14,11 +14,11 @@
                     </div>
                     <div class="card-body px-0 pt-0 pb-4">
                         @foreach($buffets as $user_buffet)
-                            <div class="bg-secondary p-4 my-4">
-                                <h2>{{ $user_buffet->trading_name }}</h2>
-                                <a href="{{ route('buffet.dashboard', ['buffet'=>$user_buffet->slug]) }}">Ver buffet</a>
+                            <div class="bg-warning p-4 my-4 text-white">
+                                <h2 class="text-white">{{ $user_buffet->trading_name }}</h2>
+                                <a class="text-white" href="{{ route('buffet.dashboard', ['buffet'=>$user_buffet->slug]) }}">Ver buffet</a>
                                 |
-                                <a href="{{ route('buffet.edit', ['buffet'=>$user_buffet->slug]) }}">Editar buffet</a>
+                                <a class="text-white" href="{{ route('buffet.edit', ['buffet'=>$user_buffet->slug]) }}">Editar buffet</a>
                             </div>
                         @endforeach
                     </div>

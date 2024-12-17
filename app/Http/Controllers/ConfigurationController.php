@@ -63,6 +63,17 @@ class ConfigurationController extends Controller
      */
     public function update(UpdateConfigurationRequest $request)
     {
+        $buffet_slug = $request->buffet;
+        $buffet = $this->buffet->where('slug', $buffet_slug)->first();
+        
+        if(!$buffet || !$buffet_slug) {
+            return redirect()->back()->withErrors(['buffet'=>'Buffet não encontrado'])->withInput();
+        }
+
+        $configuration = $this->configuration->where('buffet_id', $buffet->id)->first();
+
+        $configuration->buffet_whatsapp = "https://wa.me/1999999999";
+        $configuration->save();
         dd($request);
     }
 }

@@ -6,7 +6,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4">
-                    <div class="card-header pb-0 d-flex justify-content-between">
+                    <div class="card-header pb-0 d-flex flex-wrap justify-content-between">
                         <h6>Decorações das festas</h6>
                         <a href="{{ route('decoration.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip" title="Criar decoração">Criar Decoração</a>                                        
                     </div>

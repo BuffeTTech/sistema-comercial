@@ -15,4 +15,5 @@ enum BookingStatus: string {
     case PAID = "Pago";
     case LATE = "Atrasado";
     case PAY_LATER = "Pagar depois";
+    case VISIT_FIRST = "Visitar Antes";
 }

@@ -6,9 +6,9 @@
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4">
-                    <div class="card-header pb-0 d-flex flex-wrap align-items-center justify-content-between">
+                    <div class="card-header pb-0 d-flex flex-row flex-wrap align-items-center justify-content-between">
                         <h6 class="mb-0">Reservas</h6>
-                        <div class="d-flex flex-wrap justify-content-end">
+                        <div class="d-flex flex-wrap justify-content-start justify-content-lg-end">
                             @can('create booking')
                                 <a href="{{ route('booking.create', ['buffet'=>$buffet->slug]) }}" class="btn btn-outline-primary btn-sm fs-6 btn-tooltip m-1" title="Criar Reserva">Criar Reserva</a> 
                             @endcan      

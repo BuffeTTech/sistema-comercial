@@ -297,6 +297,8 @@ class BookingController extends Controller
         }
 
         $price = $food->price * $request->num_guests + $decoration->price + $schedule->price;
+
+        $visit = $request->schedule_visit;
             
         // Cria a reserva
         $booking = $this->booking->create([
@@ -322,10 +324,8 @@ class BookingController extends Controller
             'additional_food_observations'=>$request->additional_food_observations,
             'final_notes'=>$request->final_notes,
             'price'=>$price,
-            'status'=>BookingStatus::PENDENT->name
+            'status'=>$visit ? BookingStatus::VISIT_FIRST->name : BookingStatus::PENDENT->name
         ]);
-
-
 
         event(new BookingCreatedEvent($booking));
 
@@ -775,7 +775,6 @@ class BookingController extends Controller
                        ->paginate($request->get('per_page', 5), ['*'], 'page', $request->get('page', 1));
 
         $guest_counter = $this->guest_counter($current_party, $request);
-
         return view('bookings.party_mode',['booking'=>$current_party,'buffet'=>$buffet, 'guests'=>$guests, 'guest_counter'=>$guest_counter]);
     }
 
