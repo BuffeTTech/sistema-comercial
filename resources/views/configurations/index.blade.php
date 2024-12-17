@@ -44,7 +44,7 @@
                                         <x-input-error :messages="$errors->get('buffet_instagram')" class="mt-2" />
                                     </div>
                                     <div class="form-group">
-                                        <label for="buffet_linkedin" class="form-control-label">Instagram do Buffet</label>
+                                        <label for="buffet_linkedin" class="form-control-label">Linkedin do Buffet</label>
                                         <input class="form-control" type="text" placeholder="Instagram do Buffet" id="buffet_linkedin" name="buffet_linkedin" value="{{ old('buffet_linkedin') ?? $configuration->buffet_linkedin }}">
                                         <x-input-error :messages="$errors->get('buffet_linkedin')" class="mt-2" />
                                     </div>

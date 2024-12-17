@@ -135,14 +135,14 @@
                                     </div>
                                 @endcan
                             </div>
-                            @can('list bookings guests')
+                            @can('list booking guests')
                                 <div class="card">
                                     <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
                                         <h5>Convidados Confirmados</h5>
                                     </div>
                                 
                                     <div class="card-body pt-2">
-                                        @if($guest_counter === 0 || count($guests) == 0)
+                                        @if($guest_counter === 0 ||count($guests) == 0)
                                             <h5>Esta festa não possui convidados!</h5>
                                         @else
                                         <div class="table-responsive p-0">

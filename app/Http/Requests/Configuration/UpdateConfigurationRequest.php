@@ -24,16 +24,16 @@ class UpdateConfigurationRequest extends FormRequest
         return [
             "min_days_booking"=>"required|integer|min:0",
             "max_days_unavaiable_booking"=>"required|integer|min:0",
-            'buffet_instagram' => 'required|regex:/^https?:\/\/(www\.)?instagram\.com\/.+$/',
-            'buffet_linkedin' => 'required|regex:/^https?:\/\/(www\.)?linkedin\.com\/.+$/',
-            'buffet_facebook' => 'required|regex:/^https?:\/\/(www\.)?facebook\.com\/.+$/',
-            'buffet_whatsapp' => 'required|regex:/^https:\/\/wa\.me\/\d{1,15}$/',
+            'buffet_instagram' => 'required|regex:/^https?:\/\/(www\.)?instagram\.com\/.+$/|nullable',
+            'buffet_linkedin' => 'required|regex:/^https?:\/\/(www\.)?linkedin\.com\/.+$/|nullable',
+            'buffet_facebook' => 'required|regex:/^https?:\/\/(www\.)?facebook\.com\/.+$/nullable',
+            'buffet_whatsapp' => 'required|regex:/^https:\/\/wa\.me\/\d{1,15}$/|nullable',
             "external_decoration"=>"nullable|boolean",
             "charge_by_schedule"=>"nullable|boolean",
             "allow_post_payment"=>"nullable|boolean",
             "children_affect_pricing"=>"nullable|boolean",
-            "children_price_adjustment"=>"integer",
-            "child_age_limit"=>"integer",
+            "children_price_adjustment"=>"integer|nullable",
+            "child_age_limit"=>"integer|nullable",
         ];
     }
 }

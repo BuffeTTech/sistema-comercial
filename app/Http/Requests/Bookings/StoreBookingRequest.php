@@ -21,6 +21,7 @@ class StoreBookingRequest extends FormRequest
             'dietary_restrictions' => $this->boolean('dietary_restrictions'),
             'external_food' => $this->boolean('external_food'),
             'external_decoration' => $this->boolean('external_decoration'),
+            'schedule_visit' => $this->boolean('schedule_visit'),
         ]);
     }
 
@@ -53,6 +54,8 @@ class StoreBookingRequest extends FormRequest
             'external_decoration'=>['boolean'], // op
             // 'daytime_preference'=>['required'], // req
             'final_notes'=>['string', 'nullable'], // op
+
+            'schedule_visit'=>['boolean', 'nullable']
 
             // party_day contem scheudle_id e party day
         ];

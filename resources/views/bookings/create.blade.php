@@ -216,9 +216,15 @@
                                 <div class="step-content" id="step-4">
                                   <h5>Confirmação da festa</h5>
                                   <p>Por favor, revise suas informações antes de enviar.</p>
+                                  <div id="all-content">
+
+                                  </div>
                                     <button type="button" class="btn btn-secondary" onclick="previousStep()">Anterior</button>
                                     <button type="submit" class="btn btn-success">Fazer pré reserva</button>
-                                    <button type="submit" class="btn btn-success">Fazer pré reserva e agendar visita</button>
+                                    <input type="hidden" name="schedule_visit" value="false" id="schedule_visit">
+                                    @if($configuration->buffet_whatsapp)
+                                        <button type="submit" class="btn btn-success" id="schedule_visit_button">Fazer pré reserva e agendar visita</button>
+                                    @endif
                                 </div>
                               </form>
                         </div>
@@ -229,7 +235,19 @@
         @include('layouts.footers.auth.footer')
     </div>
     <script>
-        console.log('adas')
+
+        const button_schedule = document.querySelector("#schedule_visit_button")
+        if(button_schedule) {
+            const newTabUrl = "{{ $configuration->buffet_whatsapp }}text=Pre%20agendei%20%minha%20festa%20e%20quero%20agendar%20uma%20visita!";
+
+            button_schedule.addEventListener('click', e => {
+                e.preventDefault()
+                const schedule_visit = document.querySelector("#schedule_visit")
+                schedule_visit.value = true;
+                window.open(newTabUrl, '_blank');
+                form.submit()
+            })
+        }
 
         // constantes
         const SITEURL = "{{ url('/') }}";
@@ -320,6 +338,8 @@
             if (allValid) {
                 if(currentStep + 1 == 3) {
                     await generateSchedule()
+                } else if(currentStep + 1 == 4) {
+                    await printResume();
                 }
                 currentStep++;
                 showStep(currentStep)
@@ -355,6 +375,43 @@
         // });
     </script>
     <script>
+        async function printResume() {
+            const container_content = document.querySelector("#all-content")
+            
+            const name_birthdayperson = document.querySelector("#name_birthdayperson").value
+            const years_birthdayperson = document.querySelector("#years_birthdayperson").value
+            const birthday_date = document.querySelector("#birthday_date").value
+            const food_id = document.querySelector("input[name=food_id]:checked") //
+            const additional_foods_observations = document.querySelector("#additional_foods_observations").value
+            const dietary_restrictions = document.querySelector("#dietary_restrictions") //
+            const external_food = document.querySelector("#external_food") //
+            const decoration_id = document.querySelector("input[name=decoration_id]:checked") //
+            const external_decoration = document.querySelector("#external_decoration") //
+            const num_guests = document.querySelector("#num_guests").value
+            const price_preview = document.querySelector("#price_preview").value
+            const final_notes = document.querySelector("#final_notes").value
+
+            const food = await get_food(food_id.value)
+            const decoration = await get_decoration(decoration_id.value)
+
+            console.log(additional_foods_observations)
+
+            container_content.innerHTML = `
+                Nome do aniversariante: ${name_birthdayperson}<br>
+                Idade: ${years_birthdayperson}<br>
+                Data de nascimento: ${birthday_date}<br>
+                Pacote de comida: ${food.data.name_food}<br>
+                Observações a respeito da comida: ${additional_foods_observations != "" ? additional_foods_observations : "Nada"}<br>
+                Restrições alimentares: ${dietary_restrictions.checked ? "Sim" : "Não"}<br>
+                Comidas externas: ${external_food.checked ? "Sim" : "Não"}<br>
+                Pacote de decoração: ${decoration.data.main_theme}<br>
+                Numero de convidados: ${num_guests}<br>
+                Preço: ${price_preview}<br>
+                ${external_decoration != null ?  `Decoração externa: ${external_decoration.checked ? "Sim" : "Não"}<br>` : ""}
+                Observações finais: ${final_notes != "" ? additional_foods_observations : "Nada"}<br>
+            `                
+
+        }
         const food = new Swiper('.food_slider', {
             // Optional parameters
             direction: 'horizontal',
