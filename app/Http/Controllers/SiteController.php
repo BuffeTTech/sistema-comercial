@@ -49,7 +49,8 @@ class SiteController extends Controller
         $user = auth()->user();
         if($user->isBuffet()) {
             $buffet = Buffet::find($user->buffet_id);
-            return redirect()->route('buffet.dashboard', ['buffet'=>$buffet->slug]);
+            return redirect()->route('booking.my_bookings', ['buffet'=>$buffet->slug]);
+            // return redirect()->route('buffet.dashboard', ['buffet'=>$buffet->slug]);
         }
         if($user->isOwner()) {
             $buffets = $this->buffet->where('owner_id', $user->id)->get();
@@ -130,6 +131,7 @@ class SiteController extends Controller
             }
 
             $buffet_subscription = $this->buffet_subscription->where('buffet_id', $buffet->id)->with('subscription')->latest()->first();
+            
             if($buffet_subscription->expires_in < Carbon::now()) {
                 return redirect()->back()->withErrors(['buffet'=> "Este buffet não está mais ativo."])->withInput();
             }
@@ -311,6 +313,13 @@ class SiteController extends Controller
                         $bk = $this->booking->create([
                             'name_birthdayperson'=>$booking['name_birthdayperson'],
                             'years_birthdayperson'=>$booking['years_birthdayperson'],
+                            'birthday_date'=>$booking['birthday_date'],
+                            'external_food'=>$booking['external_food'],
+                            'dietary_restrictions'=>$booking['dietary_restrictions'],
+                            'external_decoration'=>$booking['external_decoration'],
+                            'daytime_preference'=>$booking['daytime_preference'],
+                            'additional_food_observations'=>$booking['additional_food_observations'],
+                            'final_notes'=>$booking['final_notes'],
                             'num_guests'=>$booking['num_guests'],
                             'party_day'=>$booking['party_day'],
                             'food_id'=>$foods[$booking['food_id']]['id'],
@@ -322,7 +331,8 @@ class SiteController extends Controller
                             'discount'=>$booking['discount'],
                             'status'=>$booking['status'],
                             'user_id'=>$users[$booking['user_id']]['id'],
-                            "buffet_id"=>$buffet->id
+                            "buffet_id"=>$buffet->id,
+                            'price'=>$foods[$booking['food_id']]['price'] * $booking['num_guests'] + $decorations[$booking['decoration_id']]['price'] + $booking['price_schedule']
                         ]);
                         array_push($bookings, $bk);
                     }

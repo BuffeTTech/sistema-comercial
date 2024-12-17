@@ -24,7 +24,7 @@
 
                                 <div class="form-group">
                                     <label for="slug" class="form-control-label">Slug</label>
-                                    <input class="form-control" type="slug" placeholder="pacote-sensacao" id="slug" name="slug" value="{{ old('slug') }}">
+                                    <input class="form-control" type="text" placeholder="pacote-sensacao" id="slug" name="slug" value="{{ old('slug') }}">
                                     <x-input-error :messages="$errors->get('slug')" class="mt-2" />
                                     <x-input-helper :value="'O nome unico relativo a URL do seu Pacote.'" class="mt-2" />
                                 </div>

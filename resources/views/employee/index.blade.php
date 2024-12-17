@@ -6,7 +6,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4">
-                    <div class="card-header pb-0 d-flex justify-content-between">
+                    <div class="card-header pb-0 d-flex flex-wrap justify-content-between">
                         <h6>Listagem dos Funcionários</h6>
                         @can('create employee')
                         @if($total < $configurations['max_employees'] || $configurations['max_employees'] == null)

@@ -1,9 +1,9 @@
 <!-- Navbar -->
-<nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl mt-3 mx-3 bg-primary" data-scroll="false">
+<nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl mt-3 mx-3 bg-primary dont-copy" data-scroll="false">
     <div class="container-fluid py-1 px-3">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
-                <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="javascript:;">Pages</a></li>
+                <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="javascript:;">Páginas</a></li>
                 <li class="breadcrumb-item text-sm text-white" aria-current="page"><a class="opacity-5 text-white {{ !isset($subtitle) ? 'text-white active' : ''}}" href='javascript:;'>{{ $title }}</a></li>
                 @if(isset($subtitle))
                     <li class="breadcrumb-item text-sm text-white active" aria-current="page">{{ $subtitle }}</li>
@@ -21,7 +21,7 @@
                         <a href="{{ route('logout') }}"
                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                             class="nav-link text-white font-weight-bold px-0">
-                            <span class="d-sm-inline d-none">Log out</span>
+                            <span class="d-sm-inline d-none">Sair</span>
                         </a>
                     </form>
                 </li>
